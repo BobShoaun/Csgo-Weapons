@@ -6,6 +6,7 @@ using UnityEngine.Serialization;
 using UnityEngine.Networking;
 using UnityRandom = UnityEngine.Random;
 using DUtil = Doxel.Utility;
+using Doxel.Utility.ExtensionMethods;
 
 public class Gun : HeldWeapon {
 
@@ -19,7 +20,7 @@ public class Gun : HeldWeapon {
 	public GameObject bulletHolePrefab;
 	[SerializeField]
 	protected LayerMask shootableLayer;
-	protected Camera cam;
+
 	[SerializeField]
 	protected Recoil recoil;
 	protected float nextFireTime;
@@ -76,6 +77,8 @@ public class Gun : HeldWeapon {
 	protected Player player;
 	protected PlayerController pc;
 	private CharacterController cc;
+	private Transform recoilTransform;
+	private View view;
 
 	private int scopeState;
 	private int previousScopeState;
@@ -118,11 +121,15 @@ public class Gun : HeldWeapon {
 		base.OnDisable ();
 	}
 
-	void Awake () {
-		cam = GetComponentInParent<Camera> ();
+	void Start () {
 		player = GetComponentInParent<Player> ();
 		cc = GetComponentInParent<CharacterController> ();
 		pc = GetComponentInParent<PlayerController> ();
+		view = GetComponentInParent<View> ();
+		// Find GO called "recoil" in parent TODO make an Utility method for
+		// recursively finding go with name in parent or children
+		recoilTransform = gameObject.GetGameObjectInParent ("Look").GetGameObjectInChildren ("Recoil").transform;
+
 		recoil.Initialize (magazineCapacity);
 
 		AmmunitionInMagazine = magazineCapacity;
@@ -364,7 +371,7 @@ public class Gun : HeldWeapon {
 		//pc.rotationOffset2 = Vector2.SmoothDamp (pc.rotationOffset2, Vector2.zero, ref vel, 
 		//	rotOffset2ReturnDuration, Mathf.Infinity, Time.deltaTime);
 
-		pc.rotationOffset2 = Vector2.MoveTowards (pc.rotationOffset2, Vector2.zero, Time.deltaTime * rotOffset2ReturnDuration);
+		//pc.rotationOffset2 = Vector2.MoveTowards (pc.rotationOffset2, Vector2.zero, Time.deltaTime * rotOffset2ReturnDuration);
 
 		if (Time.time >= nextRecoilCooldownTime) {
 			innacuracy = Mathf.MoveTowards (innacuracy, baseInnacuracy, Time.deltaTime * 2);
@@ -401,7 +408,8 @@ public class Gun : HeldWeapon {
 		// the cooldown duration.
 	//	pc.rotationOffset2 = Vector2.SmoothDamp (pc.rotationOffset2, Vector2.zero, ref vel, 
 		//	rotOffset2ReturnDuration, Mathf.Infinity, Time.deltaTime);
-		pc.rotationOffset2 = Vector2.MoveTowards (pc.rotationOffset2, Vector2.zero, Time.deltaTime * rotOffset2ReturnDuration);
+
+		//pc.rotationOffset2 = Vector2.MoveTowards (pc.rotationOffset2, Vector2.zero, Time.deltaTime * rotOffset2ReturnDuration);
 
 
 		// below code is still needed
@@ -412,13 +420,15 @@ public class Gun : HeldWeapon {
 //		}
 	}
 
-	public void ClientFire (int ammoInMag, Vector2 rotOffset2, float nextRecCool, Vector2 recoilDir) {
+	public void ClientFire (int ammoInMag, Vector2 recoilRotation, float nextRecCool, Vector2 recoilDir) {
 		// Do Shooting feedback like recoil, muzzleflash, animations
 		if (player.isLocalPlayer) {
 			PlayerHUD.Instance.WeaponAmmo = ammoInMag;
 		}
 
-		pc.rotationOffset2 = rotOffset2;
+		view.recoilTrackingRotation = recoilRotation;
+		view.punchRotation = recoilDir;
+
 		nextRecoilCooldownTime = nextRecCool;
 
 		// below code is totally visual, just do in client
@@ -426,11 +436,11 @@ public class Gun : HeldWeapon {
 //			new Vector2 (-0.5f * viewPunchMagnitude.x, UnityRandom.Range (-0.25f, 0.25f) * viewPunchMagnitude.y), () => 
 //			StartCoroutine (DUtil.Utility.Transition (result => pc.rotationOffset = result, viewPunchDownDuration / fireRate, pc.rotationOffset,
 //			Vector2.zero))));
-
-		StartCoroutine (DUtil.Utility.Transition (result => pc.rotationOffset = result, viewPunchUpDuration / fireRate, pc.rotationOffset, 
-			new Vector2 (-recoilDir.y * viewPunchMagnitude.y, recoilDir.x * viewPunchMagnitude.x), () => 
-			StartCoroutine (DUtil.Utility.Transition (result => pc.rotationOffset = result, viewPunchDownDuration / fireRate, pc.rotationOffset,
-				Vector2.zero))));
+//
+//		StartCoroutine (DUtil.Utility.Transition (result => pc.rotationOffset = result, viewPunchUpDuration / fireRate, pc.rotationOffset, 
+//			new Vector2 (-recoilDir.y * viewPunchMagnitude.y, recoilDir.x * viewPunchMagnitude.x), () => 
+//			StartCoroutine (DUtil.Utility.Transition (result => pc.rotationOffset = result, viewPunchDownDuration / fireRate, pc.rotationOffset,
+//				Vector2.zero))));
 	}
 
 	public void ServerTryFire () {
@@ -461,16 +471,16 @@ public class Gun : HeldWeapon {
 			innacuracy += accuracyDecay;
 			nextRecoilCooldownTime = Time.time + recoilCooldown;
 
-			var recoilResult = new Vector2 (-recoil.Current.y, recoil.Current.x);
+			var recoilRotation = new Vector2 (-recoil.Current.y, recoil.Current.x) * recoilScale;
 			//var recoilDirection = (recoil.Next - recoil.Current).normalized;
 			// TODO get a better formula that factors in movement innacuracy, 
 			// for now it is just adding it linearly
 
 			RaycastHit hit;
 			//create ray with recoil and innacuracy applied
-			Ray ray = new Ray (cam.transform.position, 
-				          cam.transform.TransformDirection 
-			(Quaternion.Euler ((Vector3) recoilResult * recoilScale +
+			Ray ray = new Ray (recoilTransform.position, 
+				recoilTransform.TransformDirection 
+			(Quaternion.Euler ((Vector3) recoilRotation +
 				          UnityRandom.insideUnitSphere * (innacuracy + cc.velocity.sqrMagnitude)
 				          ) * Vector3.forward));
 
@@ -494,7 +504,7 @@ public class Gun : HeldWeapon {
 			
 				Rigidbody rb = hit.rigidbody;
 				if (rb && rb.GetComponent<NetworkIdentity> () && !rb.isKinematic)
-					rb.AddForceAtPosition (cam.transform.forward * 30, hit.point, ForceMode.Impulse);
+					rb.AddForceAtPosition (recoilTransform.forward * 30, hit.point, ForceMode.Impulse);
 			}
 
 			if (Time.time >= nextBulletTracerTime) {
@@ -512,12 +522,12 @@ public class Gun : HeldWeapon {
 				//canScope = false;
 			}
 
-			// mini recoil for crosshair
-			pc.rotationOffset2 += recoilResult * recoilScale / 2;
+			// mini recoil tracking for crosshair
+			//pc.rotationOffset2 += recoilRotation * recoilScale / 2;
 
 			// rotOffset2 is essentially a SyncVar
 			//player.RpcSetRotationOffset (pc.rotationOffset2);
-			player.RpcFire (AmmunitionInMagazine, pc.rotationOffset2, nextRecoilCooldownTime, recoil.Direction);
+			player.RpcFire (AmmunitionInMagazine, recoilRotation, nextRecoilCooldownTime, recoil.Direction);
 
 			// Server doing fire cooldown, a simpler version that just sets it straightaway
 			//StartCoroutine (ServerFireCooldown ());

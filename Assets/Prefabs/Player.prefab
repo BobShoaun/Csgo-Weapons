@@ -104,7 +104,7 @@ GameObject:
   m_IsActive: 1
 --- !u!1 &1224834592571268
 GameObject:
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   serializedVersion: 5
@@ -114,6 +114,7 @@ GameObject:
   - component: {fileID: 124838931958934968}
   - component: {fileID: 92038041413806920}
   - component: {fileID: 81830006382180982}
+  - component: {fileID: 114201446085970828}
   m_Layer: 0
   m_Name: Camera
   m_TagString: Untagged
@@ -189,6 +190,21 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &1625889883709740
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4309866365162764}
+  m_Layer: 0
+  m_Name: Look
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &1668816524838666
 GameObject:
   m_ObjectHideFlags: 1
@@ -203,6 +219,21 @@ GameObject:
   - component: {fileID: 114607558374133136}
   m_Layer: 10
   m_Name: Lower Torso
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!1 &1835572847198208
+GameObject:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4998159600237738}
+  m_Layer: 0
+  m_Name: Recoil
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -440,6 +471,21 @@ Transform:
   m_Father: {fileID: 4096330963192736}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 5.169, y: 0, z: 0}
+--- !u!4 &4309866365162764
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1625889883709740}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.6, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 4998159600237738}
+  - {fileID: 4485394865480120}
+  m_Father: {fileID: 4710996924605132}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4355539174444492
 Transform:
   m_ObjectHideFlags: 1
@@ -502,13 +548,13 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1224834592571268}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.6, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4659871699547474}
-  m_Father: {fileID: 4710996924605132}
-  m_RootOrder: 0
+  m_Father: {fileID: 4309866365162764}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4486677899599474
 Transform:
@@ -585,7 +631,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 4485394865480120}
+  - {fileID: 4309866365162764}
   - {fileID: 4096330963192736}
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -619,6 +665,19 @@ Transform:
   - {fileID: 4189425499133920}
   m_Father: {fileID: 4096330963192736}
   m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &4998159600237738
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1835572847198208}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4309866365162764}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!20 &20768308633148954
 Camera:
@@ -1445,9 +1504,24 @@ MonoBehaviour:
   jump: {fileID: 0}
   fallImpact: {fileID: 0}
   summersaultSpeed: 0
+  camTransform: {fileID: 4309866365162764}
   fovOffset: 0
-  rotationOffset: {x: 0, y: 0}
-  rotationOffset2: {x: 0, y: 0}
+--- !u!114 &114201446085970828
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1224834592571268}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e84cf7225fb72f34aa8bc4ba1773337d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  recoilTrackingScale: 0.45
+  punchAmount: 0.055
+  punchDecay: 18
+  recoilTrackingRotation: {x: 0, y: 0}
+  punchRotation: {x: 0, y: 0}
 --- !u!114 &114242595470066914
 MonoBehaviour:
   m_ObjectHideFlags: 1

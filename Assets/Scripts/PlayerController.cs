@@ -76,7 +76,8 @@ public class PlayerController : MonoBehaviour {
 
 	private CharacterController characterController;
 	private AudioSource audioSource;
-	private Camera _camera;
+	[SerializeField]
+	private Transform camTransform;
 	private Coroutine stateDependantCoroutine;
 	private Movement previousMovement;
 	private Vector3 velocity;
@@ -97,9 +98,6 @@ public class PlayerController : MonoBehaviour {
 
 	public float fovOffset = 0;
 	private float fov = 60;
-
-	public Vector2 rotationOffset;
-	public Vector2 rotationOffset2;
 
 	private Player player;
 
@@ -163,8 +161,8 @@ public class PlayerController : MonoBehaviour {
 	private void Awake () {
 		characterController = GetComponent<CharacterController> ();
 		audioSource = GetComponent<AudioSource> ();
-		_camera = GetComponentInChildren<Camera> ();
-		viewBobDisplacement = originalCameraLocalPosition = _camera.transform.localPosition;
+		//camTransform = GetComponentInChildren<Camera> ();
+		viewBobDisplacement = originalCameraLocalPosition = camTransform.transform.localPosition;
 		player = GetComponent<Player> ();
 	}
 
@@ -174,7 +172,7 @@ public class PlayerController : MonoBehaviour {
 		speed = Mathf.MoveTowards (speed, targetSpeed, Time.deltaTime * speedMaximumDelta); // Change speed towards target speed
 		bobSpeed = Mathf.MoveTowards (bobSpeed, targetBobSpeed, Time.deltaTime * bobSpeedMaximumDelta); // Change bob speed towards target bob speed
 		fov = Mathf.MoveTowards (fov, targetFieldOfView, Time.deltaTime * fieldOfViewMaximumDelta); // Change field of view towards target field of view
-		_camera.fieldOfView = fov + fovOffset;
+		//camTransform.fieldOfView = fov + fovOffset;
 		if (doViewBob)
 			ViewBob ();
 		else // Return to original camera position if not view bobbing
@@ -247,9 +245,9 @@ public class PlayerController : MonoBehaviour {
 		rotationAngle.x += Input.GetAxis ("Mouse Y") * -sensitivity.x;
 		rotationAngle.x = Mathf.Clamp (rotationAngle.x, minimumXAngle, maximumXAngle); // Clamp up down rotation
 		rotationAngle.y += Input.GetAxis ("Mouse X") * sensitivity.y;
-		transform.localRotation = Quaternion.AngleAxis (rotationAngle.y + rotationOffset.y + rotationOffset2.y, Vector3.up); // Apply horizontal mouse rotation to controller with smoothing
-		_camera.transform.localRotation = Quaternion.AngleAxis (rotationAngle.x + rotationOffset.x + rotationOffset2.x, Vector3.right); // Apply vertical mouse rotation to camera with smoothing
-		_camera.transform.localPosition = viewBobDisplacement + fallImpactBobDisplacement; // Apply change in camera local position caused by the view bob and fall impact bob
+		transform.localRotation = Quaternion.AngleAxis (rotationAngle.y, Vector3.up); // Apply horizontal mouse rotation to controller with smoothing
+		camTransform.localRotation = Quaternion.AngleAxis (rotationAngle.x, Vector3.right); // Apply vertical mouse rotation to camera with smoothing
+		camTransform.localPosition = viewBobDisplacement + fallImpactBobDisplacement; // Apply change in camera local position caused by the view bob and fall impact bob
 	}
 
 	private void ViewBob () {
@@ -294,7 +292,7 @@ public class PlayerController : MonoBehaviour {
 
 	private IEnumerator Summersault () {
 		for (float percent = 0; percent <= 1; percent += Time.deltaTime * summersaultSpeed) {
-			_camera.transform.localRotation = Quaternion.Euler (360 * percent, 0, 0);
+			camTransform.transform.localRotation = Quaternion.Euler (360 * percent, 0, 0);
 			yield return null;
 		}
 	}
