@@ -357,8 +357,15 @@ public class Gun : HeldWeapon {
 	}
 
 	bool calledScope = false, canScope = true;
+	float lerpTime = 3;
+	float currentLerpTime;
+	Vector3 finalRecoil;
 
 	private void ServerFireCooldown () {
+
+		finalRecoil = Vector2.MoveTowards (finalRecoil, Vector2.zero, Time.deltaTime * 50);
+		recoilTransform.localRotation = Quaternion.Euler (finalRecoil);
+		view.recoilTrackingRotation = finalRecoil;
 		// Server does cool down too,  this is not the simplified version, it is
 		// not implemented yet
 
@@ -426,8 +433,7 @@ public class Gun : HeldWeapon {
 			PlayerHUD.Instance.WeaponAmmo = ammoInMag;
 		}
 
-		view.recoilTrackingRotation = recoilRotation;
-		view.punchRotation = recoilDir;
+		view.PunchDirection = recoilDir;
 
 		nextRecoilCooldownTime = nextRecCool;
 
@@ -471,18 +477,23 @@ public class Gun : HeldWeapon {
 			innacuracy += accuracyDecay;
 			nextRecoilCooldownTime = Time.time + recoilCooldown;
 
-			var recoilRotation = new Vector2 (-recoil.Current.y, recoil.Current.x) * recoilScale;
+			var recoilRotation = new Vector3 (-recoil.Current.y, recoil.Current.x) * recoilScale;
 			//var recoilDirection = (recoil.Next - recoil.Current).normalized;
 			// TODO get a better formula that factors in movement innacuracy, 
 			// for now it is just adding it linearly
+			finalRecoil += recoilRotation;
+			recoilTransform.localEulerAngles = finalRecoil;
+			//recoilTransform.localEulerAngles = (Vector3) recoilRotation;
+			//recoilTransform.localRotation = Quaternion.Lerp (recoilTransform.localRotation, Quaternion.Euler (recoilRotation), Time.deltaTime);
 
 			RaycastHit hit;
 			//create ray with recoil and innacuracy applied
 			Ray ray = new Ray (recoilTransform.position, 
-				recoilTransform.TransformDirection 
-			(Quaternion.Euler ((Vector3) recoilRotation +
-				          UnityRandom.insideUnitSphere * (innacuracy + cc.velocity.sqrMagnitude)
-				          ) * Vector3.forward));
+				          recoilTransform.forward); 
+
+//			(Quaternion.Euler ((Vector3) recoilRotation +
+//				          UnityRandom.insideUnitSphere * (innacuracy + cc.velocity.sqrMagnitude)
+//				          ) * Vector3.forward));
 
 			if (Physics.Raycast (ray, out hit, Mathf.Infinity, shootableLayer)) {
 				var part = hit.collider.GetComponent<BodyPart> ();
@@ -527,7 +538,7 @@ public class Gun : HeldWeapon {
 
 			// rotOffset2 is essentially a SyncVar
 			//player.RpcSetRotationOffset (pc.rotationOffset2);
-			player.RpcFire (AmmunitionInMagazine, recoilRotation, nextRecoilCooldownTime, recoil.Direction);
+			player.RpcFire (AmmunitionInMagazine, finalRecoil, nextRecoilCooldownTime, recoil.Direction);
 
 			// Server doing fire cooldown, a simpler version that just sets it straightaway
 			//StartCoroutine (ServerFireCooldown ());

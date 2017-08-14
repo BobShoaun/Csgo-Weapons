@@ -20,6 +20,9 @@ public class Player : NetworkBehaviour {
 	private GameObject ragdollInstance;
 	private bool isDead = false;
 
+	public float testValue = 10;
+	public float time = 0;
+
 	private WeaponManager weaponManager;
 
 	private void Start () {
@@ -43,6 +46,12 @@ public class Player : NetworkBehaviour {
 	}
 
 	private void Update () {
+
+		testValue = 2 * Mathf.Exp (-time / Mathf.Log10 ((float) Math.E * 5));
+		//testValue /= 2 * time;
+		//if (testValue > 0)
+		//	Debug.Log (testValue);
+
 		if (Input.GetKeyDown (KeyCode.Z))
 			CmdTakeDamage (20, BodyPartType.UpperTorso, gameObject, transform.position + Vector3.left * 10 + Vector3.forward * 10);
 	}

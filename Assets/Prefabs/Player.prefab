@@ -1518,10 +1518,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   recoilTrackingScale: 0.45
-  punchAmount: 0.055
   punchDecay: 18
-  recoilTrackingRotation: {x: 0, y: 0}
-  punchRotation: {x: 0, y: 0}
+  recoilTransform: {fileID: 4998159600237738}
 --- !u!114 &114242595470066914
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1549,6 +1547,8 @@ MonoBehaviour:
   model: {fileID: 4096330963192736}
   ragdollPrefab: {fileID: 1862471661750772, guid: 1b4a4bb62f3d1de4c9827b19c3f684cd,
     type: 2}
+  testValue: 10
+  time: 0
 --- !u!114 &114405013114595944
 MonoBehaviour:
   m_ObjectHideFlags: 1

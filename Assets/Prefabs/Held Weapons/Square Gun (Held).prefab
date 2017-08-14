@@ -261,7 +261,7 @@ MonoBehaviour:
   accuracyDecay: 0.03
   baseInnacuracy: 0
   bulletsPerShot: 1
-  recoilScale: 65
+  recoilScale: 80
   recoilCooldown: 0.23
   rotOffset2ReturnDuration: 35
   reloadDuration: 2.5
