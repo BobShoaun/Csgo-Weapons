@@ -1,0 +1,277 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &100100000
+Prefab:
+  m_ObjectHideFlags: 1
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications: []
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 0}
+  m_RootGameObject: {fileID: 1357578025723098}
+  m_IsPrefabParent: 1
+--- !u!1 &1231352532258686
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4175494947414122}
+  m_Layer: 0
+  m_Name: Muzzle
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!1 &1357578025723098
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4024804666789322}
+  - component: {fileID: 33984818561460102}
+  - component: {fileID: 23347338804922838}
+  - component: {fileID: 114175678757550000}
+  m_Layer: 0
+  m_Name: Square Gun (Held)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4024804666789322
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1357578025723098}
+  m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: 0.353, y: -0.28700006, z: 0.53}
+  m_LocalScale: {x: 0.20425, y: 0.39895046, z: 0.20425023}
+  m_Children:
+  - {fileID: 4175494947414122}
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+--- !u!4 &4175494947414122
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1231352532258686}
+  m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: -0.7071068}
+  m_LocalPosition: {x: 0, y: 0.629, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4024804666789322}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 270, y: 0, z: 0}
+--- !u!23 &23347338804922838
+MeshRenderer:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1357578025723098}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_Materials:
+  - {fileID: 2100000, guid: edd78f3c006ce02459e9f1d1aa49aecb, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_PreserveUVs: 1
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+--- !u!33 &33984818561460102
+MeshFilter:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1357578025723098}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &114175678757550000
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1357578025723098}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d22730e440a3f1548b5ae7cfadad89cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weapon: {fileID: 11400000, guid: 4fce416fac5896543b3d3a94867616be, type: 2}
+  droppedPrefab: {fileID: 1545550861574260, guid: 67819e94fe300144fa5b52c2a8655b9d,
+    type: 2}
+  deployTime: 1
+  showCrossHair: 1
+  fireRate: 11.1
+  magazineCapacity: 30
+  reservedAmmunition: 90
+  bulletHolePrefab: {fileID: 1799922971647616, guid: 6d9a614686d46354d98654b9992c7134,
+    type: 2}
+  shootableLayer:
+    serializedVersion: 2
+    m_Bits: 1553
+  recoil:
+    patternX:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 2
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.115812704
+        value: -0.0029578917
+        inSlope: 0.030424815
+        outSlope: 0.030424815
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.2228274
+        value: -0.015701156
+        inSlope: 0.11972303
+        outSlope: 0.11972303
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.28688365
+        value: 0.017086644
+        inSlope: 0.09899772
+        outSlope: 0.09899772
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.38505846
+        value: 0.046260852
+        inSlope: 0.021159649
+        outSlope: 0.021159649
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.5217417
+        value: -0.0010078363
+        inSlope: -0.001343502
+        outSlope: -0.001343502
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.59875995
+        value: -0.02407996
+        inSlope: 0.05105148
+        outSlope: 0.05105148
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.7616755
+        value: -0.023720246
+        inSlope: -0.1696438
+        outSlope: -0.1696438
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.8347111
+        value: 0.014775891
+        inSlope: 0.088339224
+        outSlope: 0.088339224
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 1
+        value: 0.051431257
+        inSlope: 0.07554889
+        outSlope: 0.07554889
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    patternY:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 2
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.1147891
+        value: 0.056044254
+        inSlope: 0.3426146
+        outSlope: 0.3426146
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.18965177
+        value: 0.10147223
+        inSlope: 0.026865603
+        outSlope: 0.026865603
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.39702928
+        value: 0.09652248
+        inSlope: 0.028014183
+        outSlope: 0.028014183
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.5496262
+        value: 0.109518796
+        inSlope: -0.06814951
+        outSlope: -0.06814951
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.7467424
+        value: 0.11055586
+        inSlope: -0.0908393
+        outSlope: -0.0908393
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.869841
+        value: 0.10595432
+        inSlope: -0.066161156
+        outSlope: -0.066161156
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 1
+        value: 0.09410808
+        inSlope: 0.0071525574
+        outSlope: 0.0071525574
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    random: 0
+  continuousFire: 1
+  damage: 33
+  accuracyDecay: 0.03
+  baseInnacuracy: 0
+  bulletsPerShot: 1
+  recoilScale: 65
+  recoilCooldown: 0.23
+  rotOffset2ReturnDuration: 35
+  reloadDuration: 2.5
+  bulletTracerPrefab: {fileID: 1788621936390712, guid: 8d0cdece92161c24d90549748d7cc20f,
+    type: 2}
+  muzzle: {fileID: 4175494947414122}
+  viewPunchUpDuration: 0.4
+  viewPunchDownDuration: 0.5
+  viewPunchMagnitude: {x: 0.5, y: 2}
+  continuousReload: 0
+  scope: 0
+  smartScope: 0
+  reloadIndicator: {fileID: 23347338804922838}
