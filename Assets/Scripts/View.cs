@@ -9,8 +9,9 @@ public class View : MonoBehaviour {
 	public float recoilTrackingScale = 0.45f;
 	[NonSerialized]
 	public float punchAmount = 1;
-	public float punchDecay = 10;
+	public float punchDecay = 1;
 
+	private new Camera camera;
 	public Vector2 recoilTrackingRotation;
 	private Vector3 punchRotation;
 	public Vector3 PunchDirection {
@@ -19,8 +20,14 @@ public class View : MonoBehaviour {
 		}
 	}
 
+	public float FieldOfView {
+		set { 
+			camera.fieldOfView = value;
+		}
+	}
+
 	private void Start () {
-		
+		camera = GetComponent<Camera> ();
 	}
 
 	private void Update () {
@@ -30,7 +37,7 @@ public class View : MonoBehaviour {
 //		float angleY = recoilTransform.localEulerAngles.y;
 //		angleY = angleY > 180 ? angleY - 360 : angleY;
 		//Debug.Log (new Vector3 (angleX, angleY));
-		transform.localRotation = Quaternion.Euler (recoilTrackingRotation * recoilTrackingScale);
+		transform.localRotation = Quaternion.Euler (punchRotation + (Vector3) recoilTrackingRotation * recoilTrackingScale);
 		// TODO make this decay exponential
 		punchRotation = Vector3.MoveTowards (punchRotation, Vector3.zero, Time.deltaTime * punchDecay);
 	}

@@ -10,10 +10,13 @@ public class PlayerHUD : SingletonMonoBehaviour<PlayerHUD> {
 	
 	public GameObject gameOverPanel;
 	public GameObject healthPanel;
-	public GameObject killFeedList;
+	public Transform killFeedList;
 	public GameObject killFeedPrefab;
 	public GameObject chatMessageInput;
 	public GameObject chatMessagePrefab;
+	public GameObject scorePrefab;
+	public GameObject scoreboard;
+	public Transform scoreList;
 	private Text healthText;
 	private Button send;
 	private InputField chatMessageInputField;
@@ -91,6 +94,7 @@ public class PlayerHUD : SingletonMonoBehaviour<PlayerHUD> {
 		if (chatOpen && Input.GetKeyDown (KeyCode.Return)) {
 			SendChat (chatMessageInputField.text);
 		}
+		scoreboard.SetActive (Input.GetKey (KeyCode.Tab));
 	}
 
 	private void CloseChat () {
@@ -117,7 +121,7 @@ public class PlayerHUD : SingletonMonoBehaviour<PlayerHUD> {
 	}
 
 	public void UpdateKillFeedList (string note) {
-		GameObject killFeed = Instantiate (killFeedPrefab, killFeedList.transform);
+		GameObject killFeed = Instantiate (killFeedPrefab, killFeedList);
 		killFeed.GetComponent<Text> ().text = note;
 		Destroy (killFeed, 10);
 	}
@@ -177,6 +181,21 @@ public class PlayerHUD : SingletonMonoBehaviour<PlayerHUD> {
 	public void HoverDeactivate () {
 		hoverPickup.enabled = false;
 		hoverPickup.text = string.Empty;
+	}
+
+	private Dictionary<NetworkInstanceId, ScoreUI> scoreUIs = new Dictionary<NetworkInstanceId, ScoreUI> ();
+
+	public void AddPlayerToScoreboard (NetworkInstanceId netId, string name, int kills, int deaths) {
+		ScoreUI score = Instantiate (scorePrefab, scoreList).GetComponent<ScoreUI> ();
+		scoreUIs.Add (netId, score);
+		score.UpdateUI (name, kills, deaths);
+	}
+
+	public void UpdatePlayerScoreUI (NetworkInstanceId netId, string name, int kills, int deaths) {
+		ScoreUI score;
+		if (scoreUIs.TryGetValue (netId, out score)) {
+			score.UpdateUI (name, kills, deaths);
+		}
 	}
 		
 }

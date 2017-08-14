@@ -23,7 +23,7 @@ GameObject:
   - component: {fileID: 23752155856719512}
   - component: {fileID: 95440849956720964}
   - component: {fileID: 114222775418559132}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Knife (Held)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -40,7 +40,7 @@ GameObject:
   - component: {fileID: 4889280667610116}
   - component: {fileID: 33715656053574472}
   - component: {fileID: 23206488110991324}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}

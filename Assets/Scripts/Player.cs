@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using DUtil = Doxel.Utility;
 
 public class Player : NetworkBehaviour {
 	
@@ -14,6 +15,10 @@ public class Player : NetworkBehaviour {
 
 	[SyncVar (hook = "HealthChanged")]
 	public int health = 100;
+	[SyncVar]
+	public int kills = 0;
+	[SyncVar]
+	public int deaths = 0;
 
 	public Transform model;
 	public GameObject ragdollPrefab;
@@ -28,6 +33,7 @@ public class Player : NetworkBehaviour {
 	private void Start () {
 		name = "Player " + netId;
 		weaponManager = GetComponentInChildren<WeaponManager> ();
+
 		if (isLocalPlayer) {
 			// if the player is the local player, set the player model to a layermask
 			// that cannot be seen by the local camera, so players cannot see themselves
@@ -36,6 +42,9 @@ public class Player : NetworkBehaviour {
 				child.gameObject.layer = LayerMask.NameToLayer ("Local Player Model");
 			}
 			PlayerHUD.Instance.Player = this;
+			// UI feeback when a player joins
+			CmdSendChat ("[Server]: " + name + " has joined the game");
+			//PlayerHUD.Instance.SendChat (name + " has joined the game");
 		}
 		else {
 			enabled = false;
@@ -43,11 +52,16 @@ public class Player : NetworkBehaviour {
 			GetComponentInChildren<Camera> ().enabled = false;
 			GetComponentInChildren<AudioListener> ().enabled = false;
 		}
+
+		// UI feeback when a player joins
+		PlayerHUD.Instance.AddPlayerToScoreboard (netId, name, 0, 0);
+	
 	}
 
 	private void Update () {
-
-		testValue = 2 * Mathf.Exp (-time / Mathf.Log10 ((float) Math.E * 5));
+		
+		//testValue = 2 * Mathf.Exp (-time / Mathf.Log10 ((float) Math.E * 5));
+		testValue = DUtil.Utility.Decay (testValue, 0, 1, Time.deltaTime);
 		//testValue /= 2 * time;
 		//if (testValue > 0)
 		//	Debug.Log (testValue);
@@ -147,10 +161,24 @@ public class Player : NetworkBehaviour {
 	}
 
 	[Command]
+	private void CmdOnMurder () {
+		kills++;
+		RpcOnMurder ();
+	}
+
+	[ClientRpc]
+	private void RpcOnMurder () {
+		PlayerHUD.Instance.UpdatePlayerScoreUI (netId, name, kills, deaths);
+	}
+
+	[Command]
 	private void CmdDie (GameObject murderer, BodyPartType bdt) {
 		if (isDead)
 			return;
 		isDead = true;
+		murderer.GetComponent<Player> ().CmdOnMurder ();
+
+		deaths++;
 		CmdDropAllWeapons ();
 		RpcDie (murderer, bdt);
 	}
@@ -165,6 +193,8 @@ public class Player : NetworkBehaviour {
 		PlayerHUD.Instance.UpdateKillFeedList (bdt == BodyPartType.Head ?
 			murderer.name + " Head Shotted " + gameObject.name :
 			murderer.name + " Killed " + gameObject.name);
+
+		PlayerHUD.Instance.UpdatePlayerScoreUI (netId, name, kills, deaths);
 		
 		if (Die != null)
 			Die (murderer);

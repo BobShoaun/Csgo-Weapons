@@ -20,7 +20,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4302839738662318}
   - component: {fileID: 114536849543831084}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Flashbang (Held)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -37,7 +37,7 @@ GameObject:
   - component: {fileID: 4925023141214096}
   - component: {fileID: 33007157101018854}
   - component: {fileID: 23350451486730958}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Cylinder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -54,7 +54,7 @@ GameObject:
   - component: {fileID: 4292124976947222}
   - component: {fileID: 33885704945541168}
   - component: {fileID: 23952431358234036}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Cylinder (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -71,7 +71,7 @@ GameObject:
   - component: {fileID: 4573141176453412}
   - component: {fileID: 33700120554575372}
   - component: {fileID: 23926492416488422}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Cylinder (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}

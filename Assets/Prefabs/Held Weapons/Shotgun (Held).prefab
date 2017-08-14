@@ -19,7 +19,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4208860672531280}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Muzzle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -35,7 +35,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4285232269348728}
   - component: {fileID: 114881503457768954}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Shotgun (Held)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -52,7 +52,7 @@ GameObject:
   - component: {fileID: 4737505964585966}
   - component: {fileID: 33818500442558554}
   - component: {fileID: 23534648006762698}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -69,7 +69,7 @@ GameObject:
   - component: {fileID: 4814782436434740}
   - component: {fileID: 33328392128911008}
   - component: {fileID: 23323026203070002}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Cylinder (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -86,7 +86,7 @@ GameObject:
   - component: {fileID: 4833077890842704}
   - component: {fileID: 33716758936208106}
   - component: {fileID: 23523086682154758}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Cylinder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -332,7 +332,7 @@ MonoBehaviour:
   continuousFire: 0
   damage: 26
   accuracyDecay: 0
-  baseInnacuracy: 3
+  baseInnacuracy: 0.05
   bulletsPerShot: 8
   recoilScale: 0
   recoilCooldown: 1

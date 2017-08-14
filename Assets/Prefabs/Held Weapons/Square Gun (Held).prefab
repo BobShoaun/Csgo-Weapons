@@ -19,7 +19,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4175494947414122}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Muzzle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -37,7 +37,7 @@ GameObject:
   - component: {fileID: 33984818561460102}
   - component: {fileID: 23347338804922838}
   - component: {fileID: 114175678757550000}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Square Gun (Held)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -258,10 +258,10 @@ MonoBehaviour:
     random: 0
   continuousFire: 1
   damage: 33
-  accuracyDecay: 0.03
+  accuracyDecay: 0.001
   baseInnacuracy: 0
   bulletsPerShot: 1
-  recoilScale: 80
+  recoilScale: 35
   recoilCooldown: 0.23
   rotOffset2ReturnDuration: 35
   reloadDuration: 2.5

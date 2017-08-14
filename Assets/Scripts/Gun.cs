@@ -101,6 +101,8 @@ public class Gun : HeldWeapon {
 		base.OnEnable ();
 		//if (hasScope)
 		//	PlayerHUD.Instance.crossHair.SetActive (false);
+
+		// TODO the scope system is super buggy, pls fix!
 	}
 
 	protected override void OnDisable () {
@@ -113,7 +115,7 @@ public class Gun : HeldWeapon {
 			// FIXME: find better way to disable the scope when the weapon
 			// is destroyed, this current solution may cause some bugs
 			previousScopeState = 0;
-			ClientSetScopeState (0, initialPSense, false); // HACK: this is bad. it is not updated on the server
+			ServerSetScopeState (0); // HACK: this is bad. it is not updated on the server
 		}
 		if (GetComponent<Renderer> ()) {
 			GetComponent<Renderer> ().material.color = Color.black;
@@ -210,7 +212,7 @@ public class Gun : HeldWeapon {
 		switch (value) {
 			case 0:
 			// unscoped
-				newFOV = 0;
+				newFOV = 60;
 				newSense = initialPSense;
 				isScopeActive = false;
 				break;
@@ -218,7 +220,7 @@ public class Gun : HeldWeapon {
 				if (!canScope)
 					return;
 			// scoped
-				newFOV = -30;
+				newFOV = 40;
 				newSense = initialPSense / 2;
 				isScopeActive = true;
 				break;
@@ -226,7 +228,7 @@ public class Gun : HeldWeapon {
 				if (!canScope)
 					return;
 			// zoom scoped
-				newFOV = -50;
+				newFOV = 20;
 				newSense = initialPSense / 4;
 				isScopeActive = true;
 				break;
@@ -238,7 +240,7 @@ public class Gun : HeldWeapon {
 	}
 
 	private void SetUpdatedScopedSettings (float newFOV, Vector2 newSense) {
-		pc.fovOffset = newFOV;
+		view.FieldOfView = newFOV;
 		pc.sensitivity = newSense;
 	}
 
@@ -359,11 +361,19 @@ public class Gun : HeldWeapon {
 	bool calledScope = false, canScope = true;
 	float lerpTime = 3;
 	float currentLerpTime;
+	Vector3 previousRecoil;
 	Vector3 finalRecoil;
+	bool transition = false;
 
 	private void ServerFireCooldown () {
 
-		finalRecoil = Vector2.MoveTowards (finalRecoil, Vector2.zero, Time.deltaTime * 50);
+		//StartCoroutine (DUtil.Utility.Transition (result => finalRecoil = result, 1 / fireRate, previousRecoil, finalRecoil,
+		//	() => transition = true));
+
+		//finalRecoil = Vector2.MoveTowards (finalRecoil, Vector2.zero, Time.deltaTime * 50);
+		//if (transition)
+		finalRecoil = DUtil.Utility.ExponentialDecayTowards (finalRecoil, Vector2.zero, 1f, Time.deltaTime * 5f);
+			//Vector3.MoveTowards (finalRecoil, Vector3.zero, Time.deltaTime * 1);
 		recoilTransform.localRotation = Quaternion.Euler (finalRecoil);
 		view.recoilTrackingRotation = finalRecoil;
 		// Server does cool down too,  this is not the simplified version, it is
@@ -432,7 +442,7 @@ public class Gun : HeldWeapon {
 		if (player.isLocalPlayer) {
 			PlayerHUD.Instance.WeaponAmmo = ammoInMag;
 		}
-
+		view.recoilTrackingRotation = recoilRotation;
 		view.PunchDirection = recoilDir;
 
 		nextRecoilCooldownTime = nextRecCool;
@@ -481,7 +491,9 @@ public class Gun : HeldWeapon {
 			//var recoilDirection = (recoil.Next - recoil.Current).normalized;
 			// TODO get a better formula that factors in movement innacuracy, 
 			// for now it is just adding it linearly
+			previousRecoil = finalRecoil;
 			finalRecoil += recoilRotation;
+			transition = false;
 			recoilTransform.localEulerAngles = finalRecoil;
 			//recoilTransform.localEulerAngles = (Vector3) recoilRotation;
 			//recoilTransform.localRotation = Quaternion.Lerp (recoilTransform.localRotation, Quaternion.Euler (recoilRotation), Time.deltaTime);
@@ -489,7 +501,7 @@ public class Gun : HeldWeapon {
 			RaycastHit hit;
 			//create ray with recoil and innacuracy applied
 			Ray ray = new Ray (recoilTransform.position, 
-				          recoilTransform.forward); 
+				recoilTransform.forward + UnityRandom.insideUnitSphere * innacuracy); 
 
 //			(Quaternion.Euler ((Vector3) recoilRotation +
 //				          UnityRandom.insideUnitSphere * (innacuracy + cc.velocity.sqrMagnitude)

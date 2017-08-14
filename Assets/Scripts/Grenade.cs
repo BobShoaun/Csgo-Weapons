@@ -2,16 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using Doxel.Utility.ExtensionMethods;
 
 public class Grenade : HeldWeapon {
 
 	Player player;
-	Camera cam;
+	Transform look;
 	WeaponManager wm;
 
 	void Start () {
 		player = GetComponentInParent<Player> ();
-		cam = GetComponentInParent<Camera> ();
+		look = gameObject.GetGameObjectInParent ("Look").transform;
 		wm = GetComponentInParent<WeaponManager> ();
 	}
 
@@ -33,7 +34,7 @@ public class Grenade : HeldWeapon {
 	public void ServerThrow (float strength) {
 		player.RpcDeleteWeapon ((int) wm.HoldingWeapon.Weapon.Slot);
 		GameObject spawnedNade = Instantiate (DroppedPrefab, transform.position, transform.rotation);
-		spawnedNade.GetComponent<Rigidbody> ().AddForce (cam.transform.forward * strength);
+		spawnedNade.GetComponent<Rigidbody> ().AddForce (look.forward * strength);
 		spawnedNade.GetComponent<IGrenade> ().Prime (player);
 		NetworkServer.Spawn (spawnedNade);
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Doxel.Utility.ExtensionMethods {
@@ -31,19 +32,11 @@ namespace Doxel.Utility.ExtensionMethods {
 	public static class GameObjectExtensionMethods {
 
 		public static GameObject GetGameObjectInParent (this GameObject gameObject, string name, bool includeInactive = false) {
-			foreach (var transform in gameObject.GetComponentsInParent<Transform> (includeInactive))
-				if (transform.name == name)
-					return transform.gameObject;
-			Debug.LogError ("No game object called " + name + " is found in parent");
-			return null;
+			return Array.Find (gameObject.GetComponentsInParent<Transform> (includeInactive), transform => transform.name == name).gameObject;
 		}
 
 		public static GameObject GetGameObjectInChildren (this GameObject gameObject, string name, bool includeInactive = false) {
-			foreach (var transform in gameObject.GetComponentsInChildren<Transform> (includeInactive))
-				if (transform.name == name)
-					return transform.gameObject;
-			Debug.LogError ("No game object called " + name + " is found in children");
-			return null;
+			return Array.Find (gameObject.GetComponentsInChildren<Transform> (includeInactive), transform => transform.name == name).gameObject;
 		}
 
 	}

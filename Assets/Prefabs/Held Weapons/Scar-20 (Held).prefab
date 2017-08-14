@@ -21,7 +21,7 @@ GameObject:
   - component: {fileID: 4196170530001378}
   - component: {fileID: 33750339056037186}
   - component: {fileID: 23174245811609424}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Cube (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -37,7 +37,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4108834829155560}
   - component: {fileID: 114892189677409468}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Scar-20 (Held)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -54,7 +54,7 @@ GameObject:
   - component: {fileID: 4378054152287310}
   - component: {fileID: 33192059783696362}
   - component: {fileID: 23090142074844710}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Cube (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -71,7 +71,7 @@ GameObject:
   - component: {fileID: 4486231378583538}
   - component: {fileID: 33523015414319222}
   - component: {fileID: 23874989246900348}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -88,7 +88,7 @@ GameObject:
   - component: {fileID: 4707062591746298}
   - component: {fileID: 33619211791667824}
   - component: {fileID: 23635889716303822}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Cube (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -105,7 +105,7 @@ GameObject:
   - component: {fileID: 4144266930636422}
   - component: {fileID: 33603214195637776}
   - component: {fileID: 23828749384015636}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Cylinder (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -122,7 +122,7 @@ GameObject:
   - component: {fileID: 4445526951033450}
   - component: {fileID: 33785023221165268}
   - component: {fileID: 23909855106189798}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Cylinder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -137,7 +137,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4391340432784476}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Muzzle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -577,7 +577,7 @@ MonoBehaviour:
     random: 0
   continuousFire: 1
   damage: 80
-  accuracyDecay: 0.02
+  accuracyDecay: 0.001
   baseInnacuracy: 0
   bulletsPerShot: 1
   recoilScale: 75

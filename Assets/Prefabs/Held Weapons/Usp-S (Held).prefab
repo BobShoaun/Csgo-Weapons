@@ -21,7 +21,7 @@ GameObject:
   - component: {fileID: 4135922222827724}
   - component: {fileID: 33275274259950004}
   - component: {fileID: 23646760984861012}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Cylinder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -38,7 +38,7 @@ GameObject:
   - component: {fileID: 4668872162746300}
   - component: {fileID: 33032770736230256}
   - component: {fileID: 23205258384152660}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Cube (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -55,7 +55,7 @@ GameObject:
   - component: {fileID: 4483954670192222}
   - component: {fileID: 33786016589497424}
   - component: {fileID: 23673510842166040}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -70,7 +70,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4834675110448464}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Muzzle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -86,7 +86,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4667856630934464}
   - component: {fileID: 114052449317831858}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Usp-S (Held)
   m_TagString: Untagged
   m_Icon: {fileID: 0}

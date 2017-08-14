@@ -22,7 +22,7 @@ GameObject:
   - component: {fileID: 33145110796683070}
   - component: {fileID: 23381837166985206}
   - component: {fileID: 114622078182797294}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Round Gun (Held)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -37,7 +37,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4649282175000028}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Muzzle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -174,7 +174,7 @@ MonoBehaviour:
     random: 0
   continuousFire: 0
   damage: 115
-  accuracyDecay: 0.1
+  accuracyDecay: 0.001
   baseInnacuracy: 0
   bulletsPerShot: 1
   recoilScale: 0

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Doxel.Utility.ExtensionMethods;
 
 public class Knife : HeldWeapon {
 
@@ -15,7 +16,7 @@ public class Knife : HeldWeapon {
 	private int stabDamage = 50;
 
 	private Player player;
-	private Camera cam;
+	private Transform look;
 	private float nextAttackTime;
 	private Animator animator;
 
@@ -40,7 +41,7 @@ public class Knife : HeldWeapon {
 		rotation = transform.localRotation;
 
 		player = GetComponentInParent<Player> ();
-		cam = GetComponentInParent<Camera> ();
+		look = gameObject.GetGameObjectInParent ("Look").transform;
 		animator = GetComponent<Animator> ();
 	}
 
@@ -66,7 +67,7 @@ public class Knife : HeldWeapon {
 			return;
 		nextAttackTime = Time.time + swingCooldown;
 		RaycastHit hit;
-		if (Physics.Raycast (cam.ViewportPointToRay (new Vector3 (0.5f, 0.5f, 0)), out hit, 2)) {
+		if (Physics.Raycast (look.position, look.forward, out hit, 2)) {
 			//print ("swing : " + hit.collider.gameObject);
 
 			var part = hit.collider.GetComponent<BodyPart> ();
@@ -88,7 +89,7 @@ public class Knife : HeldWeapon {
 			return;
 		nextAttackTime = Time.time + stabCooldown;
 		RaycastHit hit;
-		if (Physics.Raycast (cam.ViewportPointToRay (new Vector3 (0.5f, 0.5f, 0)), out hit, 2)) {
+		if (Physics.Raycast (look.position, look.forward, out hit, 2)) {
 			//print ("stab : " + hit.collider.gameObject);
 			var part = hit.collider.GetComponent<BodyPart> ();
 			if (part)
