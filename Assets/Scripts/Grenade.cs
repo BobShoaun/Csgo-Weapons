@@ -33,7 +33,8 @@ public class Grenade : HeldWeapon {
 
 	public void ServerThrow (float strength) {
 		player.RpcDeleteWeapon ((int) wm.HoldingWeapon.Weapon.Slot);
-		GameObject spawnedNade = Instantiate (DroppedPrefab, transform.position, transform.rotation);
+		GameObject spawnedNade = Instantiate (DroppedPrefab, look.position + look.forward, Quaternion.Euler (Vector3.forward * 90));
+		spawnedNade.GetComponent<Rigidbody> ().AddTorque (Vector3.one * strength);
 		spawnedNade.GetComponent<Rigidbody> ().AddForce (look.forward * strength);
 		spawnedNade.GetComponent<IGrenade> ().Prime (player);
 		NetworkServer.Spawn (spawnedNade);

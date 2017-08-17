@@ -315,7 +315,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weapon: {fileID: 11400000, guid: af0f6fd602487364a9d06625d1ecfcf2, type: 2}
   heldPrefab: {fileID: 1317254123059448, guid: 63bea7a3608ab9549bb5d5b96b388a8c, type: 2}
-  timer: 2
+  timer: 1.669
   sphere: {fileID: 135144867187900134}
   capsule: {fileID: 136761899017481492}
   mask:

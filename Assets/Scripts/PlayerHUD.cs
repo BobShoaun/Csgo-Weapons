@@ -22,7 +22,8 @@ public class PlayerHUD : SingletonMonoBehaviour<PlayerHUD> {
 	private InputField chatMessageInputField;
 	public Transform chatMessageList;
 	public Image flashOverlay;
-	private RawImage burntImage;
+	public RawImage burntImage;
+	public RenderTexture radar;
 
 	public Text weaponName;
 	public Text weaponAmmo;
@@ -77,7 +78,6 @@ public class PlayerHUD : SingletonMonoBehaviour<PlayerHUD> {
 
 	void Start () {
 		chatMessageInputField = chatMessageInput.GetComponentInChildren<InputField> ();
-		burntImage = GetComponentInChildren<RawImage> ();
 	}
 
 	void Update () {
@@ -196,6 +196,10 @@ public class PlayerHUD : SingletonMonoBehaviour<PlayerHUD> {
 		if (scoreUIs.TryGetValue (netId, out score)) {
 			score.UpdateUI (name, kills, deaths);
 		}
+	}
+
+	public void SetRadarCam (Camera radarCam) {
+		radarCam.targetTexture = radar;
 	}
 		
 }

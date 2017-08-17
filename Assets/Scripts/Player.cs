@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using DUtil = Doxel.Utility;
+using Doxel.Utility.ExtensionMethods;
 
 public class Player : NetworkBehaviour {
 	
@@ -24,6 +25,7 @@ public class Player : NetworkBehaviour {
 	public GameObject ragdollPrefab;
 	private GameObject ragdollInstance;
 	private bool isDead = false;
+	private Camera radarCam;
 
 	public float testValue = 10;
 	public float time = 0;
@@ -45,6 +47,8 @@ public class Player : NetworkBehaviour {
 			// UI feeback when a player joins
 			CmdSendChat ("[Server]: " + name + " has joined the game");
 			//PlayerHUD.Instance.SendChat (name + " has joined the game");
+			radarCam = gameObject.GetGameObjectInChildren ("Radar Camera").GetComponent<Camera> ();
+			PlayerHUD.Instance.SetRadarCam (radarCam);
 		}
 		else {
 			enabled = false;
@@ -123,10 +127,16 @@ public class Player : NetworkBehaviour {
 		// FIXME fix this damage indicator, for reasons it is not
 		// pointing to the source of damage
 		//print (Vector3.SignedAngle (transform.forward, damagerPos - transform.position, Vector3.up));
-		if (isLocalPlayer)
+		if (isLocalPlayer) {
+			Vector3 dir = (damagerPos - transform.position).normalized;
+			//dir = transform.TransformDirection (dir);
+			float angle = 90 - (Mathf.Atan2 (dir.z, dir.x) * Mathf.Rad2Deg);
+			print (angle);
+
 			PlayerHUD.Instance.damageIndicator.transform.rotation = 
 			Quaternion.Euler (Vector3.forward *
 				-Vector3.SignedAngle (transform.forward, damagerPos - transform.position, Vector3.up));// Quaternion.Euler (Vector3.forward * angle);
+		}
 	}
 
 	[Command]
