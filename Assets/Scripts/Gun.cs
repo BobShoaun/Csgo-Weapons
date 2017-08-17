@@ -19,9 +19,6 @@ public class Gun : HeldWeapon {
 	private int reservedAmmunition;
 	public GameObject bulletHolePrefab;
 	[SerializeField]
-	protected LayerMask shootableLayer;
-
-	[SerializeField]
 	protected Recoil recoil;
 	protected float nextFireTime;
 	[SerializeField]
@@ -459,7 +456,7 @@ public class Gun : HeldWeapon {
 //				Vector2.zero))));
 	}
 
-	public void ServerTryFire () {
+	public void ServerTryFire (LayerMask shootableLayer) {
 		//if reloding then return out
 		if (reloading)
 			return;
@@ -509,7 +506,7 @@ public class Gun : HeldWeapon {
 
 			if (Physics.Raycast (ray, out hit, Mathf.Infinity, shootableLayer)) {
 				var part = hit.collider.GetComponent<BodyPart> ();
-				if (part && part.GetComponentInParent<Player> () != player)
+				if (part)
 					part.player.CmdTakeDamage (damage, part.bodyPartType, 
 						player.gameObject, player.gameObject.transform.position);
 				else if (!hit.collider.CompareTag ("Weapon")) {

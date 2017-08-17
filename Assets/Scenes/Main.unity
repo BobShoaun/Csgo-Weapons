@@ -4350,7 +4350,7 @@ GameObject:
   - component: {fileID: 1816952308}
   - component: {fileID: 1816952307}
   m_Layer: 0
-  m_Name: EventSystem
+  m_Name: Event System
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4665,6 +4665,16 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1961750146996600, guid: d09e76774e8f40b47a2a8db665cdd7ea, type: 2}
       propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114405013114595944, guid: d09e76774e8f40b47a2a8db665cdd7ea,
+        type: 2}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114846387171594086, guid: d09e76774e8f40b47a2a8db665cdd7ea,
+        type: 2}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

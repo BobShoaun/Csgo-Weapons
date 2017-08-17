@@ -31,3 +31,27 @@ public class Weapon : ScriptableObject {
 		
 }
 
+public class WeaponH {
+
+	public GameObject firstPersonPrefab;
+	public GameObject thirdPersonPrefab;
+	public GameObject droppedPrefab;
+
+	public void Equip () {
+		
+	}
+		
+	public void Drop () {
+		
+	}
+
+	public void Deploy () {
+		
+	}
+
+	public void Keep () {
+		
+	}
+
+}
+

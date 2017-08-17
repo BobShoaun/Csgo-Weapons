@@ -25,10 +25,11 @@ public class Player : NetworkBehaviour {
 	public GameObject ragdollPrefab;
 	private GameObject ragdollInstance;
 	private bool isDead = false;
-	private Camera radarCam;
 
 	public float testValue = 10;
 	public float time = 0;
+
+	public LayerMask shootableLayer;
 
 	private WeaponManager weaponManager;
 
@@ -40,15 +41,25 @@ public class Player : NetworkBehaviour {
 			// if the player is the local player, set the player model to a layermask
 			// that cannot be seen by the local camera, so players cannot see themselves
 			// but other players can
-			foreach (var child in model.GetComponentsInChildren<Transform> ()) {
-				child.gameObject.layer = LayerMask.NameToLayer ("Local Player Model");
-			}
+//			foreach (var child in model.GetComponentsInChildren<Transform> ()) {
+//				child.gameObject.layer = LayerMask.NameToLayer ("Local Player Model");
+//			}
+
 			PlayerHUD.Instance.Player = this;
 			// UI feeback when a player joins
 			CmdSendChat ("[Server]: " + name + " has joined the game");
 			//PlayerHUD.Instance.SendChat (name + " has joined the game");
-			radarCam = gameObject.GetGameObjectInChildren ("Radar Camera").GetComponent<Camera> ();
-			PlayerHUD.Instance.SetRadarCam (radarCam);
+
+			gameObject.GetGameObjectInChildren ("Viewmodel Camera", true).SetActive (true);
+			gameObject.GetGameObjectInChildren ("Environment Camera").GetComponent<Camera> ().enabled = true;
+
+			GameObject radarCam = gameObject.GetGameObjectInChildren ("Radar Camera", true);
+			radarCam.SetActive (true);
+			PlayerHUD.Instance.SetRadarCam (radarCam.GetComponent<Camera> ());
+			if (isServer) { // if player is the host
+				// remove local player model from the shootable layer
+				//shootableLayer ^= 1 << LayerMask.NameToLayer ("Local Player Model");
+			}
 		}
 		else {
 			enabled = false;
@@ -58,7 +69,7 @@ public class Player : NetworkBehaviour {
 		}
 
 		// UI feeback when a player joins
-		PlayerHUD.Instance.AddPlayerToScoreboard (netId, name, 0, 0);
+		PlayerHUD.Instance.AddPlayerToScoreboard (netId, name, kills, deaths);
 	
 	}
 
@@ -217,7 +228,6 @@ public class Player : NetworkBehaviour {
 
 		//Destroy (gameObject);
 		gameObject.SetActive (false);
-
 	}
 
 	[Command]
@@ -313,7 +323,17 @@ public class Player : NetworkBehaviour {
 
 	[Command]
 	public void CmdFire () {
-		(weaponManager.HoldingWeapon as Gun).ServerTryFire ();
+		// HACK very expensive way, find better way.
+		// right now all raycast calculations are being done one the server
+		// so due to the host is also server architecture, the host wont be
+		// shot be the clients, this fixes it in a rather expensive manner
+		foreach (var child in model.GetComponentsInChildren<Transform> ()) {
+			child.gameObject.layer = LayerMask.NameToLayer ("Shooting Player");
+		}
+		(weaponManager.HoldingWeapon as Gun).ServerTryFire (shootableLayer);
+		foreach (var child in model.GetComponentsInChildren<Transform> ()) {
+			child.gameObject.layer = LayerMask.NameToLayer ("Default");
+		}
 	}
 
 	[ClientRpc]
