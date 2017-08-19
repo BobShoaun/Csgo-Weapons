@@ -556,8 +556,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 728dd4801202694458220308134b1e1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weapon: {fileID: 11400000, guid: ee9db8560507a524382690d03d909837, type: 2}
-  heldPrefab: {fileID: 1141091002427426, guid: 294bff9052efd9c4788d1eda8cf9f443, type: 2}
+  weaponId: 0
 --- !u!114 &114845723993261390
 MonoBehaviour:
   m_ObjectHideFlags: 1

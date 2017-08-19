@@ -11,5 +11,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d76e5b97255cba46bad8f93f7800a72, type: 3}
   m_Name: USP-S
   m_EditorClassIdentifier: 
+  id: 7
   name: USP-S
   slot: 1
+  firstPersonPrefab: {fileID: 1599716564455640, guid: 07c4b58f198d03b4da4099f2fac15e75,
+    type: 2}
+  thirdPersonPrefab: {fileID: 0}
+  droppedPrefab: {fileID: 1604821044217708, guid: 6b23aa3693b8ff14fa09955f48821dcf,
+    type: 2}

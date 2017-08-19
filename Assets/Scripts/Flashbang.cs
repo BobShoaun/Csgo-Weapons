@@ -12,7 +12,8 @@ public class Flashbang : DroppedWeapon, IGrenade {
 	private Player playerPrimer;
 	public LayerMask mask;
 
-	private void Start () {
+	protected override void Start () {
+		base.Start ();
 		sphere = GetComponent<SphereCollider> ();
 		capsule = GetComponent<CapsuleCollider> ();
 	}

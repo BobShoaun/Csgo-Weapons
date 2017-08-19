@@ -164,8 +164,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 728dd4801202694458220308134b1e1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weapon: {fileID: 11400000, guid: 0d35d1abf2115d54f811c4a33b0da6c3, type: 2}
-  heldPrefab: {fileID: 1640520531113822, guid: b577bb445daf63e4a8b1d6108900491e, type: 2}
+  weaponId: 4
 --- !u!136 &136251421344419936
 CapsuleCollider:
   m_ObjectHideFlags: 1

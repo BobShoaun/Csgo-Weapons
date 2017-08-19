@@ -4,16 +4,18 @@ using UnityEngine.Serialization;
 
 public class DroppedWeapon : NetworkBehaviour {
 
-	[SerializeField]
-	private Weapon weapon;
-	public Weapon Weapon {
-		get { return weapon; }
-	}
+	public int weaponId;
 
-	[SerializeField] [FormerlySerializedAs ("heldWeaponPrefab")]
-	private GameObject heldPrefab;
-	public GameObject HeldPrefab {
-		get { return heldPrefab; }
+	public DynamicWeapon DynamicWeapon;
+
+	protected virtual void Start () {
+		if (DynamicWeapon == null) {
+			Weapon2 weapon = WeaponDatabase.Instance [weaponId];
+			if (weapon is Gun2)
+				DynamicWeapon = new DynamicGun (weapon as Gun2);
+			else if (weapon is Knife2)
+				DynamicWeapon = new DynamicWeapon (weapon);
+		}
 	}
 
 }

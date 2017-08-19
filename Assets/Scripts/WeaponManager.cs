@@ -56,7 +56,7 @@ public class WeaponManager : MonoBehaviour {
 		if (Physics.Raycast (cam.ViewportPointToRay (Vector2.one * 0.5f), out hit, 5)
 		    && hit.collider.CompareTag ("Weapon")) {
 			// rmb this is still called in local player, if check is above
-			PlayerHUD.Instance.HoverPickup (hit.collider.GetComponent<DroppedWeapon> ().Weapon.Name);
+			//PlayerHUD.Instance.HoverPickup (hit.collider.GetComponent<DroppedWeapon> ().Weapon.Name);
 			if (Input.GetKeyDown (KeyCode.E)) {
 				player.CmdPickupWeapon (hit.collider.gameObject);
 			}
@@ -67,17 +67,17 @@ public class WeaponManager : MonoBehaviour {
 	}
 
 	public void ServerPickupWeapon (GameObject weapon) {
-		int index = (int) weapon.GetComponent<DroppedWeapon> ().Weapon.Slot;
-		if (weapons [index])
-			ServerDropWeapon (index);
+		//int index = (int) weapon.GetComponent<DroppedWeapon> ().Weapon.Slot;
+		//if (weapons [index])
+		//	ServerDropWeapon (index);
 		player.RpcPickupWeapon (weapon);
 	}
 
 	public void ClientPickupWeapon (GameObject weapon) {
-		HeldWeapon newWeapon = Instantiate (weapon.GetComponent<DroppedWeapon> ().HeldPrefab, transform).GetComponent<HeldWeapon> ();
-		int index = (int) newWeapon.Weapon.Slot;
-		weapons [index] = newWeapon;
-		player.CmdSwitch (index);
+		//HeldWeapon newWeapon = Instantiate (weapon.GetComponent<DroppedWeapon> ().HeldPrefab, transform).GetComponent<HeldWeapon> ();
+		//int index = (int) newWeapon.Weapon.Slot;
+		//weapons [index] = newWeapon;
+		//player.CmdSwitch (index);
 		player.CmdDespawn (weapon);
 	}
 		

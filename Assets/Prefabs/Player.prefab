@@ -332,7 +332,6 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4659871699547474}
-  - component: {fileID: 114405013114595944}
   - component: {fileID: 114807828612228354}
   m_Layer: 0
   m_Name: Weapon Manager
@@ -413,6 +412,8 @@ GameObject:
   - component: {fileID: 114131981858514698}
   - component: {fileID: 114383539216060534}
   - component: {fileID: 114846387171594086}
+  - component: {fileID: 114918566923426996}
+  - component: {fileID: 114545878552089196}
   m_Layer: 8
   m_Name: Player
   m_TagString: Untagged
@@ -1753,18 +1754,17 @@ MonoBehaviour:
   shootableLayer:
     serializedVersion: 2
     m_Bits: 4294964441
---- !u!114 &114405013114595944
+--- !u!114 &114545878552089196
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1929147824201740}
+  m_GameObject: {fileID: 1961750146996600}
   m_Enabled: 0
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c2970886f7b108b4fb94c09b5e5658be, type: 3}
+  m_Script: {fileID: 11500000, guid: a3b77a1dbd4973f4dbd288eacf773287, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weapons: []
 --- !u!114 &114562685934500822
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1852,6 +1852,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponHolder: {fileID: 4659871699547474}
   environmentCamera: {fileID: 20768308633148954}
+  bulletHolePrefab: {fileID: 1799922971647616, guid: 6d9a614686d46354d98654b9992c7134,
+    type: 2}
+  look: {fileID: 4309866365162764}
 --- !u!114 &114897073931385848
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1864,6 +1867,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bodyPartType: 1
+--- !u!114 &114918566923426996
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1961750146996600}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc46184ea04fc3341a49e2cbb4cc6bde, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  view: {fileID: 114201446085970828}
+  muzzle: {fileID: 0}
+  bulletHolePrefab: {fileID: 1799922971647616, guid: 6d9a614686d46354d98654b9992c7134,
+    type: 2}
+  recoilTransform: {fileID: 4998159600237738}
 --- !u!114 &114962258396299914
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -142,7 +142,7 @@ public class Player : NetworkBehaviour {
 			Vector3 dir = (damagerPos - transform.position).normalized;
 			//dir = transform.TransformDirection (dir);
 			float angle = 90 - (Mathf.Atan2 (dir.z, dir.x) * Mathf.Rad2Deg);
-			print (angle);
+			//print (angle);
 
 			PlayerHUD.Instance.damageIndicator.transform.rotation = 
 			Quaternion.Euler (Vector3.forward *

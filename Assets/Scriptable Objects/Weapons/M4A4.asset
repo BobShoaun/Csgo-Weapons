@@ -11,5 +11,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d76e5b97255cba46bad8f93f7800a72, type: 3}
   m_Name: M4A4
   m_EditorClassIdentifier: 
-  name: M4A4
+  id: 4
+  name: m4a4
   slot: 0
+  firstPersonPrefab: {fileID: 1357578025723098, guid: 5c380d384bdea7647b3bd50e017c3eab,
+    type: 2}
+  thirdPersonPrefab: {fileID: 0}
+  droppedPrefab: {fileID: 1545550861574260, guid: 67819e94fe300144fa5b52c2a8655b9d,
+    type: 2}

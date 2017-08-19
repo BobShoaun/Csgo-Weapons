@@ -360,8 +360,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 728dd4801202694458220308134b1e1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weapon: {fileID: 11400000, guid: 960de3f959972b944980a610640353f5, type: 2}
-  heldPrefab: {fileID: 1120117200344780, guid: ff29c678350b3184b9bb3717b27e8494, type: 2}
+  weaponId: 3
 --- !u!136 &136104053208884034
 CapsuleCollider:
   m_ObjectHideFlags: 1

@@ -36,7 +36,6 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4671971666096002}
-  - component: {fileID: 114833449598935298}
   m_Layer: 0
   m_Name: Bullet Hole
   m_TagString: Untagged
@@ -110,35 +109,3 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1044696425796592}
   m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &114833449598935298
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1799922971647616}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 372142912, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SceneId:
-    m_Value: 0
-  m_AssetId:
-    i0: 109
-    i1: 154
-    i2: 97
-    i3: 70
-    i4: 134
-    i5: 212
-    i6: 99
-    i7: 84
-    i8: 217
-    i9: 134
-    i10: 84
-    i11: 185
-    i12: 153
-    i13: 44
-    i14: 113
-    i15: 52
-  m_ServerOnly: 0
-  m_LocalPlayerAuthority: 0

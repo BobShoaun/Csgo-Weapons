@@ -11,5 +11,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d76e5b97255cba46bad8f93f7800a72, type: 3}
   m_Name: Flashbang
   m_EditorClassIdentifier: 
+  id: 1
   name: Flashbang
   slot: 3
+  firstPersonPrefab: {fileID: 1317254123059448, guid: 63bea7a3608ab9549bb5d5b96b388a8c,
+    type: 2}
+  thirdPersonPrefab: {fileID: 0}
+  droppedPrefab: {fileID: 1307100487844756, guid: 765065cd928101d4dbe9b101d174cc7d,
+    type: 2}

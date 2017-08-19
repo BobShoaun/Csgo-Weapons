@@ -11,5 +11,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d76e5b97255cba46bad8f93f7800a72, type: 3}
   m_Name: High Explosive Grenade
   m_EditorClassIdentifier: 
+  id: 2
   name: High Explosive Grenade
   slot: 4
+  firstPersonPrefab: {fileID: 1317952565179754, guid: f3435cc673664184a9e7ee91f5370782,
+    type: 2}
+  thirdPersonPrefab: {fileID: 0}
+  droppedPrefab: {fileID: 1246586350134086, guid: 48308d2f749f5b54eadfed2ba2987f3e,
+    type: 2}

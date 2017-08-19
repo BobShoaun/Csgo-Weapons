@@ -10,7 +10,6 @@ using Doxel.Utility.ExtensionMethods;
 
 public class Gun : HeldWeapon {
 
-
 	[SerializeField]
 	protected float fireRate = 10;
 	[SerializeField]
@@ -358,9 +357,9 @@ public class Gun : HeldWeapon {
 	bool calledScope = false, canScope = true;
 	float lerpTime = 3;
 	float currentLerpTime;
-	Vector3 previousRecoil;
+	//Vector3 previousRecoil;
 	Vector3 finalRecoil;
-	bool transition = false;
+	//bool transition = false;
 
 	private void ServerFireCooldown () {
 
@@ -488,9 +487,9 @@ public class Gun : HeldWeapon {
 			//var recoilDirection = (recoil.Next - recoil.Current).normalized;
 			// TODO get a better formula that factors in movement innacuracy, 
 			// for now it is just adding it linearly
-			previousRecoil = finalRecoil;
+			// = finalRecoil;
 			finalRecoil += recoilRotation;
-			transition = false;
+			//transition = false;
 			recoilTransform.localEulerAngles = finalRecoil;
 			//recoilTransform.localEulerAngles = (Vector3) recoilRotation;
 			//recoilTransform.localRotation = Quaternion.Lerp (recoilTransform.localRotation, Quaternion.Euler (recoilRotation), Time.deltaTime);
@@ -555,79 +554,79 @@ public class Gun : HeldWeapon {
 
 	}
 
-	[Serializable]
-	public class Recoil : IEnumerator<Vector2> {
 
-		// TODO: make this class responsible for the innacuracy,
-		// and decay of it ?
+}
 
-		[SerializeField]
-		private AnimationCurve patternX;
-		[SerializeField]
-		private AnimationCurve patternY;
-		[SerializeField]
-		private bool random = false;
+[Serializable]
+public class Recoil : IEnumerator<Vector2> {
 
-		private Vector2 [] pattern;
-		private int index;
-		private int [] randomIndices;
+	// TODO: make this class responsible for the innacuracy,
+	// and decay of it ?
 
-		public bool MoveNext () {
-			return ++index < pattern.Length;
-		}
+	[SerializeField]
+	private AnimationCurve patternX;
+	[SerializeField]
+	private AnimationCurve patternY;
+	[SerializeField]
+	private bool random = false;
 
-		public void Reset () {
-			index = -1;
-			if (random) {
-				randomIndices = new int [pattern.Length];
-				randomIndices [0] = 0;
-				for (int i = 1; i < pattern.Length; i++) {
-					int ranNum = UnityRandom.Range (1, pattern.Length);
-					randomIndices [i] = ranNum;
-				}
+	private Vector2 [] pattern;
+	private int index;
+	private int [] randomIndices;
+
+	public bool MoveNext () {
+		return ++index < pattern.Length;
+	}
+
+	public void Reset () {
+		index = -1;
+		if (random) {
+			randomIndices = new int [pattern.Length];
+			randomIndices [0] = 0;
+			for (int i = 1; i < pattern.Length; i++) {
+				int ranNum = UnityRandom.Range (1, pattern.Length);
+				randomIndices [i] = ranNum;
 			}
 		}
+	}
 
-		object IEnumerator.Current {
-			get { return Current; }
-		}
+	object IEnumerator.Current {
+		get { return Current; }
+	}
 
-		public void Dispose () {
-			
-		}
-
-		public Vector2 Next {
-			get { 
-				int nextIndex = index + (index < pattern.Length - 1 ? 1 : 0);
-				return pattern [random ? randomIndices [nextIndex] : nextIndex];
-			}
-		}
-
-		public Vector2 Current {
-			get {
-				return pattern [random ? randomIndices [index] : index];
-			}
-		}
-
-		public Vector2 Direction {
-			get { 
-				if (random)
-					return Next.normalized;
-				return (Next - Current).normalized;
-			}
-		}
-
-		public void Initialize (int magAmmo) {
-			pattern = new Vector2 [magAmmo];
-			float timeValue;
-			int i;
-			for (i = 0, timeValue = 0; i < magAmmo; i++, timeValue += 1f / magAmmo) {
-				pattern [i] = new Vector2 (patternX.Evaluate (timeValue), patternY.Evaluate (timeValue));
-			}
-			Reset ();
-		}
+	public void Dispose () {
 
 	}
 
+	public Vector2 Next {
+		get { 
+			int nextIndex = index + (index < pattern.Length - 1 ? 1 : 0);
+			return pattern [random ? randomIndices [nextIndex] : nextIndex];
+		}
+	}
+
+	public Vector2 Current {
+		get {
+			return pattern [random ? randomIndices [index] : index];
+		}
+	}
+
+	public Vector2 Direction {
+		get { 
+			if (random)
+				return Next.normalized;
+			return (Next - Current).normalized;
+		}
+	}
+
+	public void Initialize (int magAmmo) {
+		pattern = new Vector2 [magAmmo];
+		float timeValue;
+		int i;
+		for (i = 0, timeValue = 0; i < magAmmo; i++, timeValue += 1f / magAmmo) {
+			pattern [i] = new Vector2 (patternX.Evaluate (timeValue), patternY.Evaluate (timeValue));
+		}
+		Reset ();
+	}
+
 }
-	

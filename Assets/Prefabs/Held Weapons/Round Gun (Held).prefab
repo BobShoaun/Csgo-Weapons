@@ -116,7 +116,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1640520531113822}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d22730e440a3f1548b5ae7cfadad89cd, type: 3}
   m_Name: 
@@ -131,9 +131,6 @@ MonoBehaviour:
   reservedAmmunition: 30
   bulletHolePrefab: {fileID: 1799922971647616, guid: 6d9a614686d46354d98654b9992c7134,
     type: 2}
-  shootableLayer:
-    serializedVersion: 2
-    m_Bits: 1553
   recoil:
     patternX:
       serializedVersion: 2

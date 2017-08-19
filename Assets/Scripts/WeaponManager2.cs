@@ -5,20 +5,55 @@ using UnityEngine.Networking;
 using System;
 using DUtil = Doxel.Utility.Utility;
 
+
 public class WeaponManager2 : NetworkBehaviour {
-	
+
+	// Client variables
 	[SerializeField]
 	private Transform weaponHolder;
 	[SerializeField]
 	private Camera environmentCamera;
+	[SerializeField]
+	private GameObject bulletHolePrefab;
+	private GameObject [] firstPersonWeapons;
+	private GameObject [] thirdPersonWeapons;
+
+	// local player variables
+	private GunHandler gunHandler;
+	private KnifeHandler knifeHandler;
+
 	// Server variables; variables that only exists in the server and is meaningless
-	// in all the clients
-	private HeldWeapon[] weapons;
+	// to all the clients
+	[SerializeField]
+	private Transform look;
+	private DynamicWeapon [] dynamicWeapons;
 	private int currentIndex = 2;
 
-	[ServerCallback]
+	public DynamicGun CurrentDynamicGun {
+		get { return dynamicWeapons [currentIndex] as DynamicGun; }
+	}
+
+	public Gun2 CurrentGun {
+		get { return dynamicWeapons [currentIndex].weapon as Gun2; }
+	}
+
+	public Knife2 CurrentKnife {
+		get { return dynamicWeapons [currentIndex].weapon as Knife2; }
+	}
+
 	private void Start () {
-		weapons = new HeldWeapon [Enum.GetNames (typeof (Weapon.SlotType)).Length];
+		int weaponSlotAmount = Enum.GetNames (typeof (Weapon.SlotType)).Length;
+		if (isLocalPlayer) {
+			gunHandler = GetComponent<GunHandler> ();
+			knifeHandler = GetComponent<KnifeHandler> ();
+		}
+		if (isServer) {
+			dynamicWeapons = new DynamicWeapon [weaponSlotAmount];
+		}
+		if (isClient) {
+			firstPersonWeapons = new GameObject [weaponSlotAmount];
+			thirdPersonWeapons = new GameObject [weaponSlotAmount];
+		}
 	}
 
 	[ClientCallback]
@@ -54,44 +89,41 @@ public class WeaponManager2 : NetworkBehaviour {
 		if (Physics.Raycast (environmentCamera.ViewportPointToRay (Vector2.one * 0.5f), 
 			out hit, 5) && hit.collider.CompareTag ("Weapon")) {
 			// rmb this is still called in local player, if check is above
-			PlayerHUD.Instance.HoverPickup (hit.collider.GetComponent<DroppedWeapon> ().Weapon.Name);
+			PlayerHUD.Instance.HoverPickup (hit.collider.GetComponent<DroppedWeapon> ().DynamicWeapon.weapon.Name);
 			if (Input.GetKeyDown (KeyCode.E))
 				CmdEquipWeapon (hit.collider.gameObject);
 		}
 		else
 			PlayerHUD.Instance.HoverDeactivate ();
-	}
 
+	}
+		
 	[Command]
 	private void CmdEquipWeapon (GameObject droppedWeapon) {
-		Weapon weapon = droppedWeapon.GetComponent<DroppedWeapon> ().Weapon;
-		int index = (int) weapon.Slot;
-		if (weapons [index])
+		DynamicWeapon weapon = droppedWeapon.GetComponent<DroppedWeapon> ().DynamicWeapon;
+		int index = (int) weapon.weapon.Slot;
+		if (dynamicWeapons [index] != null)
 			DropWeapon (index);
-		HeldWeapon heldWeapon = Instantiate (droppedWeapon.GetComponent<DroppedWeapon> ().HeldPrefab, weaponHolder).GetComponent<HeldWeapon> ();
+		dynamicWeapons [index] = weapon;
 		Destroy (droppedWeapon);
-		weapons [index] = heldWeapon;
-		RpcEquipWeapon (heldWeapon.gameObject, index);
-	}
-
-	[ClientRpc]
-	private void RpcEquipWeapon (GameObject heldWeapon, int index) {
-		if (!isServer)
-			Instantiate (heldWeapon, weaponHolder);
-		CmdSwitchWeapon (index);
+		RpcEquipWeapon (weapon.weapon.Id, index);
+		SwitchWeapon (index);
 	}
 
 	[Server]
 	private void DropWeapon (int index) {
-		if (!weapons [index])
+		if (dynamicWeapons [index] == null)
 			return;
-		var droppedWeapon = Instantiate (weapons [index].DroppedPrefab, 
-			weapons [index].transform.position, weapons [index].transform.rotation);
-		droppedWeapon.GetComponent<Rigidbody> ().AddForce (transform.forward * 10, ForceMode.Impulse);
+		// DONE instantiate and spawn dropped weapon, then add force
+		// assign dynamic weapon info to the dropped weapon
+		var droppedWeapon = Instantiate (dynamicWeapons [index].weapon.DroppedPrefab, 
+			look.position + look.forward, look.rotation);
+		droppedWeapon.GetComponent<DroppedWeapon> ().DynamicWeapon = dynamicWeapons [index];
+		droppedWeapon.GetComponent<Rigidbody> ().AddForce (look.forward * 15, ForceMode.Impulse);
 		NetworkServer.Spawn (droppedWeapon);
-		Destroy (weapons [index].gameObject);
-		weapons [index] = null;
-		for (int i = 0; i < weapons.Length && !SwitchWeapon (i); i++);
+		dynamicWeapons [index] = null;
+		RpcDropWeapon (index);
+		for (int i = 0; i < dynamicWeapons.Length && !SwitchWeapon (i); i++);
 	}
 
 	[Command]
@@ -101,14 +133,72 @@ public class WeaponManager2 : NetworkBehaviour {
 
 	[Command]
 	private void CmdDropAllWeapons () {
-		for (int i = 0; i < weapons.Length; i++)
-			if (weapons [i])
+		for (int i = 0; i < dynamicWeapons.Length; i++)
+			if (dynamicWeapons [i] != null)
 				DropWeapon (i);
 	}
 
+	[Server]
+	private bool SwitchWeapon (int index) {
+		if (index == currentIndex || dynamicWeapons [index] == null)
+			return false;
+		if (dynamicWeapons [currentIndex] != null)
+			RpcSwitch (currentIndex, false);
+		RpcSwitch (index, true);
+		RpcUpdateHandlers (dynamicWeapons [index].weapon.Id);
+		currentIndex = index;
+		return true;
+	}
+
+	[Command]
+	private void CmdSwitchWeapon (int index) {
+		SwitchWeapon (index);
+	}
+
+	[Command]
+	private void CmdScrollSwitchWeapon (int scrollDirection) {
+		scrollDirection = Mathf.Clamp (scrollDirection, -1, 1);
+		for (int iterations = 0, 
+			index = DUtil.Remainder (currentIndex + scrollDirection, dynamicWeapons.Length); 
+			iterations < dynamicWeapons.Length; 
+			iterations++, index = DUtil.Remainder (index + scrollDirection, dynamicWeapons.Length)) {
+			if (dynamicWeapons [index] == null)
+				continue;
+			SwitchWeapon (index);
+			return;
+		}
+		// No holding weapons
+	}
+
 	[ClientRpc]
-	private void RpcSetActive (GameObject gameObject, bool active) {
-		gameObject.SetActive (active);
+	private void RpcEquipWeapon (int weaponId, int index) {
+		// instantiate weapons based on Id, ui feedback
+		//Weapon holdingWeapon = WeaponDatabase.Instance [weaponId];
+		firstPersonWeapons [index] = Instantiate (WeaponDatabase.Instance [weaponId].FirstPersonPrefab, weaponHolder);
+	}
+
+	[ClientRpc]
+	private void RpcDropWeapon (int index) {
+		// destroy local hand and viewmodel weapons
+		Destroy (firstPersonWeapons [index]);
+	}
+
+	[ClientRpc]
+	private void RpcSwitch (int index, bool current) {
+		firstPersonWeapons [index].SetActive (current);
+	}
+
+	[ClientRpc]
+	private void RpcUpdateHandlers (int weaponId) {
+		if (!isLocalPlayer)
+			return;
+		knifeHandler.enabled = false;
+		gunHandler.enabled = false;
+		Weapon2 weapon = WeaponDatabase.Instance [weaponId];
+		//if (weapon as Knife2)
+			knifeHandler.enabled = weapon as Knife2 != null;
+		//if (weapon as Gun2)
+			gunHandler.enabled = weapon as Gun2 != null;
 	}
 
 	[ClientRpc]
@@ -127,38 +217,6 @@ public class WeaponManager2 : NetworkBehaviour {
 			PlayerHUD.Instance.WeaponAmmo = 0;
 			PlayerHUD.Instance.WeaponReserve = 0;
 		}
-	}
-
-	[Server]
-	private bool SwitchWeapon (int index) {
-		if (index == currentIndex || !weapons [index])
-			return false;
-		if (weapons [currentIndex])
-			RpcSetActive (weapons [currentIndex].gameObject, false);
-		RpcSetActive (weapons [index].gameObject, true);
-		currentIndex = index;
-		RpcUpdateWeaponUI (weapons [index].gameObject);
-		return true;
-	}
-
-	[Command]
-	private void CmdSwitchWeapon (int index) {
-		SwitchWeapon (index);
-	}
-
-	[Command]
-	private void CmdScrollSwitchWeapon (int scrollDirection) {
-		scrollDirection = Mathf.Clamp (scrollDirection, -1, 1);
-		for (int j = 0, 
-			i = DUtil.Remainder (currentIndex + scrollDirection, weapons.Length); 
-			j < weapons.Length; 
-			j++, i = DUtil.Remainder (i + scrollDirection, weapons.Length)) {
-			if (!weapons [i])
-				continue;
-			SwitchWeapon (i);
-			return;
-		}
-		RpcUpdateWeaponUI (null);
 	}
 
 }

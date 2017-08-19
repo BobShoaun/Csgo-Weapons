@@ -11,5 +11,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d76e5b97255cba46bad8f93f7800a72, type: 3}
   m_Name: SCAR-20
   m_EditorClassIdentifier: 
+  id: 6
   name: SCAR-20
   slot: 0
+  firstPersonPrefab: {fileID: 1141091002427426, guid: 294bff9052efd9c4788d1eda8cf9f443,
+    type: 2}
+  thirdPersonPrefab: {fileID: 0}
+  droppedPrefab: {fileID: 1414831444557560, guid: 52d5eeec70d303c4dacbbac8742b67fd,
+    type: 2}

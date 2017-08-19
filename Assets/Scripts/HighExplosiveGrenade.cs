@@ -14,7 +14,8 @@ public class HighExplosiveGrenade : DroppedWeapon, IGrenade {
 	private Player playerPrimer;
 	private bool primed = false;
 
-	void Start () {
+	protected override void Start () {
+		base.Start ();
 		sphere = GetComponent<SphereCollider> ();
 		capsule = GetComponent<CapsuleCollider> ();
 	}

@@ -11,5 +11,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d76e5b97255cba46bad8f93f7800a72, type: 3}
   m_Name: Knife
   m_EditorClassIdentifier: 
+  id: 3
   name: Knife
   slot: 2
+  firstPersonPrefab: {fileID: 1352802281757852, guid: 9a457858e0322e8408fbb7e3324ab2d2,
+    type: 2}
+  thirdPersonPrefab: {fileID: 0}
+  droppedPrefab: {fileID: 1341514807460112, guid: f1521196e8e97ea45a62ec5e344eae6f,
+    type: 2}
