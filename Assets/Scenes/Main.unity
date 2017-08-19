@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028346, g: 0.22571373, b: 0.30692244, a: 1}
+  m_IndirectSpecularColor: {r: 0.2464749, g: 0.2823448, b: 0.34570262, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -4551,7 +4551,6 @@ MonoBehaviour:
   m_OfflineScene: 
   m_OnlineScene: 
   m_SpawnPrefabs:
-  - {fileID: 1788621936390712, guid: 8d0cdece92161c24d90549748d7cc20f, type: 2}
   - {fileID: 1246586350134086, guid: 48308d2f749f5b54eadfed2ba2987f3e, type: 2}
   - {fileID: 1307100487844756, guid: 765065cd928101d4dbe9b101d174cc7d, type: 2}
   - {fileID: 1341514807460112, guid: f1521196e8e97ea45a62ec5e344eae6f, type: 2}

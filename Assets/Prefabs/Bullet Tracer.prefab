@@ -37,8 +37,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4084127241050944}
   - component: {fileID: 54509060902576256}
-  - component: {fileID: 114946023939128592}
-  - component: {fileID: 114147287865850310}
   - component: {fileID: 114772069475986802}
   - component: {fileID: 136408578766317498}
   m_Layer: 0
@@ -129,27 +127,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 2
---- !u!114 &114147287865850310
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1788621936390712}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1768714887, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_TransformSyncMode: 3
-  m_SendInterval: 0
-  m_SyncRotationAxis: 0
-  m_RotationSyncCompression: 0
-  m_SyncSpin: 0
-  m_MovementTheshold: 0.001
-  m_VelocityThreshold: 0.0001
-  m_SnapThreshold: 5
-  m_InterpolateRotation: 1
-  m_InterpolateMovement: 1
 --- !u!114 &114772069475986802
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -161,38 +138,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cff0d0163d615d04181eacc655ed5e86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &114946023939128592
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1788621936390712}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 372142912, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SceneId:
-    m_Value: 0
-  m_AssetId:
-    i0: 141
-    i1: 12
-    i2: 222
-    i3: 206
-    i4: 146
-    i5: 22
-    i6: 28
-    i7: 36
-    i8: 217
-    i9: 5
-    i10: 73
-    i11: 116
-    i12: 141
-    i13: 124
-    i14: 194
-    i15: 15
-  m_ServerOnly: 0
-  m_LocalPlayerAuthority: 0
 --- !u!136 &136408578766317498
 CapsuleCollider:
   m_ObjectHideFlags: 1
