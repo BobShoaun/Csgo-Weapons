@@ -5,7 +5,7 @@ using UnityEngine.Networking;
 using UnityRandom = UnityEngine.Random;
 using DUtil = Doxel.Utility.Utility;
 
-public class GunHandler : NetworkBehaviour {
+public class GunHandler : Handler {
 
 	// client
 	public View view;
@@ -17,19 +17,25 @@ public class GunHandler : NetworkBehaviour {
 	private float nextFireTime = 0;
 	private float nextContinuousReloadTime = 0;
 	private float nextRecoilCooldownTime = 0;
+	private float nextRescopeTime = 0;
 	private bool reloading = false;
 	private float innacuracy = 0;
-	private WeaponManager2 wm;
 	private Vector3 recoilRotation;
 
+	public Gun Gun { get; set; }
+
 	[ServerCallback]
-	private void Start () {
-		wm = GetComponent<WeaponManager2> ();
+	private void OnEnable () {
+		Gun = GetComponent<WeaponManager2> ().CurrentWeapon as Gun;
+		RpcUpdateUI (Gun.ammunitionInMagazine, Gun.reservedAmmunition, Gun.Name);
 	}
 
 	private void Update () {
-		if (isServer)
+		if (isServer) {
 			RecoilCooldown ();
+			if (Gun.continuousReload)
+				ContinuousReload ();
+		}
 		if (!isLocalPlayer)
 			return;
 		if (Input.GetKeyDown (KeyCode.R))
@@ -44,35 +50,39 @@ public class GunHandler : NetworkBehaviour {
 
 	[Command]
 	private void CmdFire (bool mouseDown) {
-
-		if (!mouseDown && !wm.CurrentGun.continuousFire)
+		if (!mouseDown && !Gun.continuousFire)
 			return;
-		if (reloading)
+		if (reloading) //if reloding then return out
 			return;
 		if (Time.time < nextFireTime)
 			return;
-		if (wm.CurrentDynamicGun.ammunitionInMagazine <= 0)
+		if (Gun.ammunitionInMagazine <= 0) // if no more ammo then return out
 			return;
-		nextFireTime = Time.time + 1 / wm.CurrentGun.fireRate;
-		wm.CurrentDynamicGun.ammunitionInMagazine--;
-		if (!wm.CurrentGun.recoil.MoveNext ())
-			wm.CurrentGun.recoil.Reset ();
+		nextFireTime = Time.time + 1 / Gun.fireRate;
+		Gun.ammunitionInMagazine--;
+		// The first reload after a shot takes the longest
+		nextContinuousReloadTime = Time.time + Gun.reloadDuration * 3; 
+		if (!Gun.recoil.MoveNext ())
+			Gun.recoil.Reset ();
 
-		for (int i = 0; i < wm.CurrentGun.bulletsPerShot; i++) {
-			innacuracy += wm.CurrentGun.accuracyDecay;
-			nextRecoilCooldownTime = Time.time + wm.CurrentGun.recoilCooldown;
-			var recoilRotation = new Vector3 (-wm.CurrentGun.recoil.Current.y,
-				                     wm.CurrentGun.recoil.Current.x) * wm.CurrentGun.recoilScale;
+		for (int i = 0; i < Gun.bulletsPerShot; i++) {
+			// TODO get a better formula that factors in movement innacuracy, 
+			// for now it is just adding it linearly
+			innacuracy += Gun.accuracyDecay;
+			nextRecoilCooldownTime = Time.time + Gun.recoilCooldown;
+			var recoilRotation = new Vector3 (-Gun.recoil.Current.y,
+				Gun.recoil.Current.x) * Gun.recoilScale;
 			this.recoilRotation += recoilRotation;
 			recoilTransform.localEulerAngles = this.recoilRotation;
 			RaycastHit raycastHit;
+			//create ray with recoil and innacuracy applied
 			Ray ray = new Ray (recoilTransform.position, 
 				recoilTransform.forward + UnityRandom.insideUnitSphere * innacuracy); 
 
 			if (Physics.Raycast (ray, out raycastHit, Mathf.Infinity)) {
 				var part = raycastHit.collider.GetComponent<BodyPart> ();
 				if (part)
-					part.player.CmdTakeDamage (wm.CurrentGun.damage, part.bodyPartType, 
+					part.player.CmdTakeDamage (Gun.damage, part.bodyPartType, 
 						gameObject, transform.position);
 				else if (!raycastHit.collider.CompareTag ("Weapon")) {
 					if (raycastHit.collider.GetComponent<NetworkIdentity> ())
@@ -84,50 +94,75 @@ public class GunHandler : NetworkBehaviour {
 				if (rb && rb.GetComponent<NetworkIdentity> () && !rb.isKinematic)
 					rb.AddForceAtPosition (recoilTransform.forward * 30, raycastHit.point, ForceMode.Impulse);
 			}
-			RpcFire (this.recoilRotation, wm.CurrentGun.recoil.Direction);
+			RpcFire (this.recoilRotation, Gun.recoil.Direction);
 		}
+		RpcUpdateUI (Gun.ammunitionInMagazine, Gun.reservedAmmunition, Gun.Name);
 	}
 
 	[Command]
 	private void CmdEmptyReload () {
-		if (wm.CurrentDynamicGun.ammunitionInMagazine > 0)
+		if (Gun.ammunitionInMagazine > 0) // magazine is not empty, dont reload
 			return;
 		CmdReload ();
 	}
 
 	[Command]
 	private void CmdReload () {
-		if (wm.CurrentGun.continuousReload)
+		// normal reload not applicable to those with cont
+		// reload, eg shotguns
+		if (Gun.continuousReload)
 			return;
-		if (wm.CurrentDynamicGun.reservedAmmunition <= 0)
+		if (Gun.reservedAmmunition <= 0) // no more reserved ammo, cant reload
 			return;
-		if (wm.CurrentDynamicGun.ammunitionInMagazine == wm.CurrentGun.magazineCapacity)
+		if (Gun.ammunitionInMagazine == Gun.magazineCapacity) // dont have to reload if mag is still full
 			return;
 		reloading = true;
 		RpcReload ();
 		StartCoroutine (DUtil.DelayedInvoke (() => {
-			int ammoToReload = wm.CurrentGun.magazineCapacity - wm.CurrentDynamicGun.ammunitionInMagazine;
-			if (wm.CurrentDynamicGun.reservedAmmunition < ammoToReload) {
-				ammoToReload = wm.CurrentDynamicGun.reservedAmmunition;
-				wm.CurrentDynamicGun.reservedAmmunition = 0;
+			int ammoToReload = Gun.magazineCapacity - Gun.ammunitionInMagazine;
+			if (Gun.reservedAmmunition < ammoToReload) {
+				ammoToReload = Gun.reservedAmmunition;
+				Gun.reservedAmmunition = 0;
 			}
 			else
-				wm.CurrentDynamicGun.reservedAmmunition -= ammoToReload;
-			wm.CurrentDynamicGun.ammunitionInMagazine += ammoToReload;
+				Gun.reservedAmmunition -= ammoToReload;
+			Gun.ammunitionInMagazine += ammoToReload;
 			reloading = false;
-		}, wm.CurrentGun.reloadDuration));
+			RpcUpdateUI (Gun.ammunitionInMagazine, Gun.reservedAmmunition, Gun.Name);
+		}, Gun.reloadDuration));
+	}
+
+	[Server]
+	private void ContinuousReload () {
+		if (!Gun.continuousReload) // if not cont reload then cant use this method to reload
+			return;
+		if (Gun.reservedAmmunition <= 0)
+			return;
+		if (Gun.ammunitionInMagazine == Gun.magazineCapacity)
+			return;
+		if (Time.time < nextContinuousReloadTime)
+			return;
+		nextContinuousReloadTime = Time.time + Gun.reloadDuration;
+		Gun.reservedAmmunition--;
+		Gun.ammunitionInMagazine++;
+		RpcUpdateUI (Gun.ammunitionInMagazine, Gun.reservedAmmunition, Gun.Name);
 	}
 
 	[Server]
 	private void RecoilCooldown () {
 		recoilRotation = DUtil.ExponentialDecayTowards (recoilRotation, Vector3.zero, 1f, Time.deltaTime * 5f);
 		recoilTransform.localRotation = Quaternion.Euler (recoilRotation);
-		view.recoilTrackingRotation = recoilRotation;
+		RpcRecoilCooldown (recoilRotation);
 
 		if (Time.time >= nextRecoilCooldownTime) {
-			innacuracy = Mathf.MoveTowards (innacuracy, wm.CurrentGun.baseInnacuracy, Time.deltaTime * 2);
-			wm.CurrentGun.recoil.Reset ();
+			innacuracy = Mathf.MoveTowards (innacuracy, Gun.baseInnacuracy, Time.deltaTime * 2);
+			Gun.recoil.Reset ();
 		}
+	}
+
+	[ClientRpc]
+	private void RpcRecoilCooldown (Vector3 recoilRotation) {
+		view.recoilTrackingRotation = recoilRotation;
 	}
 
 	[ClientRpc]

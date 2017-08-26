@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Doxel.Utility;
 
 public class View : MonoBehaviour {
 
@@ -37,6 +38,7 @@ public class View : MonoBehaviour {
 //		float angleY = recoilTransform.localEulerAngles.y;
 //		angleY = angleY > 180 ? angleY - 360 : angleY;
 		//Debug.Log (new Vector3 (angleX, angleY));
+		recoilTrackingRotation = Utility.ExponentialDecayTowards (recoilTrackingRotation, Vector3.zero, 1f, Time.deltaTime * 5f);
 		transform.localRotation = Quaternion.Euler (punchRotation + (Vector3) recoilTrackingRotation * recoilTrackingScale);
 		// TODO make this decay exponential
 		punchRotation = Vector3.MoveTowards (punchRotation, Vector3.zero, Time.deltaTime * punchDecay);

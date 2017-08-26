@@ -8,14 +8,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5d76e5b97255cba46bad8f93f7800a72, type: 3}
+  m_Script: {fileID: 11500000, guid: fcae16e2952ecea4596bb72caa78d821, type: 3}
   m_Name: High Explosive Grenade
   m_EditorClassIdentifier: 
-  id: 2
+  id: 4
   name: High Explosive Grenade
   slot: 4
   firstPersonPrefab: {fileID: 1317952565179754, guid: f3435cc673664184a9e7ee91f5370782,
     type: 2}
-  thirdPersonPrefab: {fileID: 0}
+  thirdPersonPrefab: {fileID: 1888078861072124, guid: 885e17bc9e866c044ac186e61da97f73,
+    type: 2}
   droppedPrefab: {fileID: 1246586350134086, guid: 48308d2f749f5b54eadfed2ba2987f3e,
     type: 2}
+  smallThrowStrength: 300
+  mediumThrowStrength: 1000
+  bigThrowStrength: 1500

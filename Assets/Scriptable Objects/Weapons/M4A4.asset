@@ -8,14 +8,156 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5d76e5b97255cba46bad8f93f7800a72, type: 3}
+  m_Script: {fileID: 11500000, guid: eaa59c311bbe47049bfa97e9c206aba0, type: 3}
   m_Name: M4A4
   m_EditorClassIdentifier: 
-  id: 4
-  name: m4a4
+  id: 0
+  name: M4A4
   slot: 0
   firstPersonPrefab: {fileID: 1357578025723098, guid: 5c380d384bdea7647b3bd50e017c3eab,
     type: 2}
-  thirdPersonPrefab: {fileID: 0}
+  thirdPersonPrefab: {fileID: 1445542242404536, guid: 1990a4b5653312946b14f19fb593206f,
+    type: 2}
   droppedPrefab: {fileID: 1545550861574260, guid: 67819e94fe300144fa5b52c2a8655b9d,
+    type: 2}
+  fireRate: 11.1
+  damage: 33
+  magazineCapacity: 30
+  reservedCapacity: 90
+  baseInnacuracy: 0
+  accuracyDecay: 0.001
+  recoilScale: 35
+  recoilCooldown: 0.23
+  recoil:
+    patternX:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 2
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.115812704
+        value: -0.0029578917
+        inSlope: 0.030424815
+        outSlope: 0.030424815
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.2228274
+        value: -0.015701156
+        inSlope: 0.11972303
+        outSlope: 0.11972303
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.28688365
+        value: 0.017086644
+        inSlope: 0.09899772
+        outSlope: 0.09899772
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.38505846
+        value: 0.046260852
+        inSlope: 0.021159649
+        outSlope: 0.021159649
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.5217417
+        value: -0.0010078363
+        inSlope: -0.001343502
+        outSlope: -0.001343502
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.59875995
+        value: -0.02407996
+        inSlope: 0.05105148
+        outSlope: 0.05105148
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.7616755
+        value: -0.023720246
+        inSlope: -0.1696438
+        outSlope: -0.1696438
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.8347111
+        value: 0.014775891
+        inSlope: 0.088339224
+        outSlope: 0.088339224
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 1
+        value: 0.051431257
+        inSlope: 0.07554889
+        outSlope: 0.07554889
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    patternY:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 2
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.1147891
+        value: 0.056044254
+        inSlope: 0.3426146
+        outSlope: 0.3426146
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.18965177
+        value: 0.10147223
+        inSlope: 0.026865603
+        outSlope: 0.026865603
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.39702928
+        value: 0.09652248
+        inSlope: 0.028014183
+        outSlope: 0.028014183
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.5496262
+        value: 0.109518796
+        inSlope: -0.06814951
+        outSlope: -0.06814951
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.7467424
+        value: 0.11055586
+        inSlope: -0.0908393
+        outSlope: -0.0908393
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.869841
+        value: 0.10595432
+        inSlope: -0.066161156
+        outSlope: -0.066161156
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 1
+        value: 0.09410808
+        inSlope: 0.0071525574
+        outSlope: 0.0071525574
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    random: 0
+  reloadDuration: 2.5
+  continuousReload: 0
+  bulletsPerShot: 1
+  bulletTracerFrequency: 3
+  continuousFire: 1
+  scope: 0
+  unscopeAfterFiring: 0
+  bulletHolePrefab: {fileID: 1799922971647616, guid: 6d9a614686d46354d98654b9992c7134,
+    type: 2}
+  bulletTracerPrefab: {fileID: 1788621936390712, guid: 8d0cdece92161c24d90549748d7cc20f,
     type: 2}

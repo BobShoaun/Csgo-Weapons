@@ -8,7 +8,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5d76e5b97255cba46bad8f93f7800a72, type: 3}
+  m_Script: {fileID: 11500000, guid: b46d0a422a8096d40bee988a3069b74c, type: 3}
   m_Name: Knife
   m_EditorClassIdentifier: 
   id: 3
@@ -16,6 +16,11 @@ MonoBehaviour:
   slot: 2
   firstPersonPrefab: {fileID: 1352802281757852, guid: 9a457858e0322e8408fbb7e3324ab2d2,
     type: 2}
-  thirdPersonPrefab: {fileID: 0}
+  thirdPersonPrefab: {fileID: 1120881228153878, guid: 52a11918fbd257a49a850836e1cf1c64,
+    type: 2}
   droppedPrefab: {fileID: 1341514807460112, guid: f1521196e8e97ea45a62ec5e344eae6f,
     type: 2}
+  swingCooldown: 0.5
+  stabCooldown: 1
+  swingDamage: 25
+  stabDamage: 50

@@ -27,7 +27,7 @@ GameObject:
   - component: {fileID: 114232872602988664}
   - component: {fileID: 114462798729945364}
   m_Layer: 0
-  m_Name: Square Gun (Dropped)
+  m_Name: M4A4 (Dropped)
   m_TagString: Weapon
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -155,7 +155,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 728dd4801202694458220308134b1e1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponId: 0
+  weapon: {fileID: 11400000, guid: 317a544ee3af76241bdcd4273c9a2ddf, type: 2}
 --- !u!114 &114947792366724870
 MonoBehaviour:
   m_ObjectHideFlags: 1

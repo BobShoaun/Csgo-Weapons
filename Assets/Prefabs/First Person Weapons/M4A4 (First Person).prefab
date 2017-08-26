@@ -38,7 +38,7 @@ GameObject:
   - component: {fileID: 23347338804922838}
   - component: {fileID: 114175678757550000}
   m_Layer: 11
-  m_Name: Square Gun (Held)
+  m_Name: M4A4 (First Person)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -121,7 +121,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d22730e440a3f1548b5ae7cfadad89cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weapon: {fileID: 11400000, guid: 4ff79d4cc084f85489e61849a039f306, type: 2}
+  weapon: {fileID: 0}
   droppedPrefab: {fileID: 1545550861574260, guid: 67819e94fe300144fa5b52c2a8655b9d,
     type: 2}
   deployTime: 1

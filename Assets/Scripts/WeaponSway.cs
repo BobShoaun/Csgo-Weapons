@@ -24,7 +24,7 @@ public class WeaponSway : MonoBehaviour {
 		float zOffset = Mathf.Cos (timer * bobSpeed * 2) * bobAmount * speedPercent;
 
 
-		Vector3 newPos = new Vector3 (xOffset, 0, (speedPercent * -kickBackAmount) + zOffset);
+		Vector3 newPos = new Vector3 (xOffset, (speedPercent * -kickBackAmount) + zOffset, (speedPercent * -kickBackAmount) + zOffset);
 		transform.localPosition = newPos;
 
 

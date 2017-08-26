@@ -50,11 +50,16 @@ public class Player : NetworkBehaviour {
 			CmdSendChat ("[Server]: " + name + " has joined the game");
 			//PlayerHUD.Instance.SendChat (name + " has joined the game");
 
-			gameObject.GetGameObjectInChildren ("Viewmodel Camera", true).SetActive (true);
-			gameObject.GetGameObjectInChildren ("Environment Camera").GetComponent<Camera> ().enabled = true;
+			//gameObject.GetGameObjectInChildren ("Viewmodel Camera", true).SetActive (true);
+
+			gameObject.GetGameObjectInChildren ("Environment Camera", true).SetActive (true);
+			foreach (var child in model.GetComponentsInChildren<Transform> ()) {
+				child.gameObject.layer = LayerMask.NameToLayer ("Player Model");
+			}
 
 			GameObject radarCam = gameObject.GetGameObjectInChildren ("Radar Camera", true);
 			radarCam.SetActive (true);
+
 			PlayerHUD.Instance.SetRadarCam (radarCam.GetComponent<Camera> ());
 			if (isServer) { // if player is the host
 				// remove local player model from the shootable layer
@@ -64,13 +69,12 @@ public class Player : NetworkBehaviour {
 		else {
 			enabled = false;
 			GetComponent<PlayerController> ().enabled = false;
-			GetComponentInChildren<Camera> ().enabled = false;
-			GetComponentInChildren<AudioListener> ().enabled = false;
+			//GetComponentInChildren<Camera> ().enabled = false;
+			//GetComponentInChildren<AudioListener> ().enabled = false;
 		}
 
 		// UI feeback when a player joins
-		PlayerHUD.Instance.AddPlayerToScoreboard (netId, name, kills, deaths);
-	
+		PlayerHUD.Instance.AddPlayerToScoreboard (GetComponent<NetworkIdentity> (), name, kills, deaths);
 	}
 
 	private void Update () {
@@ -189,7 +193,7 @@ public class Player : NetworkBehaviour {
 
 	[ClientRpc]
 	private void RpcOnMurder () {
-		PlayerHUD.Instance.UpdatePlayerScoreUI (netId, name, kills, deaths);
+		PlayerHUD.Instance.UpdatePlayerScoreUI (GetComponent<NetworkIdentity> (), name, kills, deaths);
 	}
 
 	[Command]
@@ -215,7 +219,7 @@ public class Player : NetworkBehaviour {
 			murderer.name + " Head Shotted " + gameObject.name :
 			murderer.name + " Killed " + gameObject.name);
 
-		PlayerHUD.Instance.UpdatePlayerScoreUI (netId, name, kills, deaths);
+		PlayerHUD.Instance.UpdatePlayerScoreUI (GetComponent<NetworkIdentity> (), name, kills, deaths);
 		
 		if (Die != null)
 			Die (murderer);
@@ -307,7 +311,7 @@ public class Player : NetworkBehaviour {
 
 	[Command]
 	public void CmdThrow (float strength) {
-		(weaponManager.HoldingWeapon as Grenade).ServerThrow (strength);
+		(weaponManager.HoldingWeapon as GrenadeLegacy).ServerThrow (strength);
 
 	}
 
@@ -318,7 +322,7 @@ public class Player : NetworkBehaviour {
 
 	[Command]
 	public void CmdDeploy () {
-		(weaponManager.HoldingWeapon as Gun).ServerDeploy ();
+		(weaponManager.HoldingWeapon as GunLegacy).ServerDeploy ();
 	}
 
 	[Command]
@@ -326,11 +330,11 @@ public class Player : NetworkBehaviour {
 		// HACK very expensive way, find better way.
 		// right now all raycast calculations are being done one the server
 		// so due to the host is also server architecture, the host wont be
-		// shot be the clients, this fixes it in a rather expensive manner
+		// shot by the clients, this fixes it in a rather expensive manner
 		foreach (var child in model.GetComponentsInChildren<Transform> ()) {
 			child.gameObject.layer = LayerMask.NameToLayer ("Shooting Player");
 		}
-		(weaponManager.HoldingWeapon as Gun).ServerTryFire (shootableLayer);
+		(weaponManager.HoldingWeapon as GunLegacy).ServerTryFire (shootableLayer);
 		foreach (var child in model.GetComponentsInChildren<Transform> ()) {
 			child.gameObject.layer = LayerMask.NameToLayer ("Default");
 		}
@@ -338,12 +342,12 @@ public class Player : NetworkBehaviour {
 
 	[ClientRpc]
 	public void RpcFire (int ammoInMag, Vector2 v, float r, Vector2 rd) {
-		(weaponManager.HoldingWeapon as Gun).ClientFire (ammoInMag, v, r, rd);
+		(weaponManager.HoldingWeapon as GunLegacy).ClientFire (ammoInMag, v, r, rd);
 	}
 
 	[Command]
 	public void CmdReload () {
-		(weaponManager.HoldingWeapon as Gun).ServerReload ();
+		(weaponManager.HoldingWeapon as GunLegacy).ServerReload ();
 	}
 
 	[Command]
@@ -351,7 +355,7 @@ public class Player : NetworkBehaviour {
 		// HACK: just to remove the null ref exception, might cause other
 		// unwanted side effects down the road
 		if (weaponManager.HoldingWeapon != null)
-			(weaponManager.HoldingWeapon as Gun).ServerContReload ();
+			(weaponManager.HoldingWeapon as GunLegacy).ServerContReload ();
 	}
 
 	[Command]
@@ -359,32 +363,32 @@ public class Player : NetworkBehaviour {
 		// HACK: just to remove the null ref exception, might cause other
 		// unwanted side effects down the road
 		if (weaponManager.HoldingWeapon != null)
-			(weaponManager.HoldingWeapon as Gun).ServerEmptyReload ();
+			(weaponManager.HoldingWeapon as GunLegacy).ServerEmptyReload ();
 	}
 
 	[ClientRpc]
 	public void RpcStartReload () {
-		(weaponManager.HoldingWeapon as Gun).ClientStartReload ();
+		(weaponManager.HoldingWeapon as GunLegacy).ClientStartReload ();
 	}
 
 	[ClientRpc]
 	public void RpcEndReload (int ammoInMag, int reserve) {
-		(weaponManager.HoldingWeapon as Gun).ClientEndReload (ammoInMag, reserve);
+		(weaponManager.HoldingWeapon as GunLegacy).ClientEndReload (ammoInMag, reserve);
 	}
 
 	[Command]
 	public void CmdSetScopeState (int value) {
-		(weaponManager.HoldingWeapon as Gun).ServerSetScopeState (value);
+		(weaponManager.HoldingWeapon as GunLegacy).ServerSetScopeState (value);
 	}
 
 	[Command]
 	public void CmdCycleScopeState () {
-		(weaponManager.HoldingWeapon as Gun).ServerCycleScopeState ();
+		(weaponManager.HoldingWeapon as GunLegacy).ServerCycleScopeState ();
 	}
 
 	[ClientRpc]
 	public void RpcSetScopeState (float newFOV, Vector2 newSense, bool scopeActive) {
-		(weaponManager.HoldingWeapon as Gun).ClientSetScopeState (newFOV, newSense, scopeActive);
+		(weaponManager.HoldingWeapon as GunLegacy).ClientSetScopeState (newFOV, newSense, scopeActive);
 	}
 
 	public void Flashed (bool direct) {
@@ -397,22 +401,22 @@ public class Player : NetworkBehaviour {
 
 	[Command]
 	public void CmdSwing () {
-		(weaponManager.HoldingWeapon as Knife).ServerTrySwing ();
+		(weaponManager.HoldingWeapon as KnifeLegacy).ServerTrySwing ();
 	}
 
 	[Command]
 	public void CmdStab () {
-		(weaponManager.HoldingWeapon as Knife).ServerTryStab ();
+		(weaponManager.HoldingWeapon as KnifeLegacy).ServerTryStab ();
 	}
 
 	[ClientRpc]
 	public void RpcSwing () {
-		(weaponManager.HoldingWeapon as Knife).ClientSwing ();
+		(weaponManager.HoldingWeapon as KnifeLegacy).ClientSwing ();
 	}
 
 	[ClientRpc]
 	public void RpcStab () {
-		(weaponManager.HoldingWeapon as Knife).ClientStab ();
+		(weaponManager.HoldingWeapon as KnifeLegacy).ClientStab ();
 	}
 
 }

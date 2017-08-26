@@ -118,7 +118,7 @@ public class WeaponManager : MonoBehaviour {
 		HoldingWeapon.gameObject.SetActive (true);
 		HoldingWeapon.Deploy ();
 		if (player.isLocalPlayer) {
-			Gun gun = weapons [currentIndex] as Gun;
+			GunLegacy gun = weapons [currentIndex] as GunLegacy;
 			PlayerHUD.Instance.WeaponName = HoldingWeapon.Weapon.Name;
 			PlayerHUD.Instance.WeaponAmmo = gun ? gun.AmmunitionInMagazine : 0;
 			PlayerHUD.Instance.WeaponReserve = gun ? gun.ReservedAmmunition : 0;

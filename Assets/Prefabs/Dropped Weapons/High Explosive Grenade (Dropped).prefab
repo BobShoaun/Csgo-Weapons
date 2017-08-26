@@ -165,13 +165,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2877f91fe07a09448a060e2c7058bfa2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weapon: {fileID: 11400000, guid: 6f23876db6feb4340b971bb505743150, type: 2}
-  heldPrefab: {fileID: 1317952565179754, guid: f3435cc673664184a9e7ee91f5370782, type: 2}
-  timer: 4
-  radius: 5
-  explosionForce: 100
+  weapon: {fileID: 11400000, guid: 3ec107788a1f3ec43a7972f74ef26df9, type: 2}
   sphere: {fileID: 135715611410367628}
   capsule: {fileID: 136740562022546362}
+  timer: 1.7
+  radius: 5
+  explosionForce: 100
 --- !u!135 &135715611410367628
 SphereCollider:
   m_ObjectHideFlags: 1

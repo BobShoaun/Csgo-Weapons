@@ -8,14 +8,96 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5d76e5b97255cba46bad8f93f7800a72, type: 3}
+  m_Script: {fileID: 11500000, guid: eaa59c311bbe47049bfa97e9c206aba0, type: 3}
   m_Name: SCAR-20
   m_EditorClassIdentifier: 
-  id: 6
+  id: 5
   name: SCAR-20
   slot: 0
   firstPersonPrefab: {fileID: 1141091002427426, guid: 294bff9052efd9c4788d1eda8cf9f443,
     type: 2}
-  thirdPersonPrefab: {fileID: 0}
+  thirdPersonPrefab: {fileID: 1901455353028198, guid: 4caecb8061867b344a5130a4a65e7979,
+    type: 2}
   droppedPrefab: {fileID: 1414831444557560, guid: 52d5eeec70d303c4dacbbac8742b67fd,
+    type: 2}
+  fireRate: 4
+  damage: 80
+  magazineCapacity: 20
+  reservedCapacity: 90
+  baseInnacuracy: 0
+  accuracyDecay: 0.001
+  recoilScale: 75
+  recoilCooldown: 0.5
+  recoil:
+    patternX:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 2
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.31285134
+        value: 0.0057537863
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.61603034
+        value: -0.009626669
+        inSlope: -0.019902363
+        outSlope: -0.019902363
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 1.0378453
+        value: 0.014373782
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    patternY:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 2
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.35630393
+        value: 0.011228941
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.5906782
+        value: 0.03168866
+        inSlope: -0.017564744
+        outSlope: -0.017564744
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 1.1107178
+        value: 0.033668518
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    random: 0
+  reloadDuration: 2.5
+  continuousReload: 0
+  bulletsPerShot: 1
+  bulletTracerFrequency: 3
+  continuousFire: 1
+  scope: 1
+  unscopeAfterFiring: 0
+  bulletHolePrefab: {fileID: 1799922971647616, guid: 6d9a614686d46354d98654b9992c7134,
+    type: 2}
+  bulletTracerPrefab: {fileID: 1788621936390712, guid: 8d0cdece92161c24d90549748d7cc20f,
     type: 2}

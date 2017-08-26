@@ -313,11 +313,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 133ba52daab99ca41859821d64b77df3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weapon: {fileID: 11400000, guid: af0f6fd602487364a9d06625d1ecfcf2, type: 2}
-  heldPrefab: {fileID: 1317254123059448, guid: 63bea7a3608ab9549bb5d5b96b388a8c, type: 2}
-  timer: 1.669
+  weapon: {fileID: 11400000, guid: e23a194f7c56fd848880ad071498bfb8, type: 2}
   sphere: {fileID: 135144867187900134}
   capsule: {fileID: 136761899017481492}
+  timer: 1.669
   mask:
     serializedVersion: 2
     m_Bits: 4294965465
