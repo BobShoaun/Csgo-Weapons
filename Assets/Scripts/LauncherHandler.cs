@@ -2,19 +2,29 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using Doxel.Utility.ExtensionMethods;
 
 public class LauncherHandler : Handler {
 
+	// Client
+	private Transform muzzle;
+	// Server
 	private Launcher launcher;
 	private float nextFireTime = 0;
 
-	[ServerCallback]
-	private void OnEnable () {
+	protected override void ServerDeploy () {
 		launcher = GetComponent<WeaponManager2> ().CurrentWeapon as Launcher;
+		nextFireTime = Time.time + launcher.deployDuration;
 	}
 
-	[ClientCallback]
-	private void Update () {
+	protected override void ClientDeploy () {
+		muzzle = GetComponent<WeaponManager2> ().HoldingWeapon.GetGameObjectInChildren ("Muzzle").transform;
+	}
+
+	protected override void ClientUpdate () {
+		if (!isLocalPlayer)
+			return;
+
 		if (Input.GetMouseButtonDown (0))
 			CmdFire ();
 	}
@@ -24,8 +34,9 @@ public class LauncherHandler : Handler {
 		if (Time.time < nextFireTime)
 			return;
 		nextFireTime = Time.time + 1 / launcher.fireRate;
-		Instantiate (launcher.projectilePrefab);
-
+		print ("launch");
+		NetworkServer.Spawn (Instantiate (launcher.projectilePrefab, 
+			muzzle.position, Quaternion.LookRotation (muzzle.up)));
 	}
 
 }

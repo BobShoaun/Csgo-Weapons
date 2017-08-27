@@ -12,21 +12,15 @@ public class GrenadeHandler : Handler {
 	public Transform look;
 	private Grenade grenade;
 
-	[ServerCallback]
-	private void OnEnable () {
+	protected override void ServerDeploy () {
 		grenade = GetComponent<WeaponManager2> ().CurrentWeapon as Grenade;
 		RpcUpdateUI (0, 0, grenade.Name);
 	}
 
-	private void OnDisable () {
-		
-	}
-
-	[ClientCallback]
-	private void Update () {
+	protected override void ClientUpdate () {
 		if (!isLocalPlayer)
 			return;
-		
+
 		if (Input.GetMouseButtonUp (0))
 			CmdThrow (1500);
 		else if (Input.GetMouseButtonUp (1))

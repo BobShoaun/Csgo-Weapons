@@ -20,42 +20,46 @@ public class KnifeHandler : Handler {
 	private Knife knife;
 	private float nextAttackTime;
 
-	[ClientCallback]
-	private void Awake () {
 
-	}
-
-	private void OnEnable () {
-		if (isClient) {
-
-			knifeTransform = GetComponent<WeaponManager2> ().HoldingWeapon.transform;
-	
-			animator = knifeTransform.GetComponent<Animator> ();
-			position = knifeTransform.localPosition;
-			rotation = knifeTransform.localRotation;
-		}
-		if (isServer) {
-			knife = GetComponent<WeaponManager2> ().CurrentWeapon as Knife;
-			RpcUpdateUI (0, 0, knife.Name);
+	public void Keep () {
+		if (animator) {
+			animator.Rebind ();
+			//print ("rebinding");
 		}
 	}
 
-	[ClientCallback]
-	private void OnDisable () {
+	protected override void ClientKeep () {
 		knifeTransform.localPosition = position;
 		knifeTransform.localRotation = rotation;
 	}
 
-	[ClientCallback]
-	private void Update () {
+	protected override void ServerDeploy () {
+		knife = GetComponent<WeaponManager2> ().CurrentWeapon as Knife;
+		nextAttackTime = Time.time + knife.deployDuration;
+		RpcCrosshair (knife.showCrosshair);
+		RpcUpdateUI (0, 0, knife.Name);
+	}
+
+	protected override void ClientDeploy () {
+		knifeTransform = GetComponent<WeaponManager2> ().HoldingWeapon.transform;
+
+		animator = knifeTransform.GetComponent<Animator> ();
+		//animator.Rebind ();
+		position = knifeTransform.localPosition;
+		rotation = knifeTransform.localRotation;
+	}
+
+	protected override void ClientUpdate () {
 		if (!isLocalPlayer)
 			return;
-		
+
 		if (Input.GetMouseButtonDown (0))
 			CmdSwing ();
 		else if (Input.GetMouseButtonDown (1))
 			CmdStab ();
-		
+
+		if (Input.GetKeyDown (KeyCode.H))
+			Keep ();
 	}
 
 	[Command]

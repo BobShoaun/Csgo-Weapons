@@ -9,27 +9,27 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eaa59c311bbe47049bfa97e9c206aba0, type: 3}
-  m_Name: Nova
+  m_Name: AWP
   m_EditorClassIdentifier: 
-  id: 1
-  name: Nova
+  id: 7
+  name: AWP
   slot: 0
-  firstPersonPrefab: {fileID: 1120117200344780, guid: ff29c678350b3184b9bb3717b27e8494,
+  firstPersonPrefab: {fileID: 1640520531113822, guid: b577bb445daf63e4a8b1d6108900491e,
     type: 2}
-  thirdPersonPrefab: {fileID: 1371918398767940, guid: 2cc9004e5bbc1834bac13b23486f1dff,
+  thirdPersonPrefab: {fileID: 1966510396995326, guid: 12990cfa0d2186d46a3e054fc48de46c,
     type: 2}
-  droppedPrefab: {fileID: 1703945106206468, guid: a2c99d9e476325d4fbbc3af2011b1392,
+  droppedPrefab: {fileID: 1983980182311872, guid: cbfb00ec3fc0d444aa7dbf9c9377c410,
     type: 2}
   deployDuration: 1.5
-  showCrosshair: 1
-  fireRate: 1.133
-  damage: 26
-  magazineCapacity: 8
-  reservedCapacity: 32
-  baseInnacuracy: 0.05
-  accuracyDecay: 0
+  showCrosshair: 0
+  fireRate: 0.683
+  damage: 115
+  magazineCapacity: 10
+  reservedCapacity: 30
+  baseInnacuracy: 0
+  accuracyDecay: 0.001
   recoilScale: 0
-  recoilCooldown: 1
+  recoilCooldown: 0.55
   recoil:
     patternX:
       serializedVersion: 2
@@ -39,30 +39,18 @@ MonoBehaviour:
       m_RotationOrder: 4
     patternY:
       serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 2
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-      - serializedVersion: 2
-        time: 1
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
+      m_Curve: []
       m_PreInfinity: 2
       m_PostInfinity: 2
-      m_RotationOrder: 0
+      m_RotationOrder: 4
     random: 0
-  reloadDuration: 0.5
-  continuousReload: 1
-  bulletsPerShot: 8
+  reloadDuration: 2.5
+  continuousReload: 0
+  bulletsPerShot: 1
   tracerBulletInterval: 1
   continuousFire: 0
-  scope: 0
-  smartScope: 0
+  scope: 1
+  smartScope: 1
   bulletHolePrefab: {fileID: 1799922971647616, guid: 6d9a614686d46354d98654b9992c7134,
     type: 2}
   bulletTracerPrefab: {fileID: 1788621936390712, guid: 8d0cdece92161c24d90549748d7cc20f,

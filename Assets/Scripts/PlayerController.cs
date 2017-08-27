@@ -167,8 +167,8 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	private void Update () {
-		if (Input.GetKeyDown (KeyCode.G))
-			StartCoroutine (Summersault ());
+		//if (Input.GetKeyDown (KeyCode.G))
+		//	StartCoroutine (Summersault ());
 		speed = Mathf.MoveTowards (speed, targetSpeed, Time.deltaTime * speedMaximumDelta); // Change speed towards target speed
 		bobSpeed = Mathf.MoveTowards (bobSpeed, targetBobSpeed, Time.deltaTime * bobSpeedMaximumDelta); // Change bob speed towards target bob speed
 		fov = Mathf.MoveTowards (fov, targetFieldOfView, Time.deltaTime * fieldOfViewMaximumDelta); // Change field of view towards target field of view

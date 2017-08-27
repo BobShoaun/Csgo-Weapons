@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityRandom = UnityEngine.Random;
+using Doxel.Utility.ExtensionMethods;
 using DUtil = Doxel.Utility.Utility;
 
 public class GunHandler : Handler {
 
 	// client
 	public View view;
-	public Transform muzzle;
+	private Transform muzzle;
+	public GameObject bulletTracerPrefab;
 	public GameObject bulletHolePrefab;
 
 	// server 
@@ -18,24 +20,81 @@ public class GunHandler : Handler {
 	private float nextContinuousReloadTime = 0;
 	private float nextRecoilCooldownTime = 0;
 	private float nextRescopeTime = 0;
+	private float endReloadTime = 0;
 	private bool reloading = false;
 	private float innacuracy = 0;
 	private Vector3 recoilRotation;
+	private Vector2 initialSense;
+	private int scopeState;
+	private int previousScopeState;
+	private bool rescopePending = false;
 
 	public Gun Gun { get; set; }
 
 	[ServerCallback]
-	private void OnEnable () {
+	private void Start () {
+		initialSense = GetComponent<PlayerController> ().sensitivity;
+	}
+
+	protected override void ServerDeploy () {
 		Gun = GetComponent<WeaponManager2> ().CurrentWeapon as Gun;
+		// reset all vars
+		nextFireTime = Time.time + Gun.deployDuration; // factor in deploy time
+		nextContinuousReloadTime = 0;
+		nextRecoilCooldownTime = 0;
+		nextRescopeTime = 0;
+		endReloadTime = 0;
+		reloading = false;
+		innacuracy = Gun.baseInnacuracy;
+		scopeState = 0;
+		previousScopeState = 0;
+		rescopePending = false;
+
+		RpcCrosshair (Gun.showCrosshair);
 		RpcUpdateUI (Gun.ammunitionInMagazine, Gun.reservedAmmunition, Gun.Name);
 	}
 
-	private void Update () {
-		if (isServer) {
-			RecoilCooldown ();
-			if (Gun.continuousReload)
-				ContinuousReload ();
+	protected override void ClientDeploy () {
+		muzzle = GetComponent<WeaponManager2> ().HoldingWeapon.GetGameObjectInChildren ("Muzzle").transform;
+	}
+
+	protected override void ServerKeep () {
+		SetScopeState (0);
+	}
+
+	protected override void ServerUpdate () {
+		if (Gun.continuousReload)
+			ContinuousReload ();
+
+		recoilRotation = DUtil.ExponentialDecayTowards (recoilRotation, Vector3.zero, 1f, Time.deltaTime * 5f);
+		recoilTransform.localRotation = Quaternion.Euler (recoilRotation);
+		RpcRecoilCooldown (recoilRotation);
+
+		if (Time.time >= nextRecoilCooldownTime) { // RESET RECOIL AND ACCURACY
+			innacuracy = Mathf.MoveTowards (innacuracy, Gun.baseInnacuracy, Time.deltaTime * 2);
+			Gun.recoil.Reset ();
 		}
+
+		if (reloading && Time.time >= endReloadTime) { // RELOAD
+			int ammoToReload = Gun.magazineCapacity - Gun.ammunitionInMagazine;
+			if (Gun.reservedAmmunition < ammoToReload) {
+				ammoToReload = Gun.reservedAmmunition;
+				Gun.reservedAmmunition = 0;
+			}
+			else
+				Gun.reservedAmmunition -= ammoToReload;
+			Gun.ammunitionInMagazine += ammoToReload;
+			reloading = false;
+			RpcUpdateUI (Gun.ammunitionInMagazine, Gun.reservedAmmunition, Gun.Name);
+		}
+
+		if (Gun.smartScope && rescopePending && Time.time >= nextRescopeTime) { // RESCOPING
+			rescopePending = false;
+			SetScopeState (previousScopeState);
+		}
+	}
+
+	protected override void ClientUpdate () {
 		if (!isLocalPlayer)
 			return;
 		if (Input.GetKeyDown (KeyCode.R))
@@ -43,9 +102,15 @@ public class GunHandler : Handler {
 
 		if (Input.GetMouseButton (0))
 			CmdFire (Input.GetMouseButtonDown (0));
-
-		if (Input.GetMouseButtonUp (0))
+		else
 			CmdEmptyReload ();
+
+		if (Input.GetMouseButtonDown (1))
+			CmdCycleScopeState ();
+
+		if (Input.GetKeyDown (KeyCode.F)) {
+			// Inspect
+		}
 	}
 
 	[Command]
@@ -94,8 +159,18 @@ public class GunHandler : Handler {
 				if (rb && rb.GetComponent<NetworkIdentity> () && !rb.isKinematic)
 					rb.AddForceAtPosition (recoilTransform.forward * 30, raycastHit.point, ForceMode.Impulse);
 			}
-			RpcFire (this.recoilRotation, Gun.recoil.Direction);
+
+			if (Gun.ammunitionInMagazine % Gun.tracerBulletInterval == 0) {
+				RpcSpawnTracer (ray.direction);
+			}
 		}
+
+		if (Gun.smartScope) {
+			SetScopeState (0);
+			nextRescopeTime = nextFireTime;
+			rescopePending = true;
+		}
+		RpcFire (this.recoilRotation, Gun.recoil.Direction);
 		RpcUpdateUI (Gun.ammunitionInMagazine, Gun.reservedAmmunition, Gun.Name);
 	}
 
@@ -116,20 +191,16 @@ public class GunHandler : Handler {
 			return;
 		if (Gun.ammunitionInMagazine == Gun.magazineCapacity) // dont have to reload if mag is still full
 			return;
+		if (reloading)
+			return;
+		SetScopeState (0); // Unscope when reloading
+		if (Gun.smartScope) { // If scope is smart then prepare for rescope
+			nextRescopeTime = Time.time + Gun.reloadDuration;
+			rescopePending = true;
+		}
 		reloading = true;
+		endReloadTime = Time.time + Gun.reloadDuration;
 		RpcReload ();
-		StartCoroutine (DUtil.DelayedInvoke (() => {
-			int ammoToReload = Gun.magazineCapacity - Gun.ammunitionInMagazine;
-			if (Gun.reservedAmmunition < ammoToReload) {
-				ammoToReload = Gun.reservedAmmunition;
-				Gun.reservedAmmunition = 0;
-			}
-			else
-				Gun.reservedAmmunition -= ammoToReload;
-			Gun.ammunitionInMagazine += ammoToReload;
-			reloading = false;
-			RpcUpdateUI (Gun.ammunitionInMagazine, Gun.reservedAmmunition, Gun.Name);
-		}, Gun.reloadDuration));
 	}
 
 	[Server]
@@ -148,16 +219,53 @@ public class GunHandler : Handler {
 		RpcUpdateUI (Gun.ammunitionInMagazine, Gun.reservedAmmunition, Gun.Name);
 	}
 
-	[Server]
-	private void RecoilCooldown () {
-		recoilRotation = DUtil.ExponentialDecayTowards (recoilRotation, Vector3.zero, 1f, Time.deltaTime * 5f);
-		recoilTransform.localRotation = Quaternion.Euler (recoilRotation);
-		RpcRecoilCooldown (recoilRotation);
 
-		if (Time.time >= nextRecoilCooldownTime) {
-			innacuracy = Mathf.MoveTowards (innacuracy, Gun.baseInnacuracy, Time.deltaTime * 2);
-			Gun.recoil.Reset ();
+	[Command]
+	private void CmdCycleScopeState () {
+		if (Gun.scope == Gun.Scope.None)
+			return;
+		if (Time.time < nextFireTime)
+			return;
+		SetScopeState (DUtil.Remainder (scopeState + 1, Gun.scope == Gun.Scope.Generic ? 3 : 2));
+	}
+
+	[Server]
+	private void SetScopeState (int value) {
+		if (Gun.scope == Gun.Scope.None)
+			return;
+		if (reloading) // cant scope when reloading
+			return;
+		if (rescopePending)
+			return;
+		if (value > 2) { // Error checking
+			Debug.LogError ("Invalid value for scope state, has to be between 0 to 2");
+			return;
 		}
+		switch (value) {
+			case 0: // unscoped
+				RpcSetScopeState (60, initialSense, false);
+				RpcCrosshair (Gun.showCrosshair);
+				break;
+			case 1: // scoped
+				RpcSetScopeState (40, initialSense / 2, true);
+				RpcCrosshair (false);
+				break;
+			case 2: // zoom
+				RpcSetScopeState (20, initialSense / 4, true);
+				RpcCrosshair (false);
+				break;
+		}
+		previousScopeState = scopeState;
+		scopeState = value;
+	}
+
+	[ClientRpc]
+	private void RpcSetScopeState (float newFOV, Vector2 newSense, bool scoped) {
+		if (!isLocalPlayer)
+			return;
+		view.FieldOfView = newFOV;
+		GetComponent<PlayerController> ().sensitivity = newSense;
+		PlayerHUD.Instance.scopeOverlay.SetActive (scoped);
 	}
 
 	[ClientRpc]
@@ -167,7 +275,7 @@ public class GunHandler : Handler {
 
 	[ClientRpc]
 	private void RpcReload () {
-		
+		// TODO reload animation
 	}
 
 	[ClientRpc]
@@ -185,5 +293,11 @@ public class GunHandler : Handler {
 	private void RpcSpawnBulletHole (Vector3 position, Vector3 direction) {
 		Destroy (Instantiate (bulletHolePrefab, position, Quaternion.LookRotation (direction)), 20);
 	}
+
+	[ClientRpc]
+	private void RpcSpawnTracer (Vector3 direction) {
+		Instantiate (bulletTracerPrefab, muzzle.position, Quaternion.LookRotation (direction));
+	}
+
 
 }

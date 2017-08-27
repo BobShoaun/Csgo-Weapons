@@ -23,7 +23,7 @@ GameObject:
   - component: {fileID: 23381837166985206}
   - component: {fileID: 114622078182797294}
   m_Layer: 11
-  m_Name: Round Gun (Held)
+  m_Name: AWP (First Person)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -121,7 +121,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d22730e440a3f1548b5ae7cfadad89cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weapon: {fileID: 11400000, guid: 0d35d1abf2115d54f811c4a33b0da6c3, type: 2}
+  weapon: {fileID: 0}
   droppedPrefab: {fileID: 1983980182311872, guid: cbfb00ec3fc0d444aa7dbf9c9377c410,
     type: 2}
   deployTime: 1

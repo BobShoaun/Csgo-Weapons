@@ -20,6 +20,8 @@ MonoBehaviour:
     type: 2}
   droppedPrefab: {fileID: 1414831444557560, guid: 52d5eeec70d303c4dacbbac8742b67fd,
     type: 2}
+  deployDuration: 1.5
+  showCrosshair: 1
   fireRate: 4
   damage: 80
   magazineCapacity: 20
@@ -93,10 +95,10 @@ MonoBehaviour:
   reloadDuration: 2.5
   continuousReload: 0
   bulletsPerShot: 1
-  bulletTracerFrequency: 3
+  tracerBulletInterval: 1
   continuousFire: 1
   scope: 1
-  unscopeAfterFiring: 0
+  smartScope: 0
   bulletHolePrefab: {fileID: 1799922971647616, guid: 6d9a614686d46354d98654b9992c7134,
     type: 2}
   bulletTracerPrefab: {fileID: 1788621936390712, guid: 8d0cdece92161c24d90549748d7cc20f,

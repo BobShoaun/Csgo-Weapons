@@ -27,7 +27,7 @@ GameObject:
   - component: {fileID: 114469900941124172}
   - component: {fileID: 114985309903394948}
   m_Layer: 0
-  m_Name: Round Gun (Dropped)
+  m_Name: AWP (Dropped)
   m_TagString: Weapon
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -164,7 +164,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 728dd4801202694458220308134b1e1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponId: 4
+  weapon: {fileID: 11400000, guid: 878d976bbe160a546853ec5f41284cc3, type: 2}
 --- !u!136 &136251421344419936
 CapsuleCollider:
   m_ObjectHideFlags: 1

@@ -46,6 +46,9 @@ public abstract class Weapon : ScriptableObject, IIdentifiable, ICloneable {
 	public GameObject DroppedPrefab {
 		get { return droppedPrefab; }
 	}
+		
+	public float deployDuration = 1.5f;
+	public bool showCrosshair = true;
 
 	public virtual object Clone () {
 		return MemberwiseClone ();

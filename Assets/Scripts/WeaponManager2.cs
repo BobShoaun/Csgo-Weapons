@@ -29,6 +29,7 @@ public class WeaponManager2 : NetworkBehaviour {
 	private GunHandler gunHandler;
 	private KnifeHandler knifeHandler;
 	private GrenadeHandler grenadeHandler;
+	private LauncherHandler launcherHandler;
 	private int currentIndex = 2;
 
 	// Server variables; variables that only exists in the server and is meaningless
@@ -46,6 +47,7 @@ public class WeaponManager2 : NetworkBehaviour {
 		gunHandler = GetComponent<GunHandler> ();
 		knifeHandler = GetComponent<KnifeHandler> ();
 		grenadeHandler = GetComponent<GrenadeHandler> ();
+		launcherHandler = GetComponent<LauncherHandler> ();
 		if (isServer) {
 			weapons = new Weapon [weaponSlotAmount];
 		}
@@ -80,9 +82,9 @@ public class WeaponManager2 : NetworkBehaviour {
 			CmdDropCurrentWeapon ();
 
 		if (Input.GetAxis ("Mouse ScrollWheel") < 0)
-			CmdScrollSwitchWeapon (1);
+			CmdCycleSwitchWeapon (1);
 		else if (Input.GetAxis ("Mouse ScrollWheel") > 0)
-			CmdScrollSwitchWeapon (-1);
+			CmdCycleSwitchWeapon (-1);
 
 		RaycastHit hit;
 		if (Physics.Raycast (environmentCamera.ViewportPointToRay (Vector2.one * 0.5f), 
@@ -165,12 +167,12 @@ public class WeaponManager2 : NetworkBehaviour {
 	}
 
 	[Command]
-	private void CmdScrollSwitchWeapon (int scrollDirection) {
-		scrollDirection = Mathf.Clamp (scrollDirection, -1, 1);
+	private void CmdCycleSwitchWeapon (int cycleDirection) {
+		cycleDirection = Mathf.Clamp (cycleDirection, -1, 1);
 		for (int iterations = 0, 
-			index = DUtil.Remainder (currentIndex + scrollDirection, weapons.Length); 
+			index = DUtil.Remainder (currentIndex + cycleDirection, weapons.Length); 
 			iterations < weapons.Length; 
-			iterations++, index = DUtil.Remainder (index + scrollDirection, weapons.Length)) {
+			iterations++, index = DUtil.Remainder (index + cycleDirection, weapons.Length)) {
 			if (weapons [index] == null)
 				continue;
 			SwitchWeapon (index);
@@ -181,19 +183,23 @@ public class WeaponManager2 : NetworkBehaviour {
 
 	[Command]
 	private void CmdUpdateWeaponHandlers () {
+		knifeHandler.Keep ();
 		gunHandler.enabled = knifeHandler.enabled = grenadeHandler.enabled = false;
 		int num = 0;
 		if (CurrentWeapon as Gun != null) {
-			gunHandler.enabled = true;
+			//gunHandler.enabled = true;
 			num = 1;
 		}
 		else if (CurrentWeapon as Knife != null) {
-			knifeHandler.enabled = true;
+			//knifeHandler.enabled = true;
 			num = 2;
 		}
 		else if (CurrentWeapon as Grenade != null) {
-			grenadeHandler.enabled = true;
+			//grenadeHandler.enabled = true;
 			num = 3;
+		}
+		else if (CurrentWeapon as Launcher != null) {
+			num = 4;
 		}
 		RpcUpdateHandlers (num);
 	}
@@ -241,6 +247,7 @@ public class WeaponManager2 : NetworkBehaviour {
 		gunHandler.enabled = num == 1;
 		knifeHandler.enabled = num == 2;
 		grenadeHandler.enabled = num == 3;
+		launcherHandler.enabled = num == 4;
 	}
 
 }

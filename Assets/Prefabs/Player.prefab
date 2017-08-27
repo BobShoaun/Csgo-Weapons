@@ -414,6 +414,7 @@ GameObject:
   - component: {fileID: 114918566923426996}
   - component: {fileID: 114545878552089196}
   - component: {fileID: 114521207550624760}
+  - component: {fileID: 114701274455429084}
   m_Layer: 8
   m_Name: Player
   m_TagString: Untagged
@@ -1783,6 +1784,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bodyPartType: 2
+--- !u!114 &114701274455429084
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1961750146996600}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 391fdf1a281608742b17e7750c7d8a88, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114710237437799970
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1821,6 +1833,8 @@ MonoBehaviour:
   kickBackAmount: 0.05
   bobSpeed: 10
   bobAmount: 0.01
+  swayAmount: 0.02
+  swaySpeed: 7
 --- !u!114 &114812926180473018
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1875,7 +1889,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   view: {fileID: 114201446085970828}
-  muzzle: {fileID: 0}
+  bulletTracerPrefab: {fileID: 1788621936390712, guid: 8d0cdece92161c24d90549748d7cc20f,
+    type: 2}
   bulletHolePrefab: {fileID: 1799922971647616, guid: 6d9a614686d46354d98654b9992c7134,
     type: 2}
   recoilTransform: {fileID: 4998159600237738}

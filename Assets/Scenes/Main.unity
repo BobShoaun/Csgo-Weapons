@@ -2294,6 +2294,52 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: a2c99d9e476325d4fbbc3af2011b1392, type: 2}
   m_IsPrefabParent: 0
+--- !u!1001 &1023401333
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4933158318220672, guid: 28fcffb3fb60af04d80df782ec306cec, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4933158318220672, guid: 28fcffb3fb60af04d80df782ec306cec, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4933158318220672, guid: 28fcffb3fb60af04d80df782ec306cec, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4933158318220672, guid: 28fcffb3fb60af04d80df782ec306cec, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4933158318220672, guid: 28fcffb3fb60af04d80df782ec306cec, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4933158318220672, guid: 28fcffb3fb60af04d80df782ec306cec, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4933158318220672, guid: 28fcffb3fb60af04d80df782ec306cec, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4933158318220672, guid: 28fcffb3fb60af04d80df782ec306cec, type: 2}
+      propertyPath: m_RootOrder
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 1580779380806364, guid: 28fcffb3fb60af04d80df782ec306cec, type: 2}
+      propertyPath: m_Name
+      value: Rocket Launcher (Dropped)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 100100000, guid: 28fcffb3fb60af04d80df782ec306cec, type: 2}
+  m_IsPrefabParent: 0
 --- !u!4 &1042633634 stripped
 Transform:
   m_PrefabParentObject: {fileID: 4760536781926448, guid: 765065cd928101d4dbe9b101d174cc7d,
@@ -4604,6 +4650,7 @@ MonoBehaviour:
   - {fileID: 1545550861574260, guid: 67819e94fe300144fa5b52c2a8655b9d, type: 2}
   - {fileID: 1414831444557560, guid: 52d5eeec70d303c4dacbbac8742b67fd, type: 2}
   - {fileID: 1604821044217708, guid: 6b23aa3693b8ff14fa09955f48821dcf, type: 2}
+  - {fileID: 1844850804124814, guid: 86d7a5fe19a253d43bdac666cd43af5e, type: 2}
   m_CustomConfig: 0
   m_MaxConnections: 4
   m_ConnectionConfig:

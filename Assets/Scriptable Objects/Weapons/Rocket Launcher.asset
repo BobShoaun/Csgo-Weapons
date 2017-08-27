@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40787669ce69cb645b005f20dd56e6d4, type: 3}
+  m_Name: Rocket Launcher
+  m_EditorClassIdentifier: 
+  id: 8
+  name: RPG
+  slot: 0
+  firstPersonPrefab: {fileID: 1596960902127382, guid: e80a9cad7f2b29e44b9b1d98ea08c8b0,
+    type: 2}
+  thirdPersonPrefab: {fileID: 1947741462355948, guid: 612096adce324474081bb9af8cdb06cb,
+    type: 2}
+  droppedPrefab: {fileID: 1580779380806364, guid: 28fcffb3fb60af04d80df782ec306cec,
+    type: 2}
+  deployDuration: 1.5
+  showCrosshair: 1
+  projectilePrefab: {fileID: 1844850804124814, guid: 86d7a5fe19a253d43bdac666cd43af5e,
+    type: 2}
+  fireRate: 0.5
