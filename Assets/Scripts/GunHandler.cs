@@ -37,7 +37,7 @@ public class GunHandler : Handler {
 	}
 
 	protected override void ServerDeploy () {
-		Gun = GetComponent<WeaponManager2> ().CurrentWeapon as Gun;
+		Gun = GetComponent<WeaponManager> ().CurrentWeapon as Gun;
 		// reset all vars
 		nextFireTime = Time.time + Gun.deployDuration; // factor in deploy time
 		nextContinuousReloadTime = 0;
@@ -55,7 +55,7 @@ public class GunHandler : Handler {
 	}
 
 	protected override void ClientDeploy () {
-		muzzle = GetComponent<WeaponManager2> ().HoldingWeapon.GetGameObjectInChildren ("Muzzle").transform;
+		muzzle = GetComponent<WeaponManager> ().HoldingWeapon.GetGameObjectInChildren ("Muzzle").transform;
 	}
 
 	protected override void ServerKeep () {

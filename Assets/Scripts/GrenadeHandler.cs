@@ -13,7 +13,7 @@ public class GrenadeHandler : Handler {
 	private Grenade grenade;
 
 	protected override void ServerDeploy () {
-		grenade = GetComponent<WeaponManager2> ().CurrentWeapon as Grenade;
+		grenade = GetComponent<WeaponManager> ().CurrentWeapon as Grenade;
 		RpcUpdateUI (0, 0, grenade.Name);
 	}
 
@@ -29,7 +29,7 @@ public class GrenadeHandler : Handler {
 
 	[Command]
 	private void CmdThrow (float strength) {
-		GetComponent<WeaponManager2> ().DeleteCurrentWeapon ();
+		GetComponent<WeaponManager> ().DeleteCurrentWeapon ();
 		GameObject spawnedNade = Instantiate (grenade.DroppedPrefab, look.position + look.forward, Quaternion.Euler (Vector3.forward * 90));
 		spawnedNade.GetComponent<Rigidbody> ().AddTorque (Vector3.one * strength);
 		spawnedNade.GetComponent<Rigidbody> ().AddForce (look.forward * strength);

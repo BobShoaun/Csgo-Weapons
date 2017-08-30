@@ -8,46 +8,43 @@ using Doxel.Utility.ExtensionMethods;
 
 public class Player : NetworkBehaviour {
 	
-	public static Action<string> DeathNote;
-	public static Action<string> SendChatMessage;
-	public event Action<int> OnHealthChanged;
-	public event Action<GameObject> Die;
-	public event Action<bool> Flash;
-
-	[SyncVar (hook = "HealthChanged")]
+	// Server
 	public int health = 100;
 	[SyncVar]
 	public int kills = 0;
 	[SyncVar]
 	public int deaths = 0;
+	private bool isDead = false;
+
 
 	public Transform model;
 	public GameObject ragdollPrefab;
 	private GameObject ragdollInstance;
-	private bool isDead = false;
 
 	public float testValue = 10;
 	public float time = 0;
 
 	public LayerMask shootableLayer;
 
-	private WeaponManager weaponManager;
-
 	private void Start () {
-		name = "Player " + netId;
-		weaponManager = GetComponentInChildren<WeaponManager> ();
+		if (isServer) {
+			name = "Player " + netId;
+			RpcInitialize (name, health, kills, deaths);
+			// UI feeback when a player joins
+			RpcSendChat ("[Server]: " + name + " has joined the game");
+		}
 
 		if (isLocalPlayer) {
+			PlayerHUD.Instance.player = this;
+			GameObject radarCam = gameObject.GetGameObjectInChildren ("Radar Camera", true);
+			radarCam.SetActive (true);
+			PlayerHUD.Instance.SetRadarCam (radarCam.GetComponent<Camera> ());
 			// if the player is the local player, set the player model to a layermask
 			// that cannot be seen by the local camera, so players cannot see themselves
 			// but other players can
 //			foreach (var child in model.GetComponentsInChildren<Transform> ()) {
 //				child.gameObject.layer = LayerMask.NameToLayer ("Local Player Model");
 //			}
-
-			PlayerHUD.Instance.Player = this;
-			// UI feeback when a player joins
-			CmdSendChat ("[Server]: " + name + " has joined the game");
 			//PlayerHUD.Instance.SendChat (name + " has joined the game");
 
 			//gameObject.GetGameObjectInChildren ("Viewmodel Camera", true).SetActive (true);
@@ -56,11 +53,6 @@ public class Player : NetworkBehaviour {
 			foreach (var child in model.GetComponentsInChildren<Transform> ()) {
 				child.gameObject.layer = LayerMask.NameToLayer ("Player Model");
 			}
-
-			GameObject radarCam = gameObject.GetGameObjectInChildren ("Radar Camera", true);
-			radarCam.SetActive (true);
-
-			PlayerHUD.Instance.SetRadarCam (radarCam.GetComponent<Camera> ());
 			if (isServer) { // if player is the host
 				// remove local player model from the shootable layer
 				//shootableLayer ^= 1 << LayerMask.NameToLayer ("Local Player Model");
@@ -73,8 +65,6 @@ public class Player : NetworkBehaviour {
 			//GetComponentInChildren<AudioListener> ().enabled = false;
 		}
 
-		// UI feeback when a player joins
-		PlayerHUD.Instance.AddPlayerToScoreboard (GetComponent<NetworkIdentity> (), name, kills, deaths);
 	}
 
 	private void Update () {
@@ -84,7 +74,8 @@ public class Player : NetworkBehaviour {
 		//testValue /= 2 * time;
 		//if (testValue > 0)
 		//	Debug.Log (testValue);
-
+		if (!isLocalPlayer)
+			return;
 		if (Input.GetKeyDown (KeyCode.Z))
 			CmdTakeDamage (20, BodyPartType.UpperTorso, gameObject, transform.position + Vector3.left * 10 + Vector3.forward * 10);
 	}
@@ -105,37 +96,18 @@ public class Player : NetworkBehaviour {
 		go.GetComponent<Rigidbody> ().AddForceAtPosition (force, point, ForceMode.Impulse); 
 	}
 
-	private void HealthChanged (int health) {
-		if (OnHealthChanged != null)
-			OnHealthChanged (health);
-	}
-
 	[Command]
 	public void CmdTakeDamage (int damage, BodyPartType bodyPartType, GameObject damager, Vector3 damagerPos) {
-		switch (bodyPartType) {
-		case BodyPartType.Head:
-			damage *= 4;
-			break;
-		case BodyPartType.UpperTorso:
-			damage *= 1;
-			break;
-		case BodyPartType.LowerTorso:
-			damage *= 2;
-			break;
-		case BodyPartType.Legs:
-			damage /= 2;
-			break;
-		}
-		//print ("damaged : " + bodyPartType.ToString ());
-		health -= damage;
+		health -= BodyPart.CalculateDamage (bodyPartType, damage);
 		if (health <= 0)
-			CmdDie (damager, bodyPartType);
-		RpcTakeDamage (damage, bodyPartType, damager, damagerPos);
+			Die (damager, bodyPartType);
+		RpcTakeDamage (health, damagerPos);
 	}
 
 	[ClientRpc]
-	public void RpcTakeDamage (int damage, BodyPartType bodyPartType, GameObject damager, Vector3 damagerPos) {
+	public void RpcTakeDamage (int health, Vector3 damagerPos) {
 		// TODO damage effects, blood ,body twitch force
+
 		print (gameObject.name + " health is " + health);
 
 
@@ -143,6 +115,8 @@ public class Player : NetworkBehaviour {
 		// pointing to the source of damage
 		//print (Vector3.SignedAngle (transform.forward, damagerPos - transform.position, Vector3.up));
 		if (isLocalPlayer) {
+			PlayerHUD.Instance.UpdateHealth (health);
+
 			Vector3 dir = (damagerPos - transform.position).normalized;
 			//dir = transform.TransformDirection (dir);
 			float angle = 90 - (Mathf.Atan2 (dir.z, dir.x) * Mathf.Rad2Deg);
@@ -161,68 +135,43 @@ public class Player : NetworkBehaviour {
 
 	[ClientRpc]
 	private void RpcSendChat (string msg) {
-		SendChatMessage (msg);
+		PlayerHUD.Instance.ClientReceiveChat (msg);
 	}
 
-	[Command]
-	public void CmdSwitch (int num) {
-		RpcSwitch (num);
-	}
-
-	[ClientRpc]
-	public void RpcSwitch (int num) {
-		weaponManager.ClientSwitch (num);
-
-	}
-
-	[Command]
-	public void CmdScrollSwitch (int direction) {
-		RpcScrollSwitch (direction);
-	}
-
-	[ClientRpc]
-	public void RpcScrollSwitch (int direction) {
-		weaponManager.ClientScrollSwitch (direction);
-	}
-
-	[Command]
-	private void CmdOnMurder () {
+	[Server]
+	private void OnKill () {
 		kills++;
-		RpcOnMurder ();
+		RpcOnKill ();
 	}
 
 	[ClientRpc]
-	private void RpcOnMurder () {
+	private void RpcOnKill () {
 		PlayerHUD.Instance.UpdatePlayerScoreUI (GetComponent<NetworkIdentity> (), name, kills, deaths);
 	}
 
-	[Command]
-	private void CmdDie (GameObject murderer, BodyPartType bdt) {
+	[Server]
+	private void Die (GameObject murderer, BodyPartType bdt) {
 		if (isDead)
 			return;
 		isDead = true;
-		murderer.GetComponent<Player> ().CmdOnMurder ();
+		murderer.GetComponent<Player> ().OnKill ();
 
 		deaths++;
-		CmdDropAllWeapons ();
+		//CmdDropAllWeapons ();
 		RpcDie (murderer, bdt);
 	}
 
 	[ClientRpc]
 	private void RpcDie (GameObject murderer, BodyPartType bdt) {
-//		if (bdt == BodyPartType.Head)
-//			DeathNote (murderer.name + " Head Shotted " + gameObject.name);
-//		else
-//			DeathNote (murderer.name + " Killed " + gameObject.name);
-//
 		PlayerHUD.Instance.UpdateKillFeedList (bdt == BodyPartType.Head ?
 			murderer.name + " Head Shotted " + gameObject.name :
 			murderer.name + " Killed " + gameObject.name);
 
 		PlayerHUD.Instance.UpdatePlayerScoreUI (GetComponent<NetworkIdentity> (), name, kills, deaths);
-		
-		if (Die != null)
-			Die (murderer);
+
+		if (isLocalPlayer)
+			PlayerHUD.Instance.DisplayDeathUI (murderer);
+
 		// TODO Death animation, activate ragdoll and add force to damaged bodypart
 		// removes the model gameobject from player hierarchy
 		// then disable player GO
@@ -257,13 +206,6 @@ public class Player : NetworkBehaviour {
 		gameObject.SetActive (true);
 	}
 
-	[ClientRpc]
-	public void RpcSyncBullet (GameObject bullet, Vector3 position, Quaternion rot, GameObject parent) {
-		bullet.transform.SetParent (parent.transform);
-		bullet.transform.localPosition = position;
-		bullet.transform.localRotation = rot;
-	}
-
 	[Command]
 	public void CmdSpawn (GameObject gameObject, GameObject parent) {
 		NetworkServer.Spawn (gameObject);
@@ -277,52 +219,8 @@ public class Player : NetworkBehaviour {
 	}
 
 	[Command]
-	public void CmdDropWeapon (int index) {
-		weaponManager.ServerDropWeapon (index);
-	}
-
-	[Command]
-	public void CmdDropAllWeapons () {
-		weaponManager.ServerDropAllWeapons ();
-	}
-
-	[ClientRpc]
-	public void RpcDropWeapon (int index) {
-		// DO drop weapon animation
-		weaponManager.ClientDeleteWeapon (index);
-	}
-
-	[Command]
-	public void CmdPickupWeapon (GameObject weapon) {
-		//RpcPickupWeapon (weapon);
-		weaponManager.ServerPickupWeapon (weapon);
-	}
-
-	[ClientRpc]
-	public void RpcPickupWeapon (GameObject weapon) {
-		// Do pickup weapon animation
-		weaponManager.ClientPickupWeapon (weapon);
-	}
-
-	[Command]
 	public void CmdDespawn (GameObject gm) {
 		NetworkServer.Destroy (gm);
-	}
-
-	[Command]
-	public void CmdThrow (float strength) {
-		(weaponManager.HoldingWeapon as GrenadeLegacy).ServerThrow (strength);
-
-	}
-
-	[ClientRpc]
-	public void RpcDeleteWeapon (int index) {
-		weaponManager.ClientDeleteWeapon (index);
-	}
-
-	[Command]
-	public void CmdDeploy () {
-		(weaponManager.HoldingWeapon as GunLegacy).ServerDeploy ();
 	}
 
 	[Command]
@@ -334,89 +232,20 @@ public class Player : NetworkBehaviour {
 		foreach (var child in model.GetComponentsInChildren<Transform> ()) {
 			child.gameObject.layer = LayerMask.NameToLayer ("Shooting Player");
 		}
-		(weaponManager.HoldingWeapon as GunLegacy).ServerTryFire (shootableLayer);
+		//(weaponManager.HoldingWeapon as GunLegacy).ServerTryFire (shootableLayer);
 		foreach (var child in model.GetComponentsInChildren<Transform> ()) {
 			child.gameObject.layer = LayerMask.NameToLayer ("Default");
 		}
 	}
 
 	[ClientRpc]
-	public void RpcFire (int ammoInMag, Vector2 v, float r, Vector2 rd) {
-		(weaponManager.HoldingWeapon as GunLegacy).ClientFire (ammoInMag, v, r, rd);
-	}
-
-	[Command]
-	public void CmdReload () {
-		(weaponManager.HoldingWeapon as GunLegacy).ServerReload ();
-	}
-
-	[Command]
-	public void CmdContReload () {
-		// HACK: just to remove the null ref exception, might cause other
-		// unwanted side effects down the road
-		if (weaponManager.HoldingWeapon != null)
-			(weaponManager.HoldingWeapon as GunLegacy).ServerContReload ();
-	}
-
-	[Command]
-	public void CmdEmptyReload () {
-		// HACK: just to remove the null ref exception, might cause other
-		// unwanted side effects down the road
-		if (weaponManager.HoldingWeapon != null)
-			(weaponManager.HoldingWeapon as GunLegacy).ServerEmptyReload ();
-	}
-
-	[ClientRpc]
-	public void RpcStartReload () {
-		(weaponManager.HoldingWeapon as GunLegacy).ClientStartReload ();
-	}
-
-	[ClientRpc]
-	public void RpcEndReload (int ammoInMag, int reserve) {
-		(weaponManager.HoldingWeapon as GunLegacy).ClientEndReload (ammoInMag, reserve);
-	}
-
-	[Command]
-	public void CmdSetScopeState (int value) {
-		(weaponManager.HoldingWeapon as GunLegacy).ServerSetScopeState (value);
-	}
-
-	[Command]
-	public void CmdCycleScopeState () {
-		(weaponManager.HoldingWeapon as GunLegacy).ServerCycleScopeState ();
-	}
-
-	[ClientRpc]
-	public void RpcSetScopeState (float newFOV, Vector2 newSense, bool scopeActive) {
-		(weaponManager.HoldingWeapon as GunLegacy).ClientSetScopeState (newFOV, newSense, scopeActive);
-	}
-
-	public void Flashed (bool direct) {
-		// NOTE: method not called anywhere atm
-
-		// play flashed animation
-		if (Flash != null)
-			Flash (direct);
-	}
-
-	[Command]
-	public void CmdSwing () {
-		(weaponManager.HoldingWeapon as KnifeLegacy).ServerTrySwing ();
-	}
-
-	[Command]
-	public void CmdStab () {
-		(weaponManager.HoldingWeapon as KnifeLegacy).ServerTryStab ();
-	}
-
-	[ClientRpc]
-	public void RpcSwing () {
-		(weaponManager.HoldingWeapon as KnifeLegacy).ClientSwing ();
-	}
-
-	[ClientRpc]
-	public void RpcStab () {
-		(weaponManager.HoldingWeapon as KnifeLegacy).ClientStab ();
+	private void RpcInitialize (string name, int health, int kills, int deaths) {
+		this.name = name;
+		if (!isLocalPlayer)
+			return;
+		PlayerHUD.Instance.UpdateHealth (health);
+		// UI feeback when a player joins
+		PlayerHUD.Instance.AddPlayerToScoreboard (GetComponent<NetworkIdentity> (), name, kills, deaths);
 	}
 
 }

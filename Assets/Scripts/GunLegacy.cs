@@ -148,33 +148,33 @@ public class GunLegacy : HeldWeapon {
 		
 		if (!player.isLocalPlayer)
 			return;
-
-		if (continuousReload)
-			player.CmdContReload ();
-
-		//player.CmdFireCooldown ();
-
-
-
-		if (Input.GetKeyDown (KeyCode.R))
-			player.CmdReload ();
-
-		if (Input.GetMouseButtonDown (0) || continuousFire && Input.GetMouseButton (0))
-			player.CmdFire ();
-
-		if (scope != Scope.None && Input.GetMouseButtonDown (1))
-			player.CmdCycleScopeState ();
+//
+//		if (continuousReload)
+//			player.CmdContReload ();
+//
+//		//player.CmdFireCooldown ();
+//
+//
+//
+//		if (Input.GetKeyDown (KeyCode.R))
+//			player.CmdReload ();
+//
+//		if (Input.GetMouseButtonDown (0) || continuousFire && Input.GetMouseButton (0))
+//			player.CmdFire ();
+//
+//		if (scope != Scope.None && Input.GetMouseButtonDown (1))
+//			player.CmdCycleScopeState ();
 
 		// DONE: make player reload automaticly after the ammo is depleted
 		// BUT allow the reload on when the player has let go of the mouse
 		// button.
-		if (Input.GetMouseButtonUp (0))
-			player.CmdEmptyReload ();
+		//if (Input.GetMouseButtonUp (0)) {}
+		//	player.CmdEmptyReload ();
 	}
 
 	public override void Deploy () {
 
-		player.CmdDeploy ();
+		//player.CmdDeploy ();
 
 		//if (!player.isClient)
 		//	return;
@@ -232,7 +232,7 @@ public class GunLegacy : HeldWeapon {
 		previousScopeState = scopeState;
 		scopeState = value;
 		SetUpdatedScopedSettings (newFOV, newSense);
-		player.RpcSetScopeState (newFOV, newSense, isScopeActive);
+		//player.RpcSetScopeState (newFOV, newSense, isScopeActive);
 	}
 
 	private void SetUpdatedScopedSettings (float newFOV, Vector2 newSense) {
@@ -290,7 +290,7 @@ public class GunLegacy : HeldWeapon {
 		timeTillRescopes = Time.time + reloadDuration;
 
 		reloading = true;
-		player.RpcStartReload ();
+		//player.RpcStartReload ();
 		StartCoroutine (DUtil.Utility.DelayedInvoke (() => {
 			int ammoToReload = magazineCapacity - AmmunitionInMagazine;
 			if (reservedAmmunition < ammoToReload) {
@@ -300,7 +300,7 @@ public class GunLegacy : HeldWeapon {
 			else
 				ReservedAmmunition -= ammoToReload;
 			AmmunitionInMagazine += ammoToReload;
-			player.RpcEndReload (AmmunitionInMagazine, reservedAmmunition);
+			//player.RpcEndReload (AmmunitionInMagazine, reservedAmmunition);
 			reloading = false;
 //
 //			canScope = true;
@@ -330,7 +330,7 @@ public class GunLegacy : HeldWeapon {
 		nextContinuousReloadTime = Time.time + reloadDuration;
 		ReservedAmmunition--;
 		AmmunitionInMagazine++;
-		player.RpcEndReload (AmmunitionInMagazine, reservedAmmunition);
+		//player.RpcEndReload (AmmunitionInMagazine, reservedAmmunition);
 	}
 
 	Color icolor;
@@ -546,7 +546,7 @@ public class GunLegacy : HeldWeapon {
 
 			// rotOffset2 is essentially a SyncVar
 			//player.RpcSetRotationOffset (pc.rotationOffset2);
-			player.RpcFire (AmmunitionInMagazine, finalRecoil, nextRecoilCooldownTime, recoil.Direction);
+			//player.RpcFire (AmmunitionInMagazine, finalRecoil, nextRecoilCooldownTime, recoil.Direction);
 
 			// Server doing fire cooldown, a simpler version that just sets it straightaway
 			//StartCoroutine (ServerFireCooldown ());

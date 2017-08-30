@@ -34,14 +34,14 @@ public class KnifeHandler : Handler {
 	}
 
 	protected override void ServerDeploy () {
-		knife = GetComponent<WeaponManager2> ().CurrentWeapon as Knife;
+		knife = GetComponent<WeaponManager> ().CurrentWeapon as Knife;
 		nextAttackTime = Time.time + knife.deployDuration;
 		RpcCrosshair (knife.showCrosshair);
 		RpcUpdateUI (0, 0, knife.Name);
 	}
 
 	protected override void ClientDeploy () {
-		knifeTransform = GetComponent<WeaponManager2> ().HoldingWeapon.transform;
+		knifeTransform = GetComponent<WeaponManager> ().HoldingWeapon.transform;
 
 		animator = knifeTransform.GetComponent<Animator> ();
 		//animator.Rebind ();

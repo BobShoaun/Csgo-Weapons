@@ -34,20 +34,7 @@ public class PlayerHUD : SingletonMonoBehaviour<PlayerHUD> {
 	public GameObject crossHair;
 	public GameObject damageIndicator;
 
-	private Player player;
-	public Player Player {
-		get { return player; }
-		set {
-			player = value;
-			player.OnHealthChanged += DisplayHealth;
-			player.Die += PlayerDied;
-			//player.Flash += direct => StartCoroutine (FlashSequence (direct));
-			//Player.DeathNote = UpdateKillFeedList;
-			Player.SendChatMessage = ClientReceiveChat;
-			healthText = healthPanel.GetComponentInChildren<Text> ();
-			DisplayHealth (player.health);
-		}
-	}
+	public Player player;
 
 	public string WeaponName {
 		set {
@@ -78,6 +65,7 @@ public class PlayerHUD : SingletonMonoBehaviour<PlayerHUD> {
 
 	void Start () {
 		chatMessageInputField = chatMessageInput.GetComponentInChildren<InputField> ();
+		healthText = healthPanel.GetComponentInChildren<Text> ();
 	}
 
 	void Update () {
@@ -109,13 +97,13 @@ public class PlayerHUD : SingletonMonoBehaviour<PlayerHUD> {
 		player.CmdSendChat (player.name + ": " + msg);
 	}
 
-	private void ClientReceiveChat (string msg) {
+	public void ClientReceiveChat (string msg) {
 		GameObject chatObj = Instantiate (chatMessagePrefab, chatMessageList);
 		chatObj.GetComponent<Text> ().text = msg;
 		Destroy (chatObj, 20);
 	}
 
-	void PlayerDied (GameObject murderer) {
+	public void DisplayDeathUI (GameObject murderer) {
 		gameOverPanel.SetActive (true);
 		healthPanel.SetActive (false);
 	}
@@ -134,7 +122,7 @@ public class PlayerHUD : SingletonMonoBehaviour<PlayerHUD> {
 		player.CmdRespawn ();
 	}
 
-	void DisplayHealth (int health) {
+	public void UpdateHealth (int health) {
 		healthText.text = health.ToString () + " / 100";
 	}
 
