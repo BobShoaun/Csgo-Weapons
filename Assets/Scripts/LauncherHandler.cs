@@ -36,7 +36,7 @@ public class LauncherHandler : Handler {
 		nextFireTime = Time.time + 1 / launcher.fireRate;
 		print ("launch");
 		NetworkServer.Spawn (Instantiate (launcher.projectilePrefab, 
-			muzzle.position, Quaternion.LookRotation (muzzle.up)));
+			muzzle.position, Quaternion.LookRotation (muzzle.up, muzzle.forward)));
 	}
 
 }

@@ -108,7 +108,6 @@ public class WeaponManager2 : NetworkBehaviour {
 		weapons [index] = weapon;
 		RpcEquipWeapon (weapon.Id, index);
 		SwitchWeapon (index);
-		//UpdateWeaponHandlers ();
 	}
 
 	[Server]
@@ -248,6 +247,13 @@ public class WeaponManager2 : NetworkBehaviour {
 		knifeHandler.enabled = num == 2;
 		grenadeHandler.enabled = num == 3;
 		launcherHandler.enabled = num == 4;
+	}
+
+	[ServerCallback]
+	private void OnControllerColliderHit (ControllerColliderHit controllerColliderHit) {
+		if (controllerColliderHit.collider.CompareTag ("Weapon"))
+			if (weapons [(int) controllerColliderHit.collider.GetComponent<DroppedWeapon> ().weapon.Slot] == null)
+				CmdEquipWeapon (controllerColliderHit.collider.gameObject);
 	}
 
 }
