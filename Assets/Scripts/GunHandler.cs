@@ -36,8 +36,14 @@ public class GunHandler : Handler {
 		initialSense = GetComponent<PlayerController> ().sensitivity;
 	}
 
-	protected override void ServerDeploy () {
-		Gun = GetComponent<WeaponManager> ().CurrentWeapon as Gun;
+	public override void ServerDeploy (Weapon weapon) {
+		Gun = weapon as Gun;
+		if (Gun == null) {
+			enabled = false;
+			return;
+		}
+		else
+			enabled = true;
 		// reset all vars
 		nextFireTime = Time.time + Gun.deployDuration; // factor in deploy time
 		nextContinuousReloadTime = 0;
@@ -54,11 +60,13 @@ public class GunHandler : Handler {
 		RpcUpdateUI (Gun.ammunitionInMagazine, Gun.reservedAmmunition, Gun.Name);
 	}
 
-	protected override void ClientDeploy () {
-		muzzle = GetComponent<WeaponManager> ().HoldingWeapon.GetGameObjectInChildren ("Muzzle").transform;
+	public override void ClientDeploy (GameObject firstPerson, GameObject thirdPerson) {
+		//muzzle = GetComponent<WeaponManager> ().HoldingWeapon.GetGameObjectInChildren ("Muzzle").transform;
+		muzzle = firstPerson.GetGameObjectInChildren ("Muzzle").transform;
 	}
 
-	protected override void ServerKeep () {
+	public override void ServerKeep () {
+		base.ServerKeep ();
 		SetScopeState (0);
 	}
 
@@ -139,12 +147,19 @@ public class GunHandler : Handler {
 				Gun.recoil.Current.x) * Gun.recoilScale;
 			this.recoilRotation += recoilRotation;
 			recoilTransform.localEulerAngles = this.recoilRotation;
-			RaycastHit raycastHit;
+			//RaycastHit raycastHit;
 			//create ray with recoil and innacuracy applied
 			Ray ray = new Ray (recoilTransform.position, 
 				recoilTransform.forward + UnityRandom.insideUnitSphere * innacuracy); 
 
-			if (Physics.Raycast (ray, out raycastHit, Mathf.Infinity)) {
+			RaycastHit [] raycastHits = Physics.RaycastAll (ray, 100);
+			foreach (var raycastHit in raycastHits) {
+				if (raycastHit.collider.GetComponent<BodyPart> () != null) {
+					if (netId == raycastHit.collider.GetComponent<BodyPart> ().player.netId) {
+						// Hit itself
+						continue;
+					}
+				}
 				var part = raycastHit.collider.GetComponent<BodyPart> ();
 				if (part)
 					part.player.CmdTakeDamage (Gun.damage, part.bodyPartType, 
@@ -159,6 +174,23 @@ public class GunHandler : Handler {
 				if (rb && rb.GetComponent<NetworkIdentity> () && !rb.isKinematic)
 					rb.AddForceAtPosition (recoilTransform.forward * 30, raycastHit.point, ForceMode.Impulse);
 			}
+
+//
+//			if (Physics.Raycast (ray, out raycastHit, Mathf.Infinity)) {
+//				var part = raycastHit.collider.GetComponent<BodyPart> ();
+//				if (part)
+//					part.player.CmdTakeDamage (Gun.damage, part.bodyPartType, 
+//						gameObject, transform.position);
+//				else if (!raycastHit.collider.CompareTag ("Weapon")) {
+//					if (raycastHit.collider.GetComponent<NetworkIdentity> ())
+//						RpcSpawnBulletHoleWithParent (raycastHit.point, raycastHit.normal, raycastHit.collider.gameObject);
+//					else
+//						RpcSpawnBulletHole (raycastHit.point, raycastHit.normal);
+//				}
+//				Rigidbody rb = raycastHit.rigidbody;
+//				if (rb && rb.GetComponent<NetworkIdentity> () && !rb.isKinematic)
+//					rb.AddForceAtPosition (recoilTransform.forward * 30, raycastHit.point, ForceMode.Impulse);
+//			}
 
 			if (Gun.ammunitionInMagazine % Gun.tracerBulletInterval == 0) {
 				RpcSpawnTracer (ray.direction);

@@ -12,12 +12,18 @@ public class LauncherHandler : Handler {
 	private Launcher launcher;
 	private float nextFireTime = 0;
 
-	protected override void ServerDeploy () {
-		launcher = GetComponent<WeaponManager> ().CurrentWeapon as Launcher;
+	public override void ServerDeploy (Weapon weapon) {
+		launcher = weapon as Launcher;
+		if (launcher == null) {
+			enabled = false;
+			return;
+		}
+		else
+			enabled = true;
 		nextFireTime = Time.time + launcher.deployDuration;
 	}
 
-	protected override void ClientDeploy () {
+	public override void ClientDeploy (GameObject firstPerson, GameObject thirdPerson) {
 		muzzle = GetComponent<WeaponManager> ().HoldingWeapon.GetGameObjectInChildren ("Muzzle").transform;
 	}
 

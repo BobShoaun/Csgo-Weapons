@@ -26,6 +26,7 @@ public class WeaponManager : NetworkBehaviour {
 	}
 
 	// both client and server
+	private Handler[] handlers;
 	private GunHandler gunHandler;
 	private KnifeHandler knifeHandler;
 	private GrenadeHandler grenadeHandler;
@@ -48,6 +49,7 @@ public class WeaponManager : NetworkBehaviour {
 		knifeHandler = GetComponent<KnifeHandler> ();
 		grenadeHandler = GetComponent<GrenadeHandler> ();
 		launcherHandler = GetComponent<LauncherHandler> ();
+		handlers = GetComponents<Handler> ();
 		if (isServer) {
 			weapons = new Weapon [weaponSlotAmount];
 		}
@@ -107,7 +109,9 @@ public class WeaponManager : NetworkBehaviour {
 			DropWeapon (index);
 		weapons [index] = weapon;
 		RpcEquipWeapon (weapon.Id, index);
-		SwitchWeapon (index);
+		if (!SwitchWeapon (index))
+			foreach (var handler in handlers)
+				handler.ServerDeploy (weapons [currentIndex]);
 	}
 
 	[Server]
@@ -141,8 +145,8 @@ public class WeaponManager : NetworkBehaviour {
 		DropWeapon (currentIndex);
 	}
 
-	[Command]
-	private void CmdDropAllWeapons () {
+	[Server]
+	public void DropAllWeapons () {
 		for (int i = 0; i < weapons.Length; i++)
 			if (weapons [i] != null)
 				DropWeapon (i);
@@ -157,6 +161,10 @@ public class WeaponManager : NetworkBehaviour {
 		RpcSwitch (index, true);
 		currentIndex = index;
 		//UpdateWeaponHandlers ();
+		foreach (Handler handler in handlers) {
+			handler.ServerKeep ();
+			handler.ServerDeploy (weapons [currentIndex]);
+		}
 		return true;
 	}
 
@@ -217,7 +225,10 @@ public class WeaponManager : NetworkBehaviour {
 			thirdPersonWeapons [index].transform.localPosition = Vector3.zero;
 			thirdPersonWeapons [index].transform.localRotation = Quaternion.identity;
 		}
-		CmdUpdateWeaponHandlers ();
+		foreach (Handler handler in handlers) {
+			handler.ClientDeploy (firstPersonWeapons [index], thirdPersonWeapons [index]);
+		}
+		//CmdUpdateWeaponHandlers ();
 	}
 
 	[ClientRpc]
@@ -227,7 +238,7 @@ public class WeaponManager : NetworkBehaviour {
 			Destroy (firstPersonWeapons [index]);
 		else 
 			Destroy (thirdPersonWeapons [index]);
-		CmdUpdateWeaponHandlers ();
+		//CmdUpdateWeaponHandlers ();
 	}
 
 	[ClientRpc]
@@ -238,7 +249,10 @@ public class WeaponManager : NetworkBehaviour {
 			firstPersonWeapons [index].SetActive (current);
 		else
 			thirdPersonWeapons [index].SetActive (current);
-		CmdUpdateWeaponHandlers ();
+		foreach (Handler handler in handlers) {
+			handler.ClientDeploy (firstPersonWeapons [index], thirdPersonWeapons [index]);
+		}
+		//CmdUpdateWeaponHandlers ();
 	}
 
 	[ClientRpc]

@@ -26,45 +26,37 @@ public class Player : NetworkBehaviour {
 
 	public LayerMask shootableLayer;
 
-	private void Start () {
-		if (isServer) {
-			name = "Player " + netId;
-			RpcInitialize (name, health, kills, deaths);
-			// UI feeback when a player joins
-			RpcSendChat ("[Server]: " + name + " has joined the game");
+	public override void OnStartLocalPlayer () {
+		
+		GetComponent<PlayerController> ().enabled = true;
+		PlayerHUD.Instance.player = this;
+		GameObject radarCam = gameObject.GetGameObjectInChildren ("Radar Camera", true);
+		radarCam.SetActive (true);
+		PlayerHUD.Instance.SetRadarCam (radarCam.GetComponent<Camera> ());
+		// if the player is the local player, set the player model to a layermask
+		// that cannot be seen by the local camera, so players cannot see themselves
+		// but other players can
+		//			foreach (var child in model.GetComponentsInChildren<Transform> ()) {
+		//				child.gameObject.layer = LayerMask.NameToLayer ("Local Player Model");
+		//			}
+		//PlayerHUD.Instance.SendChat (name + " has joined the game");
+
+		//gameObject.GetGameObjectInChildren ("Viewmodel Camera", true).SetActive (true);
+
+		gameObject.GetGameObjectInChildren ("Environment Camera", true).SetActive (true);
+		foreach (var child in model.GetComponentsInChildren<Transform> ()) {
+			child.gameObject.layer = LayerMask.NameToLayer ("Player Model");
 		}
+		PlayerHUD.Instance.UpdateHealth (health);
+	}
 
-		if (isLocalPlayer) {
-			PlayerHUD.Instance.player = this;
-			GameObject radarCam = gameObject.GetGameObjectInChildren ("Radar Camera", true);
-			radarCam.SetActive (true);
-			PlayerHUD.Instance.SetRadarCam (radarCam.GetComponent<Camera> ());
-			// if the player is the local player, set the player model to a layermask
-			// that cannot be seen by the local camera, so players cannot see themselves
-			// but other players can
-//			foreach (var child in model.GetComponentsInChildren<Transform> ()) {
-//				child.gameObject.layer = LayerMask.NameToLayer ("Local Player Model");
-//			}
-			//PlayerHUD.Instance.SendChat (name + " has joined the game");
+	public override void OnStartClient () {
+		name = "Player " + netId;
+		PlayerHUD.Instance.AddPlayerToScoreboard (GetComponent<NetworkIdentity> (), name, kills, deaths);
+	}
 
-			//gameObject.GetGameObjectInChildren ("Viewmodel Camera", true).SetActive (true);
-
-			gameObject.GetGameObjectInChildren ("Environment Camera", true).SetActive (true);
-			foreach (var child in model.GetComponentsInChildren<Transform> ()) {
-				child.gameObject.layer = LayerMask.NameToLayer ("Player Model");
-			}
-			if (isServer) { // if player is the host
-				// remove local player model from the shootable layer
-				//shootableLayer ^= 1 << LayerMask.NameToLayer ("Local Player Model");
-			}
-		}
-		else {
-			enabled = false;
-			GetComponent<PlayerController> ().enabled = false;
-			//GetComponentInChildren<Camera> ().enabled = false;
-			//GetComponentInChildren<AudioListener> ().enabled = false;
-		}
-
+	public override void OnStartServer () {
+		RpcSendChat ("[Server]: " + name + " has joined the game");
 	}
 
 	private void Update () {
@@ -157,7 +149,7 @@ public class Player : NetworkBehaviour {
 		murderer.GetComponent<Player> ().OnKill ();
 
 		deaths++;
-		//CmdDropAllWeapons ();
+		GetComponent<WeaponManager> ().DropAllWeapons ();
 		RpcDie (murderer, bdt);
 	}
 
@@ -240,12 +232,12 @@ public class Player : NetworkBehaviour {
 
 	[ClientRpc]
 	private void RpcInitialize (string name, int health, int kills, int deaths) {
+		// UI feeback when a player joins
 		this.name = name;
+		PlayerHUD.Instance.AddPlayerToScoreboard (GetComponent<NetworkIdentity> (), name, kills, deaths);
 		if (!isLocalPlayer)
 			return;
 		PlayerHUD.Instance.UpdateHealth (health);
-		// UI feeback when a player joins
-		PlayerHUD.Instance.AddPlayerToScoreboard (GetComponent<NetworkIdentity> (), name, kills, deaths);
 	}
 
 }

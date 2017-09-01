@@ -6,10 +6,10 @@ using UnityEngine.Networking;
 public abstract class Handler : NetworkBehaviour {
 
 	private void OnEnable () {
-		if (isServer)
-			ServerDeploy ();
-		if (isClient)
-			ClientDeploy ();
+//		if (isServer)
+//			ServerDeploy ();
+//		if (isClient)
+//			ClientDeploy ();
 	}
 
 	private void OnDisable () {
@@ -27,12 +27,15 @@ public abstract class Handler : NetworkBehaviour {
 	}
 
 	[Server]
-	protected virtual void ServerDeploy () {}
+	public virtual void ServerDeploy (Weapon weapon) {}
 
 	[Client]
-	protected virtual void ClientDeploy (){}
+	public virtual void ClientDeploy (GameObject firstPerson, GameObject thirdPerson) {}
 
-	protected virtual void ServerKeep (){}
+	[Server]
+	public virtual void ServerKeep () {
+		enabled = false;
+	}
 
 	protected virtual void ClientKeep (){}
 

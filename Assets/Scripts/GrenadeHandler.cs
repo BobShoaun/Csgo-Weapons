@@ -12,8 +12,14 @@ public class GrenadeHandler : Handler {
 	public Transform look;
 	private Grenade grenade;
 
-	protected override void ServerDeploy () {
-		grenade = GetComponent<WeaponManager> ().CurrentWeapon as Grenade;
+	public override void ServerDeploy (Weapon weapon) {
+		grenade = weapon as Grenade;
+		if (grenade == null) {
+			enabled = false;
+			return;
+		}
+		else
+			enabled = true;
 		RpcUpdateUI (0, 0, grenade.Name);
 	}
 

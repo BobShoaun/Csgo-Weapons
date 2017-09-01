@@ -33,14 +33,20 @@ public class KnifeHandler : Handler {
 		knifeTransform.localRotation = rotation;
 	}
 
-	protected override void ServerDeploy () {
-		knife = GetComponent<WeaponManager> ().CurrentWeapon as Knife;
+	public override void ServerDeploy (Weapon weapon) {
+		knife = weapon as Knife;
+		if (knife == null) {
+			enabled = false;
+			return;
+		}
+		else
+			enabled = true;
 		nextAttackTime = Time.time + knife.deployDuration;
 		RpcCrosshair (knife.showCrosshair);
 		RpcUpdateUI (0, 0, knife.Name);
 	}
 
-	protected override void ClientDeploy () {
+	public override void ClientDeploy (GameObject firstPerson, GameObject thirdPerson) {
 		knifeTransform = GetComponent<WeaponManager> ().HoldingWeapon.transform;
 
 		animator = knifeTransform.GetComponent<Animator> ();
