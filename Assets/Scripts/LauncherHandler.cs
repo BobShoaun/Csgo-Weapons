@@ -13,18 +13,25 @@ public class LauncherHandler : Handler {
 	private float nextFireTime = 0;
 
 	public override void ServerDeploy (Weapon weapon) {
+		if (enabled)
+			ServerKeep ();
 		launcher = weapon as Launcher;
 		if (launcher == null) {
 			enabled = false;
+			RpcEnable (false);
 			return;
 		}
-		else
+		else {
 			enabled = true;
+			RpcEnable (true);
+		}
 		nextFireTime = Time.time + launcher.deployDuration;
 	}
 
 	public override void ClientDeploy (GameObject firstPerson, GameObject thirdPerson) {
-		muzzle = GetComponent<WeaponManager> ().HoldingWeapon.GetGameObjectInChildren ("Muzzle").transform;
+		if (!enabled)
+			return;
+		muzzle = firstPerson.GetGameObjectInChildren ("Muzzle").transform;
 	}
 
 	protected override void ClientUpdate () {
@@ -43,6 +50,11 @@ public class LauncherHandler : Handler {
 		print ("launch");
 		NetworkServer.Spawn (Instantiate (launcher.projectilePrefab, 
 			muzzle.position, Quaternion.LookRotation (muzzle.up, muzzle.forward)));
+	}
+
+	[ClientRpc]
+	protected void RpcEnable (bool enable) {
+		enabled = enable;
 	}
 
 }

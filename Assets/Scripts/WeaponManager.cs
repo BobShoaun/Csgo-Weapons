@@ -18,19 +18,13 @@ public class WeaponManager : NetworkBehaviour {
 	private Camera environmentCamera;
 	[SerializeField]
 	private GameObject bulletHolePrefab;
-	private GameObject [] firstPersonWeapons;
-	private GameObject [] thirdPersonWeapons;
 
-	public GameObject HoldingWeapon {
-		get { return firstPersonWeapons [currentIndex]; }
-	}
+
+	private GameObject firstPersonWeapon;
+	private GameObject thirdPersonWeapon;
 
 	// both client and server
 	private Handler[] handlers;
-	private GunHandler gunHandler;
-	private KnifeHandler knifeHandler;
-	private GrenadeHandler grenadeHandler;
-	private LauncherHandler launcherHandler;
 	private int currentIndex = 2;
 
 	// Server variables; variables that only exists in the server and is meaningless
@@ -39,23 +33,19 @@ public class WeaponManager : NetworkBehaviour {
 	private Transform look;
 	private Weapon [] weapons;
 
+	public event Action<Weapon, Weapon> OnWeaponChanged;
+
 	public Weapon CurrentWeapon {
 		get { return weapons [currentIndex]; }
 	}
 
 	private void Start () {
 		int weaponSlotAmount = Enum.GetNames (typeof (Weapon.SlotType)).Length;
-		gunHandler = GetComponent<GunHandler> ();
-		knifeHandler = GetComponent<KnifeHandler> ();
-		grenadeHandler = GetComponent<GrenadeHandler> ();
-		launcherHandler = GetComponent<LauncherHandler> ();
 		handlers = GetComponents<Handler> ();
 		if (isServer) {
 			weapons = new Weapon [weaponSlotAmount];
 		}
 		if (isClient) {
-			firstPersonWeapons = new GameObject [weaponSlotAmount];
-			thirdPersonWeapons = new GameObject [weaponSlotAmount];
 		}
 	}
 
@@ -64,21 +54,21 @@ public class WeaponManager : NetworkBehaviour {
 		if (!isLocalPlayer)
 			return;
 		if (Input.GetKeyDown (KeyCode.Alpha1))
-			SwitchWeapon (0);
+			CmdSwitchWeapon (0);
 		else if (Input.GetKeyDown (KeyCode.Alpha2))
-			SwitchWeapon (1);
+			CmdSwitchWeapon (1);
 		else if (Input.GetKeyDown (KeyCode.Alpha3))
-			SwitchWeapon (2);
+			CmdSwitchWeapon (2);
 		else if (Input.GetKeyDown (KeyCode.Alpha4))
-			SwitchWeapon (3);
+			CmdSwitchWeapon (3);
 		else if (Input.GetKeyDown (KeyCode.Alpha5))
-			SwitchWeapon (4);
+			CmdSwitchWeapon (4);
 		else if (Input.GetKeyDown (KeyCode.Alpha6))
-			SwitchWeapon (5);
+			CmdSwitchWeapon (5);
 		else if (Input.GetKeyDown (KeyCode.Alpha7))
-			SwitchWeapon (6);
+			CmdSwitchWeapon (6);
 		else if (Input.GetKeyDown (KeyCode.Alpha8))
-			SwitchWeapon (7);
+			CmdSwitchWeapon (7);
 
 		if (Input.GetKeyDown (KeyCode.Q))
 			CmdDropCurrentWeapon ();
@@ -108,10 +98,11 @@ public class WeaponManager : NetworkBehaviour {
 		if (weapons [index] != null)
 			DropWeapon (index);
 		weapons [index] = weapon;
-		RpcEquipWeapon (weapon.Id, index);
-		if (!SwitchWeapon (index))
+		if (!SwitchWeapon (index)) {
 			foreach (var handler in handlers)
-				handler.ServerDeploy (weapons [currentIndex]);
+				handler.ServerDeploy (weapon);
+			RpcInstantiateViewmodel (weapon.Id);
+		}
 	}
 
 	[Server]
@@ -122,7 +113,7 @@ public class WeaponManager : NetworkBehaviour {
 	[Server]
 	private void DeleteWeapon (int index) {
 		weapons [index] = null;
-		RpcDeleteWeapon (index);
+		RpcDestroyViewmodel ();
 		for (int i = 0; i < weapons.Length && !SwitchWeapon (i); i++);
 	}
 
@@ -156,15 +147,14 @@ public class WeaponManager : NetworkBehaviour {
 	private bool SwitchWeapon (int index) {
 		if (index == currentIndex || weapons [index] == null)
 			return false;
-		if (weapons [currentIndex] != null)
-			RpcSwitch (currentIndex, false);
-		RpcSwitch (index, true);
-		currentIndex = index;
-		//UpdateWeaponHandlers ();
-		foreach (Handler handler in handlers) {
-			handler.ServerKeep ();
-			handler.ServerDeploy (weapons [currentIndex]);
+		if (weapons [currentIndex] != null) {
+			//RpcSwitch (currentIndex, false);
 		}
+		currentIndex = index;
+
+		foreach (Handler handler in handlers)
+			handler.ServerDeploy (weapons [index]);
+		RpcInstantiateViewmodel (weapons [index].Id);
 		return true;
 	}
 
@@ -188,79 +178,26 @@ public class WeaponManager : NetworkBehaviour {
 		// No holding weapons
 	}
 
-	[Command]
-	private void CmdUpdateWeaponHandlers () {
-		knifeHandler.Keep ();
-		gunHandler.enabled = knifeHandler.enabled = grenadeHandler.enabled = false;
-		int num = 0;
-		if (CurrentWeapon as Gun != null) {
-			//gunHandler.enabled = true;
-			num = 1;
-		}
-		else if (CurrentWeapon as Knife != null) {
-			//knifeHandler.enabled = true;
-			num = 2;
-		}
-		else if (CurrentWeapon as Grenade != null) {
-			//grenadeHandler.enabled = true;
-			num = 3;
-		}
-		else if (CurrentWeapon as Launcher != null) {
-			num = 4;
-		}
-		RpcUpdateHandlers (num);
-	}
-
 	[ClientRpc]
-	private void RpcEquipWeapon (int weaponId, int index) {
-		// instantiate weapons based on Id, ui feedback
-		//Weapon holdingWeapon = WeaponDatabase.Instance [weaponId];
-		currentIndex = index;
+	private void RpcInstantiateViewmodel (int weaponId) {
 		if (isLocalPlayer) {
-			firstPersonWeapons [index] = Instantiate (weaponDatabase [weaponId].FirstPersonPrefab, weaponHolder);
+			Destroy (firstPersonWeapon);
+			firstPersonWeapon = Instantiate (weaponDatabase [weaponId].FirstPersonPrefab, weaponHolder);
 		}
 		else {
-			thirdPersonWeapons [index] = Instantiate (weaponDatabase [weaponId].ThirdPersonPrefab);
-			thirdPersonWeapons [index].transform.SetParent (weaponMount, true);
-			thirdPersonWeapons [index].transform.localPosition = Vector3.zero;
-			thirdPersonWeapons [index].transform.localRotation = Quaternion.identity;
+			Destroy (thirdPersonWeapon);
+			thirdPersonWeapon = Instantiate (weaponDatabase [weaponId].ThirdPersonPrefab);
+			thirdPersonWeapon.transform.SetParent (weaponMount, true);
+			thirdPersonWeapon.transform.localPosition = Vector3.zero;
+			thirdPersonWeapon.transform.localRotation = Quaternion.identity;
 		}
-		foreach (Handler handler in handlers) {
-			handler.ClientDeploy (firstPersonWeapons [index], thirdPersonWeapons [index]);
-		}
-		//CmdUpdateWeaponHandlers ();
+		foreach (Handler handler in handlers)
+			handler.ClientDeploy (firstPersonWeapon, thirdPersonWeapon);
 	}
 
 	[ClientRpc]
-	private void RpcDeleteWeapon (int index) {
-		// destroy local hand and viewmodel weapons
-		if (isLocalPlayer) 
-			Destroy (firstPersonWeapons [index]);
-		else 
-			Destroy (thirdPersonWeapons [index]);
-		//CmdUpdateWeaponHandlers ();
-	}
-
-	[ClientRpc]
-	private void RpcSwitch (int index, bool current) {
-		if (current)
-			currentIndex = index;
-		if (isLocalPlayer)
-			firstPersonWeapons [index].SetActive (current);
-		else
-			thirdPersonWeapons [index].SetActive (current);
-		foreach (Handler handler in handlers) {
-			handler.ClientDeploy (firstPersonWeapons [index], thirdPersonWeapons [index]);
-		}
-		//CmdUpdateWeaponHandlers ();
-	}
-
-	[ClientRpc]
-	private void RpcUpdateHandlers (int num) {
-		gunHandler.enabled = num == 1;
-		knifeHandler.enabled = num == 2;
-		grenadeHandler.enabled = num == 3;
-		launcherHandler.enabled = num == 4;
+	private void RpcDestroyViewmodel () {
+		Destroy (isLocalPlayer ? firstPersonWeapon : thirdPersonWeapon);
 	}
 
 	[ServerCallback]

@@ -5,18 +5,23 @@ using UnityEngine.Networking;
 
 public abstract class Handler : NetworkBehaviour {
 
+	private void Start () {
+		//GetComponent<WeaponManager> ().OnWeaponChanged += OnWeaponChanged;
+	}
+
 	private void OnEnable () {
 //		if (isServer)
 //			ServerDeploy ();
 //		if (isClient)
 //			ClientDeploy ();
+
 	}
 
 	private void OnDisable () {
-		if (isServer)
-			ServerKeep ();
-		if (isClient)
-			ClientKeep ();
+//		if (isServer)
+//			ServerKeep ();
+//		if (isClient)
+//			ClientKeep ();
 	}
 
 	private void Update () {
@@ -27,21 +32,26 @@ public abstract class Handler : NetworkBehaviour {
 	}
 
 	[Server]
-	public virtual void ServerDeploy (Weapon weapon) {}
+	public abstract void ServerDeploy (Weapon weapon);
 
 	[Client]
-	public virtual void ClientDeploy (GameObject firstPerson, GameObject thirdPerson) {}
+	public abstract void ClientDeploy (GameObject firstPerson, GameObject thirdPerson);
 
 	[Server]
 	public virtual void ServerKeep () {
-		enabled = false;
 	}
 
 	protected virtual void ClientKeep (){}
 
-	protected virtual void ServerUpdate (){}
+	protected virtual void ServerUpdate () {
+	}
 
-	protected virtual void ClientUpdate (){}
+	protected abstract void ClientUpdate ();
+
+//	[ClientRpc]
+//	protected void RpcEnable (bool enable) {
+//		enabled = enable;
+//	}
 
 	[ClientRpc]
 	protected void RpcUpdateUI (int ammo, int reserved, string name) {

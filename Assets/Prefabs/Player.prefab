@@ -1747,6 +1747,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56035a5d571221047800625dc549fdd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  weaponDatabase: {fileID: 11400000, guid: 01ee59e264703fb4a8df04367d72a68a, type: 2}
+  weaponMount: {fileID: 4374835853063776}
+  weaponHolder: {fileID: 4659871699547474}
   look: {fileID: 4309866365162764}
 --- !u!114 &114545878552089196
 MonoBehaviour:
@@ -1759,6 +1762,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3b77a1dbd4973f4dbd288eacf773287, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  weaponDatabase: {fileID: 11400000, guid: 01ee59e264703fb4a8df04367d72a68a, type: 2}
+  weaponMount: {fileID: 4374835853063776}
+  weaponHolder: {fileID: 4659871699547474}
   look: {fileID: 4309866365162764}
 --- !u!114 &114562685934500822
 MonoBehaviour:
@@ -1795,6 +1801,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 391fdf1a281608742b17e7750c7d8a88, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  weaponDatabase: {fileID: 11400000, guid: 01ee59e264703fb4a8df04367d72a68a, type: 2}
+  weaponMount: {fileID: 4374835853063776}
+  weaponHolder: {fileID: 4659871699547474}
 --- !u!114 &114710237437799970
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1888,6 +1897,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc46184ea04fc3341a49e2cbb4cc6bde, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  weaponDatabase: {fileID: 11400000, guid: 01ee59e264703fb4a8df04367d72a68a, type: 2}
+  weaponMount: {fileID: 4374835853063776}
+  weaponHolder: {fileID: 4659871699547474}
   view: {fileID: 114201446085970828}
   bulletTracerPrefab: {fileID: 1788621936390712, guid: 8d0cdece92161c24d90549748d7cc20f,
     type: 2}

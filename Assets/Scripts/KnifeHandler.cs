@@ -20,39 +20,46 @@ public class KnifeHandler : Handler {
 	private Knife knife;
 	private float nextAttackTime;
 
+	protected override void ClientKeep () {
+		//knifeTransform.localPosition = position;
+		//knifeTransform.localRotation = rotation;
+	}
 
-	public void Keep () {
+	public override void ServerKeep () {
 		if (animator) {
 			animator.Rebind ();
 			//print ("rebinding");
 		}
 	}
 
-	protected override void ClientKeep () {
-		knifeTransform.localPosition = position;
-		knifeTransform.localRotation = rotation;
-	}
-
 	public override void ServerDeploy (Weapon weapon) {
+		if (enabled)
+			ServerKeep ();
 		knife = weapon as Knife;
 		if (knife == null) {
 			enabled = false;
+			RpcEnable (false);
 			return;
 		}
-		else
+		else {
 			enabled = true;
+			RpcEnable (true);
+		}
 		nextAttackTime = Time.time + knife.deployDuration;
 		RpcCrosshair (knife.showCrosshair);
 		RpcUpdateUI (0, 0, knife.Name);
 	}
 
 	public override void ClientDeploy (GameObject firstPerson, GameObject thirdPerson) {
-		knifeTransform = GetComponent<WeaponManager> ().HoldingWeapon.transform;
-
-		animator = knifeTransform.GetComponent<Animator> ();
+		if (!enabled)
+			return;
+		if (isLocalPlayer) {
+			knifeTransform = firstPerson.transform;
+			animator = knifeTransform.GetComponent<Animator> ();
+		}
 		//animator.Rebind ();
-		position = knifeTransform.localPosition;
-		rotation = knifeTransform.localRotation;
+		//position = knifeTransform.localPosition;
+		//rotation = knifeTransform.localRotation;
 	}
 
 	protected override void ClientUpdate () {
@@ -64,8 +71,8 @@ public class KnifeHandler : Handler {
 		else if (Input.GetMouseButtonDown (1))
 			CmdStab ();
 
-		if (Input.GetKeyDown (KeyCode.H))
-			Keep ();
+		//if (Input.GetKeyDown (KeyCode.H))
+			//Keep ();
 	}
 
 	[Command]
@@ -100,12 +107,19 @@ public class KnifeHandler : Handler {
 
 	[ClientRpc]
 	private void RpcSwing () {
-		animator.SetTrigger ("Swing");
+		if (isLocalPlayer)
+			animator.SetTrigger ("Swing");
 	}
 
 	[ClientRpc]
 	private void RpcStab () {
-		animator.SetTrigger ("Stab");
+		if (isLocalPlayer)
+			animator.SetTrigger ("Stab");
+	}
+
+	[ClientRpc]
+	protected void RpcEnable (bool enable) {
+		enabled = enable;
 	}
 
 }

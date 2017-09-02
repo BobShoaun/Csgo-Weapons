@@ -16,11 +16,18 @@ public class GrenadeHandler : Handler {
 		grenade = weapon as Grenade;
 		if (grenade == null) {
 			enabled = false;
+			RpcEnable (false);
 			return;
 		}
-		else
+		else {
 			enabled = true;
+			RpcEnable (true);
+		}
 		RpcUpdateUI (0, 0, grenade.Name);
+	}
+
+	public override void ClientDeploy (GameObject firstPerson, GameObject thirdPerson) {
+		
 	}
 
 	protected override void ClientUpdate () {
@@ -35,21 +42,17 @@ public class GrenadeHandler : Handler {
 
 	[Command]
 	private void CmdThrow (float strength) {
-		GetComponent<WeaponManager> ().DeleteCurrentWeapon ();
 		GameObject spawnedNade = Instantiate (grenade.DroppedPrefab, look.position + look.forward, Quaternion.Euler (Vector3.forward * 90));
 		spawnedNade.GetComponent<Rigidbody> ().AddTorque (Vector3.one * strength);
 		spawnedNade.GetComponent<Rigidbody> ().AddForce (look.forward * strength);
 		NetworkServer.Spawn (spawnedNade);
 		spawnedNade.GetComponent<IGrenade> ().Prime (GetComponent<Player> ());
+		GetComponent<WeaponManager> ().DeleteCurrentWeapon ();
 	}
 
 	[ClientRpc]
-	private void RpcUpdateUI (int ammo, int reserved, string name) {
-		if (!isLocalPlayer)
-			return;
-		PlayerHUD.Instance.WeaponName = name;
-		PlayerHUD.Instance.WeaponAmmo = ammo;
-		PlayerHUD.Instance.WeaponReserve = reserved;
+	protected void RpcEnable (bool enable) {
+		enabled = enable;
 	}
 
 }
