@@ -9,41 +9,32 @@ using DUtil = Doxel.Utility.Utility;
 public class WeaponManager : NetworkBehaviour {
 
 	// Client variables
-	public WeaponDatabase weaponDatabase;
 	[SerializeField]
-	private Transform weaponHolder;
+	private WeaponDatabase weaponDatabase;
 	[SerializeField]
-	private Transform weaponMount;
+	private Transform firstPersonMount;
+	[SerializeField]
+	private Transform thirsPersonMount;
 	[SerializeField]
 	private Camera environmentCamera;
-	[SerializeField]
-	private GameObject bulletHolePrefab;
-
 
 	private GameObject firstPersonWeapon;
 	private GameObject thirdPersonWeapon;
 
 	// both client and server
 	private Handler[] handlers;
-	private int currentIndex = 2;
 
 	// Server variables; variables that only exists in the server and is meaningless
 	// to all the clients
 	[SerializeField]
 	private Transform look;
 	private Weapon [] weapons;
-
-	public event Action<Weapon, Weapon> OnWeaponChanged;
-
-	public Weapon CurrentWeapon {
-		get { return weapons [currentIndex]; }
-	}
+	private int currentIndex = 2;
 
 	private void Start () {
-		int weaponSlotAmount = Enum.GetNames (typeof (Weapon.SlotType)).Length;
 		handlers = GetComponents<Handler> ();
 		if (isServer) {
-			weapons = new Weapon [weaponSlotAmount];
+			weapons = new Weapon [Enum.GetNames (typeof (Weapon.SlotType)).Length];
 		}
 		if (isClient) {
 		}
@@ -82,7 +73,7 @@ public class WeaponManager : NetworkBehaviour {
 		if (Physics.Raycast (environmentCamera.ViewportPointToRay (Vector2.one * 0.5f), 
 			out hit, 5) && hit.collider.CompareTag ("Weapon")) {
 			// rmb this is still called in local player, if check is above
-			PlayerHUD.Instance.HoverPickup (hit.collider.GetComponent<DroppedWeapon> ().name);
+			PlayerHUD.Instance.HoverPickup (hit.collider.name);
 			if (Input.GetKeyDown (KeyCode.E))
 				CmdEquipWeapon (hit.collider.gameObject);
 		}
@@ -126,7 +117,8 @@ public class WeaponManager : NetworkBehaviour {
 		var droppedWeapon = Instantiate (weapons [index].DroppedPrefab, 
 			look.position + look.forward, look.rotation);
 		droppedWeapon.GetComponent<DroppedWeapon> ().weapon = weapons [index];
-		droppedWeapon.GetComponent<Rigidbody> ().AddForce (look.forward * 15, ForceMode.Impulse);
+		droppedWeapon.GetComponent<Rigidbody> ().AddForce 
+		(GetComponent<CharacterController> ().velocity + (look.forward * 15), ForceMode.Impulse);
 		NetworkServer.Spawn (droppedWeapon);
 		DeleteWeapon (index);
 	}
@@ -182,12 +174,12 @@ public class WeaponManager : NetworkBehaviour {
 	private void RpcInstantiateViewmodel (int weaponId) {
 		if (isLocalPlayer) {
 			Destroy (firstPersonWeapon);
-			firstPersonWeapon = Instantiate (weaponDatabase [weaponId].FirstPersonPrefab, weaponHolder);
+			firstPersonWeapon = Instantiate (weaponDatabase [weaponId].FirstPersonPrefab, firstPersonMount);
 		}
 		else {
 			Destroy (thirdPersonWeapon);
 			thirdPersonWeapon = Instantiate (weaponDatabase [weaponId].ThirdPersonPrefab);
-			thirdPersonWeapon.transform.SetParent (weaponMount, true);
+			thirdPersonWeapon.transform.SetParent (thirsPersonMount, true);
 			thirdPersonWeapon.transform.localPosition = Vector3.zero;
 			thirdPersonWeapon.transform.localRotation = Quaternion.identity;
 		}
@@ -203,7 +195,7 @@ public class WeaponManager : NetworkBehaviour {
 	[ServerCallback]
 	private void OnControllerColliderHit (ControllerColliderHit controllerColliderHit) {
 		if (controllerColliderHit.collider.CompareTag ("Weapon"))
-			if (weapons [(int) controllerColliderHit.collider.GetComponent<DroppedWeapon> ().weapon.Slot] == null)
+			if (weapons [(int) controllerColliderHit.collider.GetComponentInParent<DroppedWeapon> ().weapon.Slot] == null)
 				CmdEquipWeapon (controllerColliderHit.collider.gameObject);
 	}
 
