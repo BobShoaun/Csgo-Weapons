@@ -5,7 +5,7 @@ using UnityEngine.Networking;
 
 public class Rocket : NetworkBehaviour {
 
-	public float speed = 10;
+	public float force = 10;
 	private new Rigidbody rigidbody;
 	private float lifeTime = 10;
 	private float deathTime;
@@ -24,13 +24,14 @@ public class Rocket : NetworkBehaviour {
 
 	[ServerCallback]
 	private void FixedUpdate () {
-		rigidbody.AddForce (transform.up * speed, ForceMode.Acceleration);
-		rigidbody.AddTorque (transform.up * 100);
+		//transform.Translate (Vector3.forward * speed * Time.fixedDeltaTime);
+		rigidbody.AddForce (transform.forward * force * Time.fixedDeltaTime, ForceMode.Acceleration);
+		rigidbody.AddTorque (transform.forward * 100);
 	}
 
 	[ServerCallback]
 	private void OnCollisionEnter () {
-		Explode ();
+		//Explode ();
 	}
 
 	[Server]

@@ -22,6 +22,6 @@ MonoBehaviour:
     type: 2}
   deployDuration: 1.5
   showCrosshair: 1
-  projectilePrefab: {fileID: 1844850804124814, guid: 86d7a5fe19a253d43bdac666cd43af5e,
+  projectilePrefab: {fileID: 1634972338516578, guid: 86d7a5fe19a253d43bdac666cd43af5e,
     type: 2}
   fireRate: 0.5

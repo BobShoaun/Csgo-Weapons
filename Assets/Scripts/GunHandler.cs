@@ -15,7 +15,7 @@ public class GunHandler : Handler {
 	public GameObject bulletTracerPrefab;
 	public GameObject bulletHolePrefab;
 
-	// server 
+	// server
 	public Transform recoilTransform;
 	private float nextFireTime = 0;
 	private float nextContinuousReloadTime = 0;
@@ -81,7 +81,6 @@ public class GunHandler : Handler {
 	}
 
 	public override void ServerKeep () {
-		//base.ServerKeep ();
 		SetScopeState (0);
 	}
 

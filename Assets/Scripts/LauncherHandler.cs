@@ -8,7 +8,10 @@ public class LauncherHandler : Handler {
 
 	// Client
 	private Transform muzzle;
+
 	// Server
+	[SerializeField]
+	private Transform look;
 	private Launcher launcher;
 	private float nextFireTime = 0;
 
@@ -47,9 +50,17 @@ public class LauncherHandler : Handler {
 		if (Time.time < nextFireTime)
 			return;
 		nextFireTime = Time.time + 1 / launcher.fireRate;
-		print ("launch");
-		NetworkServer.Spawn (Instantiate (launcher.projectilePrefab, 
-			muzzle.position, Quaternion.LookRotation (muzzle.up, muzzle.forward)));
+		RaycastHit hit;
+		if (Physics.Raycast (look.position, look.forward, out hit)) {
+			Debug.DrawRay (muzzle.position, hit.point - muzzle.position);
+			NetworkServer.Spawn (Instantiate (launcher.projectilePrefab, 
+				muzzle.position, Quaternion.LookRotation ((hit.point - muzzle.position).normalized)));
+			//Quaternion.LookRotation (hit.point - muzzle.position);
+			//Quaternion.LookRotation (muzzle.up, muzzle.forward) 
+
+
+		}
+
 	}
 
 	[ClientRpc]
