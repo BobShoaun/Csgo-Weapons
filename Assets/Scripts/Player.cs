@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
-using DUtil = Doxel.Utility;
+using DUtil = Doxel.Utility.Utility;
 using Doxel.Utility.ExtensionMethods;
 
 public class Player : NetworkBehaviour {
@@ -26,6 +26,10 @@ public class Player : NetworkBehaviour {
 
 	public LayerMask shootableLayer;
 
+	// Server
+	public Transform aim;
+	private Vector3 aimRotation;
+
 	public override void OnStartLocalPlayer () {
 		
 		GetComponent<PlayerController> ().enabled = true;
@@ -42,7 +46,6 @@ public class Player : NetworkBehaviour {
 		//PlayerHUD.Instance.SendChat (name + " has joined the game");
 
 		//gameObject.GetGameObjectInChildren ("Viewmodel Camera", true).SetActive (true);
-
 		gameObject.GetGameObjectInChildren ("Environment Camera", true).SetActive (true);
 		foreach (var child in model.GetComponentsInChildren<Transform> ()) {
 			child.gameObject.layer = LayerMask.NameToLayer ("Player Model");
@@ -60,16 +63,29 @@ public class Player : NetworkBehaviour {
 	}
 
 	private void Update () {
-		
-		//testValue = 2 * Mathf.Exp (-time / Mathf.Log10 ((float) Math.E * 5));
-		testValue = DUtil.Utility.Decay (testValue, 0, 1, Time.deltaTime);
-		//testValue /= 2 * time;
-		//if (testValue > 0)
-		//	Debug.Log (testValue);
+		ClientUpdate ();
+		ServerUpdate ();
+	}
+
+	[ClientCallback]
+	private void ClientUpdate () {
 		if (!isLocalPlayer)
 			return;
 		if (Input.GetKeyDown (KeyCode.Z))
-			CmdTakeDamage (20, BodyPartType.UpperTorso, gameObject, transform.position + Vector3.left * 10 + Vector3.forward * 10);
+			TakeDamage (20, gameObject, 
+				transform.position + Vector3.left * 10 + Vector3.forward * 10, BodyPartType.UpperTorso);
+	}
+
+	[ServerCallback]
+	private void ServerUpdate () {
+		//testValue = 2 * Mathf.Exp (-time / Mathf.Log10 ((float) Math.E * 5));
+		testValue = DUtil.Decay (testValue, 0, 1, Time.deltaTime);
+		//testValue /= 2 * time;
+		//if (testValue > 0)
+
+		aimRotation = DUtil.ExponentialDecayTowards (aimRotation, Vector3.zero, 1f, Time.deltaTime * 5f);
+		aim.localRotation = Quaternion.Euler (aimRotation);
+
 	}
 
 	[Command]
@@ -88,9 +104,9 @@ public class Player : NetworkBehaviour {
 		go.GetComponent<Rigidbody> ().AddForceAtPosition (force, point, ForceMode.Impulse); 
 	}
 
-	[Command]
-	public void CmdTakeDamage (int damage, BodyPartType bodyPartType, GameObject damager, Vector3 damagerPos) {
-		health -= BodyPart.CalculateDamage (bodyPartType, damage);
+	[Server]
+	public void TakeDamage (int damage, GameObject damager, Vector3 damagerPos, BodyPartType bodyPartType) {
+		health -= damage;
 		if (health <= 0)
 			Die (damager, bodyPartType);
 		RpcTakeDamage (health, damagerPos);

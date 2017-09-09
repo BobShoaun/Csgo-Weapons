@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using System;
 
 public class GrenadeHandler : Handler {
 
@@ -12,21 +13,17 @@ public class GrenadeHandler : Handler {
 	public Transform look;
 	private Grenade grenade;
 
-	public override void ServerDeploy (Weapon weapon) {
+
+	protected override bool SetWeapon (Weapon weapon) {
 		grenade = weapon as Grenade;
-		if (grenade == null) {
-			enabled = false;
-			RpcEnable (false);
-			return;
-		}
-		else {
-			enabled = true;
-			RpcEnable (true);
-		}
-		RpcUpdateUI (0, 0, grenade.Name);
+		return base.SetWeapon (grenade);
 	}
 
-	public override void ClientDeploy (GameObject firstPerson, GameObject thirdPerson) {
+	protected override void ServerKeep () {
+		
+	}
+
+	protected override void ClientDeploy (GameObject firstPerson, GameObject thirdPerson) {
 		
 	}
 
@@ -42,10 +39,10 @@ public class GrenadeHandler : Handler {
 
 	[Command]
 	private void CmdThrow (float strength) {
-		GameObject spawnedNade = Instantiate (grenade.DroppedPrefab, look.position + look.forward, Quaternion.Euler (Vector3.forward * 90));
+		var spawnedNade = Instantiate (grenade.DroppedPrefab, look.position + look.forward, Quaternion.Euler (Vector3.forward * 90));
 		spawnedNade.GetComponent<Rigidbody> ().AddTorque (Vector3.one * strength);
 		spawnedNade.GetComponent<Rigidbody> ().AddForce (look.forward * strength);
-		NetworkServer.Spawn (spawnedNade);
+		NetworkServer.Spawn (spawnedNade.gameObject);
 		spawnedNade.GetComponent<IGrenade> ().Prime (GetComponent<Player> ());
 		GetComponent<WeaponManager> ().DeleteCurrentWeapon ();
 	}

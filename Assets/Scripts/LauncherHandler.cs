@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using Doxel.Utility.ExtensionMethods;
+using System;
 
 public class LauncherHandler : Handler {
 
@@ -15,25 +16,21 @@ public class LauncherHandler : Handler {
 	private Launcher launcher;
 	private float nextFireTime = 0;
 
-	public override void ServerDeploy (Weapon weapon) {
-		if (enabled)
-			ServerKeep ();
+	protected override bool SetWeapon (Weapon weapon) {
 		launcher = weapon as Launcher;
-		if (launcher == null) {
-			enabled = false;
-			RpcEnable (false);
-			return;
-		}
-		else {
-			enabled = true;
-			RpcEnable (true);
-		}
+		return base.SetWeapon (launcher);
+	}
+
+	protected override void ServerDeploy () {
+		base.ServerDeploy ();
 		nextFireTime = Time.time + launcher.deployDuration;
 	}
 
-	public override void ClientDeploy (GameObject firstPerson, GameObject thirdPerson) {
-		if (!enabled)
-			return;
+	protected override void ServerKeep () {
+		
+	}
+
+	protected override void ClientDeploy (GameObject firstPerson, GameObject thirdPerson) {
 		muzzle = firstPerson.GetGameObjectInChildren ("Muzzle").transform;
 	}
 
@@ -57,8 +54,6 @@ public class LauncherHandler : Handler {
 				muzzle.position, Quaternion.LookRotation ((hit.point - muzzle.position).normalized)));
 			//Quaternion.LookRotation (hit.point - muzzle.position);
 			//Quaternion.LookRotation (muzzle.up, muzzle.forward) 
-
-
 		}
 
 	}

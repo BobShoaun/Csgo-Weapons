@@ -10,11 +10,11 @@ public class RuntimeWeaponDatabase : RuntimeDatabase<Weapon, RuntimeWeaponDataba
 		base.Awake ();
 
 	}
-
-	public Weapon Add (int weaponId) {
-		Weapon newWeapon = (Weapon) weaponDatabase [weaponId].Clone ();
-		newWeapon.runtimeId = Add (newWeapon);
-		return newWeapon;
-	}
+//
+//	public Weapon Add (int weaponId) {
+//		Weapon newWeapon = (Weapon) weaponDatabase [weaponId].Clone ();
+//		newWeapon.runtimeId = Add (newWeapon);
+//		return newWeapon;
+//	}
 
 }

@@ -18,8 +18,10 @@ MonoBehaviour:
     type: 2}
   thirdPersonPrefab: {fileID: 1120881228153878, guid: 52a11918fbd257a49a850836e1cf1c64,
     type: 2}
-  droppedPrefab: {fileID: 1341514807460112, guid: f1521196e8e97ea45a62ec5e344eae6f,
+  droppedPrefab: {fileID: 114687161953634290, guid: f1521196e8e97ea45a62ec5e344eae6f,
     type: 2}
+  deployDuration: 0.5
+  showCrosshair: 1
   swingCooldown: 0.5
   stabCooldown: 1
   swingDamage: 25

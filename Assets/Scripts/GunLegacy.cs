@@ -504,22 +504,22 @@ public class GunLegacy : HeldWeapon {
 //				          ) * Vector3.forward));
 
 			if (Physics.Raycast (ray, out hit, Mathf.Infinity, shootableLayer)) {
-				var part = hit.collider.GetComponent<BodyPart> ();
-				if (part)
-					part.player.CmdTakeDamage (damage, part.bodyPartType, 
-						player.gameObject, player.gameObject.transform.position);
-				else if (!hit.collider.CompareTag ("Weapon")) {
-					var bulletHole = Instantiate (bulletHolePrefab, hit.point, Quaternion.LookRotation (hit.normal));
-					bulletHole.transform.SetParent (hit.transform);
-					if (hit.transform.GetComponent<NetworkIdentity> ())
-						player.CmdSpawn (bulletHole, hit.transform.gameObject);
-					else
-						NetworkServer.Spawn (bulletHole);
-					//					if (hit.transform.GetComponent<NetworkIdentity> ())
-					//						GetComponentInParent<Player> ().RpcSyncBullet (bulletHole, bulletHole.transform.localPosition, 
-					//							bulletHole.transform.localRotation, hit.transform.gameObject);
-					Destroy (bulletHole, 20);
-				}
+//				var part = hit.collider.GetComponent<BodyPart> ();
+//				if (part)
+//					part.player.TakeDamage (damage, part.bodyPartType, 
+//						player.gameObject, player.gameObject.transform.position);
+//				else if (!hit.collider.CompareTag ("Weapon")) {
+//					var bulletHole = Instantiate (bulletHolePrefab, hit.point, Quaternion.LookRotation (hit.normal));
+//					bulletHole.transform.SetParent (hit.transform);
+//					if (hit.transform.GetComponent<NetworkIdentity> ())
+//						player.CmdSpawn (bulletHole, hit.transform.gameObject);
+//					else
+//						NetworkServer.Spawn (bulletHole);
+//					//					if (hit.transform.GetComponent<NetworkIdentity> ())
+//					//						GetComponentInParent<Player> ().RpcSyncBullet (bulletHole, bulletHole.transform.localPosition, 
+//					//							bulletHole.transform.localRotation, hit.transform.gameObject);
+//					Destroy (bulletHole, 20);
+//				}
 			
 				Rigidbody rb = hit.rigidbody;
 				if (rb && rb.GetComponent<NetworkIdentity> () && !rb.isKinematic)

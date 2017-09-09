@@ -20,39 +20,29 @@ public class KnifeHandler : Handler {
 	private Knife knife;
 	private float nextAttackTime;
 
+	protected override bool SetWeapon (Weapon weapon) {
+		knife = weapon as Knife;
+		return base.SetWeapon (knife);
+	}
+
 	protected override void ClientKeep () {
 		//knifeTransform.localPosition = position;
 		//knifeTransform.localRotation = rotation;
 	}
 
-	public override void ServerKeep () {
+	protected override void ServerKeep () {
 		if (animator) {
 			animator.Rebind ();
 			//print ("rebinding");
 		}
 	}
 
-	public override void ServerDeploy (Weapon weapon) {
-		if (enabled)
-			ServerKeep ();
-		knife = weapon as Knife;
-		if (knife == null) {
-			enabled = false;
-			RpcEnable (false);
-			return;
-		}
-		else {
-			enabled = true;
-			RpcEnable (true);
-		}
+	protected override void ServerDeploy () {
+		base.ServerDeploy ();
 		nextAttackTime = Time.time + knife.deployDuration;
-		RpcCrosshair (knife.showCrosshair);
-		RpcUpdateUI (0, 0, knife.Name);
 	}
 
-	public override void ClientDeploy (GameObject firstPerson, GameObject thirdPerson) {
-		if (!enabled)
-			return;
+	protected override void ClientDeploy (GameObject firstPerson, GameObject thirdPerson) {
 		if (isLocalPlayer) {
 			knifeTransform = firstPerson.transform;
 			animator = knifeTransform.GetComponent<Animator> ();
@@ -70,9 +60,6 @@ public class KnifeHandler : Handler {
 			CmdSwing ();
 		else if (Input.GetMouseButtonDown (1))
 			CmdStab ();
-
-		//if (Input.GetKeyDown (KeyCode.H))
-			//Keep ();
 	}
 
 	[Command]
@@ -84,8 +71,7 @@ public class KnifeHandler : Handler {
 		if (Physics.Raycast (look.position, look.forward, out hit, 2)) {
 			var part = hit.collider.GetComponent<BodyPart> ();
 			if (part)
-				part.player.CmdTakeDamage (knife.swingDamage, part.bodyPartType, 
-					gameObject, transform.position);
+				part.TakeDamage (knife.swingDamage, gameObject, transform.position);
 		}
 		RpcSwing ();
 	}
@@ -97,10 +83,9 @@ public class KnifeHandler : Handler {
 		nextAttackTime = Time.time + knife.stabCooldown;
 		RaycastHit hit;
 		if (Physics.Raycast (look.position, look.forward, out hit, 2)) {
-			var part = hit.collider.GetComponent<BodyPart> ();
-			if (part)
-				part.player.CmdTakeDamage (knife.stabDamage, part.bodyPartType, 
-					gameObject, transform.position);
+			BodyPart bodyPart;
+			if (bodyPart = hit.collider.GetComponent<BodyPart> ())
+				bodyPart.TakeDamage (knife.stabDamage, gameObject, transform.position);
 		}
 		RpcStab ();
 	}
@@ -115,11 +100,6 @@ public class KnifeHandler : Handler {
 	private void RpcStab () {
 		if (isLocalPlayer)
 			animator.SetTrigger ("Stab");
-	}
-
-	[ClientRpc]
-	protected void RpcEnable (bool enable) {
-		enabled = enable;
 	}
 
 }

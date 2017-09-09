@@ -90,8 +90,7 @@ public class WeaponManager : NetworkBehaviour {
 			DropWeapon (index);
 		weapons [index] = weapon;
 		if (!SwitchWeapon (index)) {
-			foreach (var handler in handlers)
-				handler.ServerDeploy (weapon);
+			Array.ForEach (handlers, handler => handler.OnWeaponChanged (weapons [index]));
 			RpcInstantiateViewmodel (weapon.Id);
 		}
 	}
@@ -105,7 +104,11 @@ public class WeaponManager : NetworkBehaviour {
 	private void DeleteWeapon (int index) {
 		weapons [index] = null;
 		RpcDestroyViewmodel ();
-		for (int i = 0; i < weapons.Length && !SwitchWeapon (i); i++);
+		//for (int i = 0; i < weapons.Length && !SwitchWeapon (i); i++);
+		for (int i = 0; i < weapons.Length; i++)
+			if (SwitchWeapon (i))
+				return;
+		Array.ForEach (handlers, handler => handler.OnWeaponChanged (weapons [index]));
 	}
 
 	[Server]
@@ -116,10 +119,10 @@ public class WeaponManager : NetworkBehaviour {
 		// assign dynamic weapon info to the dropped weapon
 		var droppedWeapon = Instantiate (weapons [index].DroppedPrefab, 
 			look.position + look.forward, look.rotation);
-		droppedWeapon.GetComponent<DroppedWeapon> ().weapon = weapons [index];
+		droppedWeapon.weapon = weapons [index];
 		droppedWeapon.GetComponent<Rigidbody> ().AddForce 
 		(GetComponent<CharacterController> ().velocity + (look.forward * 15), ForceMode.Impulse);
-		NetworkServer.Spawn (droppedWeapon);
+		NetworkServer.Spawn (droppedWeapon.gameObject);
 		DeleteWeapon (index);
 	}
 
@@ -139,14 +142,12 @@ public class WeaponManager : NetworkBehaviour {
 	private bool SwitchWeapon (int index) {
 		if (index == currentIndex || weapons [index] == null)
 			return false;
-		if (weapons [currentIndex] != null) {
-			//RpcSwitch (currentIndex, false);
-		}
-		currentIndex = index;
-
-		foreach (Handler handler in handlers)
-			handler.ServerDeploy (weapons [index]);
+//		if (weapons [currentIndex] != null) {
+//			//RpcSwitch (currentIndex, false);
+//		}
+		Array.ForEach (handlers, handler => handler.OnWeaponChanged (weapons [index]));
 		RpcInstantiateViewmodel (weapons [index].Id);
+		currentIndex = index;
 		return true;
 	}
 
@@ -183,8 +184,7 @@ public class WeaponManager : NetworkBehaviour {
 			thirdPersonWeapon.transform.localPosition = Vector3.zero;
 			thirdPersonWeapon.transform.localRotation = Quaternion.identity;
 		}
-		foreach (Handler handler in handlers)
-			handler.ClientDeploy (firstPersonWeapon, thirdPersonWeapon);
+		Array.ForEach (handlers, handler => handler.OnModelChanged (firstPersonWeapon, thirdPersonWeapon));
 	}
 
 	[ClientRpc]

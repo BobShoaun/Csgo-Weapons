@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using System;
+using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -9,58 +11,111 @@ public class LaserBeamerHandler : Handler {
 	// Client
 	private Transform firstPersonMuzzle;
 	private Transform thirdPersonMuzzle;
-	private LineRenderer laserPrefab;
+	private LineRenderer laser;
+
 	// Server
+	[SerializeField]
+	private LayerMask shootableLayer;
+	public Transform recoilTransform;
 	private LaserBeamer laserBeamer;
+	private bool shooting;
+	private int damage;
+	private float nextDamageIncreaseTime = 0;
+	private float nextShootTime = 0;
 
-	public override void ServerDeploy (Weapon weapon) {
-		if (enabled)
-			ServerKeep ();
+	protected override bool SetWeapon (Weapon weapon) {
 		laserBeamer = weapon as LaserBeamer;
-		if (laserBeamer == null) {
-			enabled = false;
-			RpcEnable (false);
-			return;
-		}
-		else {
-			enabled = true;
-			RpcEnable (true);
-		}
-
-		RpcCrosshair (laserBeamer.showCrosshair);
-		RpcUpdateUI (0, 0, laserBeamer.Name);
+		return base.SetWeapon (laserBeamer);
 	}
 
-	public override void ClientDeploy (GameObject firstPerson, GameObject thirdPerson) {
-		if (!enabled)
-			return;
-		if (isLocalPlayer)
+	[ServerCallback]
+	private void Start () {
+		
+	}
+
+	protected override void ServerDeploy () {
+		base.ServerDeploy ();
+		damage = laserBeamer.baseDamage;
+		nextShootTime = Time.time + laserBeamer.deployDuration;
+	}
+
+	protected override void ServerKeep () {
+		shooting = false;
+	}
+
+	protected override void ClientDeploy (GameObject firstPerson, GameObject thirdPerson) {
+		if (isLocalPlayer) {
 			firstPersonMuzzle = firstPerson.GetGameObjectInChildren ("Muzzle").transform;
+			laser = firstPersonMuzzle.GetComponent<LineRenderer> ();
+		}
 		else
 			thirdPersonMuzzle = thirdPerson.GetGameObjectInChildren ("Muzzle").transform;
 	}
 
-	[ClientRpc]
-	protected void RpcEnable (bool enable) {
-		enabled = enable;
+	protected override void ServerUpdate () {
+		if (shooting && Time.time >= nextShootTime)
+			RpcShoot (RaycastReflect (recoilTransform.position, 
+				recoilTransform.forward, laserBeamer.range).ToArray ());
 	}
 
 	protected override void ClientUpdate () {
-		if (Input.GetMouseButtonDown (0)) {
-			CmdShoot ();
-		}
+		if (Input.GetMouseButtonDown (0))
+			CmdToggleShoot (true);
+		else if (Input.GetMouseButtonUp (0))
+			CmdToggleShoot (false); 
 	}
 
 	[Command]
-	private void CmdShoot () {
-		
+	private void CmdToggleShoot (bool shooting) {
+		this.shooting = shooting;
+		RpcToggleShoot (shooting);
 	}
 
 	[ClientRpc]
-	private void RpcShoot () {
+	private void RpcToggleShoot (bool shooting) {
 		if (isLocalPlayer)
-			Instantiate (laserPrefab).SetPosition (0, firstPersonMuzzle.position);
+			laser.enabled = shooting;
+	}
 
+	[ClientRpc]
+	private void RpcShoot (Vector3 [] reflections) {
+		reflections = Array.ConvertAll (reflections, 
+			reflection => firstPersonMuzzle.InverseTransformPoint (reflection));
+		if (isLocalPlayer) {
+			laser.positionCount = reflections.Length + 1;
+			for (int i = 0; i < reflections.Length; i++)
+				laser.SetPosition (i + 1, reflections [i]);
+		}
+	}
+
+	[Server]
+	private IEnumerable<Vector3> RaycastReflect (Vector3 position, Vector3 direction, float range, ICollection<Vector3> reflections = null) {
+		if (range <= 0)
+			return reflections;
+		if (reflections == null)
+			reflections = new List<Vector3> ();
+		RaycastHit raycastHit;
+		if (Physics.Raycast (position, direction, out raycastHit, range, shootableLayer)) {
+			BodyPart bodyPart;
+			if (bodyPart = raycastHit.collider.GetComponent<BodyPart> ()) {
+				bodyPart.TakeDamage (laserBeamer.baseDamage, gameObject, transform.position);
+				nextDamageIncreaseTime = Time.time + laserBeamer.damageIncreaseInterval;
+				if (nextDamageIncreaseTime >= Time.time) {
+					
+				}
+			}
+			Rigidbody rigidbody = raycastHit.rigidbody;
+			if (rigidbody) {
+				rigidbody.AddForceAtPosition (direction * 50, raycastHit.point);
+			}
+
+			reflections.Add (raycastHit.point);
+			RaycastReflect (raycastHit.point, Vector3.Reflect (direction, raycastHit.normal), 
+				range - raycastHit.distance, reflections);
+		}
+		else
+			reflections.Add (position + direction * range);
+		return reflections;
 	}
 
 }

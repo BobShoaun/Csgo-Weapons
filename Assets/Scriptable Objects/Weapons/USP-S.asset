@@ -18,16 +18,16 @@ MonoBehaviour:
     type: 2}
   thirdPersonPrefab: {fileID: 1013810621065492, guid: 51e4fefa3a64e0d4bb07153d66e7f006,
     type: 2}
-  droppedPrefab: {fileID: 1604821044217708, guid: 6b23aa3693b8ff14fa09955f48821dcf,
+  droppedPrefab: {fileID: 114604804819191012, guid: 6b23aa3693b8ff14fa09955f48821dcf,
     type: 2}
-  deployDuration: 1.5
+  deployDuration: 1
   showCrosshair: 1
   fireRate: 5.867
   damage: 35
   magazineCapacity: 12
   reservedCapacity: 24
   baseInnacuracy: 0
-  accuracyDecay: 0.05
+  accuracyDecay: 0.005
   recoilScale: 10
   recoilCooldown: 0.55
   recoil:

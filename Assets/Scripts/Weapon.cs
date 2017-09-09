@@ -3,7 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
 
-public abstract class Weapon : ScriptableObject, IIdentifiable, ICloneable {
+public abstract class Weapon : ScriptableObject, IIdentifiable {
 
 	public enum SlotType { Primary, Secondary, Knife,
 		Flash, Grenade, Smoke, Decoy, Bomb }
@@ -42,19 +42,19 @@ public abstract class Weapon : ScriptableObject, IIdentifiable, ICloneable {
 	}
 
 	[SerializeField]
-	private GameObject droppedPrefab;
-	public GameObject DroppedPrefab {
+	private DroppedWeapon droppedPrefab;
+	public DroppedWeapon DroppedPrefab {
 		get { return droppedPrefab; }
 	}
 		
 	public float deployDuration = 1.5f;
 	public bool showCrosshair = true;
-
-	public virtual object Clone () {
-		return MemberwiseClone ();
-	}
-
-	[NonSerialized]
-	public int runtimeId;
-
+//
+//	public virtual object Clone () {
+//		return MemberwiseClone ();
+//	}
+//
+//	[NonSerialized]
+//	public int runtimeId;
+//
 }

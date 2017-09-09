@@ -1,28 +1,15 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
 public abstract class Handler : NetworkBehaviour {
 
-	private void Start () {
-		//GetComponent<WeaponManager> ().OnWeaponChanged += OnWeaponChanged;
-	}
+	private Weapon weapon;
 
-	private void OnEnable () {
-//		if (isServer)
-//			ServerDeploy ();
-//		if (isClient)
-//			ClientDeploy ();
-
-	}
-
-	private void OnDisable () {
-//		if (isServer)
-//			ServerKeep ();
-//		if (isClient)
-//			ClientKeep ();
-	}
+	[SyncVar (hook = "SetEnable")]
+	protected bool Enabled = false;
 
 	private void Update () {
 		if (isServer)
@@ -30,28 +17,52 @@ public abstract class Handler : NetworkBehaviour {
 		if (isClient)
 			ClientUpdate ();
 	}
+		
+	private void SetEnable (bool enabled) {
+		this.enabled = enabled;
+		if (enabled)
+			ServerDeploy ();
+	}
 
 	[Server]
-	public abstract void ServerDeploy (Weapon weapon);
+	public void OnWeaponChanged (Weapon weapon) {
+		if (enabled)
+			ServerKeep ();
+		Enabled = SetWeapon (weapon);
+	}
 
 	[Client]
-	public abstract void ClientDeploy (GameObject firstPerson, GameObject thirdPerson);
+	public void OnModelChanged (GameObject firstPerson, GameObject thirdPerson) {
+		if (enabled)
+			ClientDeploy (firstPerson, thirdPerson);
+	}
 
 	[Server]
-	public virtual void ServerKeep () {
+	protected virtual bool SetWeapon (Weapon weapon) {
+		this.weapon = weapon;
+		return weapon != null;
 	}
 
-	protected virtual void ClientKeep (){}
-
-	protected virtual void ServerUpdate () {
+	[Server]
+	protected virtual void ServerDeploy () {
+		RpcCrosshair (weapon.showCrosshair);
+		RpcUpdateUI (0, 0, weapon.name);
 	}
 
+	[Client]
+	protected abstract void ClientDeploy (GameObject firstPerson, GameObject thirdPerson);
+
+	[Server]
+	protected abstract void ServerKeep ();
+
+	[Client]
+	protected virtual void ClientKeep () { }
+
+	[ServerCallback]
+	protected virtual void ServerUpdate () { }
+
+	[ClientCallback]
 	protected abstract void ClientUpdate ();
-
-//	[ClientRpc]
-//	protected void RpcEnable (bool enable) {
-//		enabled = enable;
-//	}
 
 	[ClientRpc]
 	protected void RpcUpdateUI (int ammo, int reserved, string name) {
@@ -68,5 +79,6 @@ public abstract class Handler : NetworkBehaviour {
 			return;
 		PlayerHUD.Instance.crossHair.SetActive (active);
 	}
+
 
 }

@@ -19,7 +19,6 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4302839738662318}
-  - component: {fileID: 114536849543831084}
   m_Layer: 11
   m_Name: Flashbang (Held)
   m_TagString: Untagged
@@ -250,19 +249,3 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1576414472017894}
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &114536849543831084
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1317254123059448}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 669be810134987442a725b3554e78170, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  weapon: {fileID: 11400000, guid: af0f6fd602487364a9d06625d1ecfcf2, type: 2}
-  droppedPrefab: {fileID: 1307100487844756, guid: 765065cd928101d4dbe9b101d174cc7d,
-    type: 2}
-  deployTime: 1
-  showCrossHair: 1

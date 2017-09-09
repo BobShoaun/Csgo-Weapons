@@ -62,10 +62,9 @@ public class HighExplosiveGrenade : DroppedWeapon, IGrenade {
 		foreach (var col in Physics.OverlapSphere (transform.position, 5)) {
 			if (col.attachedRigidbody)
 				col.attachedRigidbody.AddExplosionForce (1000, transform.position, 5, 5);
-			Player player;
-			if (player = col.GetComponent<Player> ()) {
-				player.CmdTakeDamage (50, BodyPartType.Legs, playerPrimer.gameObject, transform.position);
-			}
+			BodyPart bodyPart;
+			if (bodyPart = col.GetComponent<BodyPart> ())
+				bodyPart.TakeDamage (50, playerPrimer.gameObject, transform.position);
 		}
 		Destroy (gameObject);
 	}

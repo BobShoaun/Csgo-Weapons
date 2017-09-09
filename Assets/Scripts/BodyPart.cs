@@ -1,19 +1,23 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.Networking;
 
 [RequireComponent (typeof (Collider))]
 public class BodyPart : MonoBehaviour {
 
-	[NonSerialized]
-	public Player player;
-	public BodyPartType bodyPartType;
+	public NetworkInstanceId NetId {
+		get { return player.netId; }
+	}
+	private Player player;
+	[SerializeField]
+	private BodyPartType bodyPartType;
 
 	private void Start () {
 		player = GetComponentInParent<Player> ();
 	}
 
-	public static int CalculateDamage (BodyPartType bodyPart, int damage) {
-		switch (bodyPart) {
+	private int CalculateDamage (int damage) {
+		switch (bodyPartType) {
 			case BodyPartType.Head:
 				return damage * 4;
 			case BodyPartType.UpperTorso:
@@ -25,6 +29,10 @@ public class BodyPart : MonoBehaviour {
 			default :
 				return damage;
 		}
+	}
+
+	public void TakeDamage (int damage, GameObject damager, Vector3 damageSourcePosition) {
+		player.TakeDamage (CalculateDamage (damage), damager, damageSourcePosition, bodyPartType);
 	}
 
 }

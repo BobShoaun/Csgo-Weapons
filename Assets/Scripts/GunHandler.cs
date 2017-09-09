@@ -5,6 +5,8 @@ using UnityEngine.Networking;
 using UnityRandom = UnityEngine.Random;
 using Doxel.Utility.ExtensionMethods;
 using DUtil = Doxel.Utility.Utility;
+using System;
+using System.Linq;
 
 public class GunHandler : Handler {
 
@@ -32,25 +34,17 @@ public class GunHandler : Handler {
 
 	private Gun gun;
 
+	protected override bool SetWeapon (Weapon weapon) {
+		gun = weapon as Gun;
+		return base.SetWeapon (gun);
+	}
+
 	[ServerCallback]
 	private void Start () {
 		initialSense = GetComponent<PlayerController> ().sensitivity;
 	}
 
-	public override void ServerDeploy (Weapon weapon) {
-		if (enabled)
-			ServerKeep ();
-		gun = weapon as Gun;
-		if (gun == null) {
-			enabled = false;
-			RpcEnable (false);
-			return;
-		}
-		else {
-			enabled = true;
-			RpcEnable (true);
-		}
-		// reset all vars
+	protected override void ServerDeploy () {
 		nextFireTime = Time.time + gun.deployDuration; // factor in deploy time
 		nextContinuousReloadTime = 0;
 		nextRecoilCooldownTime = 0;
@@ -62,25 +56,18 @@ public class GunHandler : Handler {
 		previousScopeState = 0;
 		rescopePending = false;
 
-		RpcCrosshair (gun.showCrosshair);
+		base.ServerDeploy ();
 		RpcUpdateUI (gun.ammunitionInMagazine, gun.reservedAmmunition, gun.Name);
 	}
 
-	public override void ClientDeploy (GameObject firstPerson, GameObject thirdPerson) {
-		if (!enabled)
-			return;
+	protected override void ClientDeploy (GameObject firstPerson, GameObject thirdPerson) {
 		if (isLocalPlayer)
 			firstPersonMuzzle = firstPerson.GetGameObjectInChildren ("Muzzle").transform;
 		else
 			thirdPersonMuzzle = thirdPerson.GetGameObjectInChildren ("Muzzle").transform;
 	}
 
-	[ClientRpc]
-	protected void RpcEnable (bool enable) {
-		enabled = enable;
-	}
-
-	public override void ServerKeep () {
+	protected override void ServerKeep () {
 		SetScopeState (0);
 	}
 
@@ -166,27 +153,26 @@ public class GunHandler : Handler {
 			Ray ray = new Ray (recoilTransform.position, 
 				recoilTransform.forward + UnityRandom.insideUnitSphere * innacuracy); 
 
-			RaycastHit [] raycastHits = Physics.RaycastAll (ray, 100);
+			RaycastHit [] raycastHits = Physics.RaycastAll (ray, 100).OrderBy (raycastHit => raycastHit.distance).ToArray ();
 			foreach (var raycastHit in raycastHits) {
-				if (raycastHit.collider.GetComponent<BodyPart> () != null) {
-					if (netId == raycastHit.collider.GetComponent<BodyPart> ().player.netId) {
+				BodyPart bodyPart;
+				if (bodyPart = raycastHit.collider.GetComponent<BodyPart> ()) {
+					bodyPart.TakeDamage (gun.damage, gameObject, transform.position);
+					if (netId == bodyPart.NetId) {
 						// Hit itself
 						continue;
 					}
 				}
-				var part = raycastHit.collider.GetComponent<BodyPart> ();
-				if (part)
-					part.player.CmdTakeDamage (gun.damage, part.bodyPartType, 
-						gameObject, transform.position);
 				else if (!raycastHit.collider.CompareTag ("Weapon")) {
 					if (raycastHit.collider.GetComponent<NetworkIdentity> ())
 						RpcSpawnBulletHoleWithParent (raycastHit.point, raycastHit.normal, raycastHit.collider.gameObject);
 					else
 						RpcSpawnBulletHole (raycastHit.point, raycastHit.normal);
 				}
-				Rigidbody rb = raycastHit.rigidbody;
-				if (rb && rb.GetComponent<NetworkIdentity> () && !rb.isKinematic)
-					rb.AddForceAtPosition (recoilTransform.forward * 30, raycastHit.point, ForceMode.Impulse);
+				Rigidbody rigidbody = raycastHit.rigidbody;
+				if (rigidbody && rigidbody.GetComponent<NetworkIdentity> ())
+					rigidbody.AddForceAtPosition (recoilTransform.forward * 30, raycastHit.point, ForceMode.Impulse);
+
 			}
 
 //

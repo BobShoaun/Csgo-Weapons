@@ -18,8 +18,10 @@ MonoBehaviour:
     type: 2}
   thirdPersonPrefab: {fileID: 1445542242404536, guid: 1990a4b5653312946b14f19fb593206f,
     type: 2}
-  droppedPrefab: {fileID: 1545550861574260, guid: 67819e94fe300144fa5b52c2a8655b9d,
+  droppedPrefab: {fileID: 114462798729945364, guid: 67819e94fe300144fa5b52c2a8655b9d,
     type: 2}
+  deployDuration: 1.5
+  showCrosshair: 1
   fireRate: 11.1
   damage: 33
   magazineCapacity: 30
@@ -153,10 +155,10 @@ MonoBehaviour:
   reloadDuration: 2.5
   continuousReload: 0
   bulletsPerShot: 1
-  bulletTracerFrequency: 3
+  tracerBulletInterval: 3
   continuousFire: 1
   scope: 0
-  unscopeAfterFiring: 0
+  smartScope: 0
   bulletHolePrefab: {fileID: 1799922971647616, guid: 6d9a614686d46354d98654b9992c7134,
     type: 2}
   bulletTracerPrefab: {fileID: 1788621936390712, guid: 8d0cdece92161c24d90549748d7cc20f,

@@ -284,7 +284,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4998159600237738}
   m_Layer: 0
-  m_Name: Recoil
+  m_Name: Aim
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -415,6 +415,7 @@ GameObject:
   - component: {fileID: 114545878552089196}
   - component: {fileID: 114521207550624760}
   - component: {fileID: 114701274455429084}
+  - component: {fileID: 114333332296592328}
   m_Layer: 8
   m_Name: Player
   m_TagString: Untagged
@@ -1714,6 +1715,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bodyPartType: 3
+--- !u!114 &114333332296592328
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1961750146996600}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0112af207722ad0438e9a07a61c11ba8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shootableLayer:
+    serializedVersion: 2
+    m_Bits: 4294964955
+  recoilTransform: {fileID: 4998159600237738}
 --- !u!114 &114383539216060534
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1736,6 +1752,7 @@ MonoBehaviour:
   shootableLayer:
     serializedVersion: 2
     m_Bits: 4294964441
+  aim: {fileID: 4998159600237738}
 --- !u!114 &114521207550624760
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -21,7 +21,6 @@ GameObject:
   - component: {fileID: 4402374638990266}
   - component: {fileID: 33546902781885110}
   - component: {fileID: 23435349117058156}
-  - component: {fileID: 114593192239374406}
   m_Layer: 11
   m_Name: High Explosive Grenade (Held)
   m_TagString: Untagged
@@ -81,19 +80,3 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1317952565179754}
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &114593192239374406
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1317952565179754}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 669be810134987442a725b3554e78170, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  weapon: {fileID: 11400000, guid: 6f23876db6feb4340b971bb505743150, type: 2}
-  droppedPrefab: {fileID: 1246586350134086, guid: 48308d2f749f5b54eadfed2ba2987f3e,
-    type: 2}
-  deployTime: 1
-  showCrossHair: 1

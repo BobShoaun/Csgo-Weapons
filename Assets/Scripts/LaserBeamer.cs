@@ -8,5 +8,6 @@ public class LaserBeamer : Weapon {
 	public int baseDamage = 5;
 	public int damageMultiplier = 2;
 	public int range = 100;
+	public float damageIncreaseInterval = 1.5f;
 
 }

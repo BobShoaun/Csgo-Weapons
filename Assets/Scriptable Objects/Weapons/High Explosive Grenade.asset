@@ -18,8 +18,10 @@ MonoBehaviour:
     type: 2}
   thirdPersonPrefab: {fileID: 1888078861072124, guid: 885e17bc9e866c044ac186e61da97f73,
     type: 2}
-  droppedPrefab: {fileID: 1246586350134086, guid: 48308d2f749f5b54eadfed2ba2987f3e,
+  droppedPrefab: {fileID: 114615629823676972, guid: 48308d2f749f5b54eadfed2ba2987f3e,
     type: 2}
+  deployDuration: 1.5
+  showCrosshair: 1
   smallThrowStrength: 300
   mediumThrowStrength: 1000
   bigThrowStrength: 1500
