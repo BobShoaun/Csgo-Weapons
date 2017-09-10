@@ -1579,7 +1579,7 @@ MonoBehaviour:
   minimumXAngle: -70
   maximumXAngle: 90
   cameraSmoothSpeed: 18
-  stationaryFieldOfView: 60
+  stationaryFieldOfView: 90
   walkFieldOfView: 60
   sprintFieldOfView: 60
   fieldOfViewMaximumDelta: 10
@@ -1770,7 +1770,7 @@ MonoBehaviour:
   weaponDatabase: {fileID: 11400000, guid: 01ee59e264703fb4a8df04367d72a68a, type: 2}
   firstPersonMount: {fileID: 4659871699547474}
   thirdPersonMount: {fileID: 4374835853063776}
-  look: {fileID: 4309866365162764}
+  aim: {fileID: 4998159600237738}
 --- !u!114 &114545878552089196
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1923,6 +1923,9 @@ MonoBehaviour:
     type: 2}
   bloodSplatterPrefab: {fileID: 1338366420505496, guid: f64d277093392234980b30bb0c4bdbd5,
     type: 2}
+  shootableLayer:
+    serializedVersion: 2
+    m_Bits: 4294964441
   aim: {fileID: 4998159600237738}
 --- !u!114 &114962258396299914
 MonoBehaviour:

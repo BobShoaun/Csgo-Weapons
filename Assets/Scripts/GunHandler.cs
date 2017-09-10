@@ -20,7 +20,10 @@ public class GunHandler : Handler {
 	public GameObject bloodSplatterPrefab;
 
 	// Server
-	public Transform aim;
+	[SerializeField]
+	private LayerMask shootableLayer;
+	[SerializeField]
+	private Transform aim;
 	private float nextFireTime = 0;
 	private float nextContinuousReloadTime = 0;
 	private float nextRecoilCooldownTime = 0;
@@ -157,24 +160,26 @@ public class GunHandler : Handler {
 			//create ray with recoil and innacuracy applied
 			int damage = gun.damage; // dynamic damage, initialized with every shot with base damage, but will be changed by penetration
 			bool hitPlayer = false;
+			List<NetworkInstanceId> shotPlayers = new List<NetworkInstanceId> ();
 			Ray ray = new Ray (aim.position, 
 				aim.forward + UnityRandom.insideUnitSphere * innacuracy); 
 
-			RaycastHit [] raycastHits = Physics.RaycastAll (ray, gun.range).OrderBy (raycastHit => raycastHit.distance).ToArray ();
+			RaycastHit [] raycastHits = Physics.RaycastAll (ray, gun.range, shootableLayer).OrderBy (raycastHit => raycastHit.distance).ToArray ();
 			foreach (var raycastHit in raycastHits) {
 				DMat mat;
 				BodyPart bodyPart;
 				if (bodyPart = raycastHit.collider.GetComponent<BodyPart> ()) {
 					if (netId == bodyPart.NetId) {
 						// Hit itself
-						print ("PLAYER HIT HIMSELF, WHAT A SPOON!");
 						continue;
 					}
 					else {
-						print ("PLAYER SHOT SOMEONE ELSE LIKE A PRO ");
+						if (shotPlayers.Contains (bodyPart.NetId)) // shot the same player mroe than once, hit hand, then torso, then hand again
+							continue;
+						shotPlayers.Add (bodyPart.NetId);
 						bodyPart.TakeDamage (damage, gameObject, transform.position);
 						hitPlayer = true;
-						// TODO blood splatter behind
+						// DONE blood splatter behind
 					}
 				}
 				else if (mat = raycastHit.collider.GetComponent<DMat> ()) {
@@ -320,7 +325,7 @@ public class GunHandler : Handler {
 		}
 		switch (value) {
 			case 0: // unscoped
-				RpcSetScopeState (60, initialSense, false);
+				RpcSetScopeState (90, initialSense, false);
 				RpcUpdateCrosshair (gun.showCrosshair);
 				break;
 			case 1: // scoped
@@ -328,7 +333,7 @@ public class GunHandler : Handler {
 				RpcUpdateCrosshair (false);
 				break;
 			case 2: // zoom
-				RpcSetScopeState (20, initialSense / 4, true);
+				RpcSetScopeState (15, initialSense / 4, true);
 				RpcUpdateCrosshair (false);
 				break;
 		}
@@ -343,6 +348,7 @@ public class GunHandler : Handler {
 		view.FieldOfView = newFOV;
 		GetComponent<PlayerController> ().sensitivity = newSense;
 		PlayerHUD.Instance.scopeOverlay.SetActive (scoped);
+		firstPersonViewmodel.SetActive (!scoped);
 	}
 
 	[ClientRpc]

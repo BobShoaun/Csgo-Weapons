@@ -20,7 +20,8 @@ public class Player : NetworkBehaviour {
 	[SyncVar]
 	public int deaths = 0;
 	private bool isDead = false;
-	public Transform aim;
+	[SerializeField]
+	private Transform aim;
 	private Vector3 aimRotation;
 
 	public float testValue = 10;
@@ -43,10 +44,10 @@ public class Player : NetworkBehaviour {
 		//PlayerHUD.Instance.SendChat (name + " has joined the game");
 
 		//gameObject.GetGameObjectInChildren ("Viewmodel Camera", true).SetActive (true);
-		gameObject.GetGameObjectInChildren ("Environment Camera", true).SetActive (true);
-		foreach (var child in model.GetComponentsInChildren<Transform> ()) {
-			child.gameObject.layer = LayerMask.NameToLayer ("Player Model");
+		foreach (Renderer renderer in model.GetComponentsInChildren<Renderer> ()) {
+			renderer.enabled = false;
 		}
+		gameObject.GetGameObjectInChildren ("Environment Camera", true).SetActive (true);
 		PlayerHUD.Instance.UpdateHealth (health);
 	}
 
@@ -165,6 +166,7 @@ public class Player : NetworkBehaviour {
 
 		deaths++;
 		GetComponent<WeaponManager> ().DropAllWeapons ();
+		gameObject.SetActive (false);
 		RpcDie (murderer, bdt);
 	}
 
@@ -201,6 +203,7 @@ public class Player : NetworkBehaviour {
 		//(GameManager.singleton as GameManager).Respawn (gameObject);
 		health = 100;
 		isDead = false;
+		gameObject.SetActive (true);
 		RpcRespawn ();
 	}
 

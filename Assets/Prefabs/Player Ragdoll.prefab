@@ -23,7 +23,7 @@ GameObject:
   - component: {fileID: 136165198789012822}
   - component: {fileID: 23002821063443590}
   - component: {fileID: 54100130284162234}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Thigh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -42,7 +42,7 @@ GameObject:
   - component: {fileID: 136943710527765266}
   - component: {fileID: 23676275215533962}
   - component: {fileID: 54714322166992202}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Hand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -61,7 +61,7 @@ GameObject:
   - component: {fileID: 65084880891508224}
   - component: {fileID: 23134729757125824}
   - component: {fileID: 54417934862986958}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Upper Torso
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -80,7 +80,7 @@ GameObject:
   - component: {fileID: 136505268785974048}
   - component: {fileID: 23741424254393944}
   - component: {fileID: 54973508563745194}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Calf
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -95,7 +95,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4940453515343820}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Left Arm
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -114,7 +114,7 @@ GameObject:
   - component: {fileID: 136147534135564786}
   - component: {fileID: 23000519740754434}
   - component: {fileID: 54829326508778756}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Shoulder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -133,7 +133,7 @@ GameObject:
   - component: {fileID: 136642566331727960}
   - component: {fileID: 23270032388657958}
   - component: {fileID: 54912710535877692}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Calf
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -148,7 +148,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4218138537244466}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Right Arm
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -167,7 +167,7 @@ GameObject:
   - component: {fileID: 136129831176329032}
   - component: {fileID: 23692822898234012}
   - component: {fileID: 54357611099390958}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Thigh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -182,7 +182,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4276718123897486}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Left Leg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -201,7 +201,7 @@ GameObject:
   - component: {fileID: 136301731861184740}
   - component: {fileID: 23749933370346778}
   - component: {fileID: 54825469483181434}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Shoulder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -220,7 +220,7 @@ GameObject:
   - component: {fileID: 136291966758787210}
   - component: {fileID: 23710963990933214}
   - component: {fileID: 54472439451482824}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Hand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -239,7 +239,7 @@ GameObject:
   - component: {fileID: 135842619513308052}
   - component: {fileID: 23870627977970988}
   - component: {fileID: 54539409912994748}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -258,7 +258,7 @@ GameObject:
   - component: {fileID: 65662139430006140}
   - component: {fileID: 23236953812219698}
   - component: {fileID: 54119875360791296}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Lower Torso
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -273,7 +273,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4017298428912196}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Player Ragdoll
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -288,7 +288,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4928138825496978}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Right Leg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
