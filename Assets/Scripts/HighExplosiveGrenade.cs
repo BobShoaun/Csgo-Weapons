@@ -5,7 +5,7 @@ using UnityEngine.Networking;
 
 public class HighExplosiveGrenade : DroppedWeapon, IGrenade {
 
-	// Client and server
+	// Both
 	public Collider sphere;
 	public Collider capsule;
 

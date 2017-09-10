@@ -8,36 +8,22 @@ using DUtil = Doxel.Utility.Utility;
 
 public class WeaponManager : NetworkBehaviour {
 
-	// Client variables
-	[SerializeField]
-	private WeaponDatabase weaponDatabase;
-	[SerializeField]
-	private Transform firstPersonMount;
-	[SerializeField]
-	private Transform thirsPersonMount;
+	// Client
 	[SerializeField]
 	private Camera environmentCamera;
 
-	private GameObject firstPersonWeapon;
-	private GameObject thirdPersonWeapon;
-
-	// both client and server
-	private Handler[] handlers;
-
-	// Server variables; variables that only exists in the server and is meaningless
+	// Server ; variables that only exists in the server and is meaningless
 	// to all the clients
+	private Handler[] handlers;
 	[SerializeField]
 	private Transform look;
 	private Weapon [] weapons;
 	private int currentIndex = 2;
 
+	[ServerCallback]
 	private void Start () {
 		handlers = GetComponents<Handler> ();
-		if (isServer) {
-			weapons = new Weapon [Enum.GetNames (typeof (Weapon.SlotType)).Length];
-		}
-		if (isClient) {
-		}
+		weapons = new Weapon [Enum.GetNames (typeof (Weapon.SlotType)).Length];
 	}
 
 	[ClientCallback]
@@ -90,8 +76,9 @@ public class WeaponManager : NetworkBehaviour {
 			DropWeapon (index);
 		weapons [index] = weapon;
 		if (!SwitchWeapon (index)) {
+			print ("CALLED");
 			Array.ForEach (handlers, handler => handler.OnWeaponChanged (weapons [index]));
-			RpcInstantiateViewmodel (weapon.Id);
+			//RpcInstantiateViewmodel (weapon.Id);
 		}
 	}
 
@@ -103,11 +90,12 @@ public class WeaponManager : NetworkBehaviour {
 	[Server]
 	private void DeleteWeapon (int index) {
 		weapons [index] = null;
-		RpcDestroyViewmodel ();
+		//RpcDestroyViewmodel ();
 		//for (int i = 0; i < weapons.Length && !SwitchWeapon (i); i++);
 		for (int i = 0; i < weapons.Length; i++)
 			if (SwitchWeapon (i))
 				return;
+		print ("CALLED");
 		Array.ForEach (handlers, handler => handler.OnWeaponChanged (weapons [index]));
 	}
 
@@ -140,13 +128,12 @@ public class WeaponManager : NetworkBehaviour {
 
 	[Server]
 	private bool SwitchWeapon (int index) {
-		if (index == currentIndex || weapons [index] == null)
+		if (index == currentIndex || weapons [index] == null) {
 			return false;
-//		if (weapons [currentIndex] != null) {
-//			//RpcSwitch (currentIndex, false);
-//		}
+		}
+		print ("CALLED");
 		Array.ForEach (handlers, handler => handler.OnWeaponChanged (weapons [index]));
-		RpcInstantiateViewmodel (weapons [index].Id);
+		//RpcInstantiateViewmodel (weapons [index].Id);
 		currentIndex = index;
 		return true;
 	}
@@ -169,27 +156,6 @@ public class WeaponManager : NetworkBehaviour {
 			return;
 		}
 		// No holding weapons
-	}
-
-	[ClientRpc]
-	private void RpcInstantiateViewmodel (int weaponId) {
-		if (isLocalPlayer) {
-			Destroy (firstPersonWeapon);
-			firstPersonWeapon = Instantiate (weaponDatabase [weaponId].FirstPersonPrefab, firstPersonMount);
-		}
-		else {
-			Destroy (thirdPersonWeapon);
-			thirdPersonWeapon = Instantiate (weaponDatabase [weaponId].ThirdPersonPrefab);
-			thirdPersonWeapon.transform.SetParent (thirsPersonMount, true);
-			thirdPersonWeapon.transform.localPosition = Vector3.zero;
-			thirdPersonWeapon.transform.localRotation = Quaternion.identity;
-		}
-		Array.ForEach (handlers, handler => handler.OnModelChanged (firstPersonWeapon, thirdPersonWeapon));
-	}
-
-	[ClientRpc]
-	private void RpcDestroyViewmodel () {
-		Destroy (isLocalPlayer ? firstPersonWeapon : thirdPersonWeapon);
 	}
 
 	[ServerCallback]

@@ -1726,6 +1726,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0112af207722ad0438e9a07a61c11ba8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  weaponDatabase: {fileID: 11400000, guid: 01ee59e264703fb4a8df04367d72a68a, type: 2}
+  firstPersonMount: {fileID: 4659871699547474}
+  thirdPersonMount: {fileID: 4374835853063776}
   shootableLayer:
     serializedVersion: 2
     m_Bits: 4294964955
@@ -1741,18 +1744,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73f007266d3f3614e88fe3099d4c0f3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 100
-  kills: 0
-  deaths: 0
   model: {fileID: 4096330963192736}
   ragdollPrefab: {fileID: 1862471661750772, guid: 1b4a4bb62f3d1de4c9827b19c3f684cd,
     type: 2}
+  health: 100
+  kills: 0
+  deaths: 0
+  aim: {fileID: 4998159600237738}
   testValue: 10
   time: 0
   shootableLayer:
     serializedVersion: 2
     m_Bits: 4294964441
-  aim: {fileID: 4998159600237738}
 --- !u!114 &114521207550624760
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1764,6 +1767,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56035a5d571221047800625dc549fdd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  weaponDatabase: {fileID: 11400000, guid: 01ee59e264703fb4a8df04367d72a68a, type: 2}
+  firstPersonMount: {fileID: 4659871699547474}
+  thirdPersonMount: {fileID: 4374835853063776}
   look: {fileID: 4309866365162764}
 --- !u!114 &114545878552089196
 MonoBehaviour:
@@ -1776,6 +1782,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3b77a1dbd4973f4dbd288eacf773287, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  weaponDatabase: {fileID: 11400000, guid: 01ee59e264703fb4a8df04367d72a68a, type: 2}
+  firstPersonMount: {fileID: 4659871699547474}
+  thirdPersonMount: {fileID: 4374835853063776}
   look: {fileID: 4309866365162764}
 --- !u!114 &114562685934500822
 MonoBehaviour:
@@ -1812,6 +1821,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 391fdf1a281608742b17e7750c7d8a88, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  weaponDatabase: {fileID: 11400000, guid: 01ee59e264703fb4a8df04367d72a68a, type: 2}
+  firstPersonMount: {fileID: 4659871699547474}
+  thirdPersonMount: {fileID: 4374835853063776}
   look: {fileID: 4309866365162764}
 --- !u!114 &114710237437799970
 MonoBehaviour:
@@ -1876,9 +1888,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2970886f7b108b4fb94c09b5e5658be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponDatabase: {fileID: 11400000, guid: 01ee59e264703fb4a8df04367d72a68a, type: 2}
-  firstPersonMount: {fileID: 4659871699547474}
-  thirsPersonMount: {fileID: 4374835853063776}
   environmentCamera: {fileID: 20768308633148954}
   look: {fileID: 4309866365162764}
 --- !u!114 &114897073931385848
@@ -1904,12 +1913,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc46184ea04fc3341a49e2cbb4cc6bde, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  weaponDatabase: {fileID: 11400000, guid: 01ee59e264703fb4a8df04367d72a68a, type: 2}
+  firstPersonMount: {fileID: 4659871699547474}
+  thirdPersonMount: {fileID: 4374835853063776}
   view: {fileID: 114201446085970828}
   bulletTracerPrefab: {fileID: 1788621936390712, guid: 8d0cdece92161c24d90549748d7cc20f,
     type: 2}
   bulletHolePrefab: {fileID: 1799922971647616, guid: 6d9a614686d46354d98654b9992c7134,
     type: 2}
-  recoilTransform: {fileID: 4998159600237738}
+  bloodSplatterPrefab: {fileID: 1338366420505496, guid: f64d277093392234980b30bb0c4bdbd5,
+    type: 2}
+  aim: {fileID: 4998159600237738}
 --- !u!114 &114962258396299914
 MonoBehaviour:
   m_ObjectHideFlags: 1

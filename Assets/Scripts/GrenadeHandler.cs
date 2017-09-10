@@ -13,18 +13,18 @@ public class GrenadeHandler : Handler {
 	public Transform look;
 	private Grenade grenade;
 
-
-	protected override bool SetWeapon (Weapon weapon) {
-		grenade = weapon as Grenade;
-		return base.SetWeapon (grenade);
+	protected override Type WeaponType {
+		get {
+			return typeof (Grenade);
+		}
 	}
 
 	protected override void ServerKeep () {
 		
 	}
 
-	protected override void ClientDeploy (GameObject firstPerson, GameObject thirdPerson) {
-		
+	protected override void ClientDeploy (Weapon weapon) {
+		base.ClientDeploy (weapon);
 	}
 
 	protected override void ClientUpdate () {

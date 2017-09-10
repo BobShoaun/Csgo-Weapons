@@ -8,7 +8,6 @@ using System;
 public class KnifeHandler : Handler {
 
 	// clients
-	private GameObject firstPersonKnife;
 	private Animator animator;
 
 	private Vector3 position;
@@ -20,12 +19,14 @@ public class KnifeHandler : Handler {
 	private Knife knife;
 	private float nextAttackTime;
 
-	protected override bool SetWeapon (Weapon weapon) {
-		knife = weapon as Knife;
-		return base.SetWeapon (knife);
+	protected override Type WeaponType {
+		get {
+			return typeof (Knife);
+		}
 	}
 
 	protected override void ClientKeep () {
+		base.ClientKeep ();
 		//knifeTransform.localPosition = position;
 		//knifeTransform.localRotation = rotation;
 	}
@@ -37,14 +38,17 @@ public class KnifeHandler : Handler {
 		}
 	}
 
-	protected override void ServerDeploy () {
-		base.ServerDeploy ();
+	protected override void ServerDeploy (Weapon weapon) {
+		base.ServerDeploy (weapon);
+		knife = weapon as Knife;
+
 		nextAttackTime = Time.time + knife.deployDuration;
 	}
 
-	protected override void ClientDeploy (GameObject firstPerson, GameObject thirdPerson) {
+	protected override void ClientDeploy (Weapon weapon) {
+		base.ClientDeploy (weapon);
 		if (isLocalPlayer) {
-			knifeTransform = firstPerson.transform;
+			knifeTransform = firstPersonViewmodel.transform;
 			animator = knifeTransform.GetComponent<Animator> ();
 		}
 		//animator.Rebind ();

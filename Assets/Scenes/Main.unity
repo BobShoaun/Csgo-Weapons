@@ -1662,6 +1662,7 @@ GameObject:
   - component: {fileID: 720389466}
   - component: {fileID: 720389465}
   - component: {fileID: 720389464}
+  - component: {fileID: 720389468}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -1733,6 +1734,23 @@ Transform:
   m_Father: {fileID: 2119722712}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 11.714001, z: 0}
+--- !u!114 &720389468
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 720389463}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 454955832252a034d8b44da304cd23d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bulletCollisionBehaviour: 1
+  showBulletHole: 1
+  penetrationPrevention: 5
+  bulletHolePrefab: {fileID: 1799922971647616, guid: 6d9a614686d46354d98654b9992c7134,
+    type: 2}
+  footStepSound: {fileID: 0}
 --- !u!1001 &734523521
 Prefab:
   m_ObjectHideFlags: 0

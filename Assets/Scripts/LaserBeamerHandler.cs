@@ -23,9 +23,10 @@ public class LaserBeamerHandler : Handler {
 	private float nextDamageIncreaseTime = 0;
 	private float nextShootTime = 0;
 
-	protected override bool SetWeapon (Weapon weapon) {
-		laserBeamer = weapon as LaserBeamer;
-		return base.SetWeapon (laserBeamer);
+	protected override Type WeaponType {
+		get {
+			return typeof (LaserBeamer);
+		}
 	}
 
 	[ServerCallback]
@@ -33,8 +34,10 @@ public class LaserBeamerHandler : Handler {
 		
 	}
 
-	protected override void ServerDeploy () {
-		base.ServerDeploy ();
+	protected override void ServerDeploy (Weapon weapon) {
+		base.ServerDeploy (weapon);
+		laserBeamer = weapon as LaserBeamer;
+
 		damage = laserBeamer.baseDamage;
 		nextShootTime = Time.time + laserBeamer.deployDuration;
 	}
@@ -43,13 +46,14 @@ public class LaserBeamerHandler : Handler {
 		shooting = false;
 	}
 
-	protected override void ClientDeploy (GameObject firstPerson, GameObject thirdPerson) {
+	protected override void ClientDeploy (Weapon weapon) {
+		base.ClientDeploy (weapon);
 		if (isLocalPlayer) {
-			firstPersonMuzzle = firstPerson.GetGameObjectInChildren ("Muzzle").transform;
+			firstPersonMuzzle = firstPersonViewmodel.GetGameObjectInChildren ("Muzzle").transform;
 			laser = firstPersonMuzzle.GetComponent<LineRenderer> ();
 		}
 		else
-			thirdPersonMuzzle = thirdPerson.GetGameObjectInChildren ("Muzzle").transform;
+			thirdPersonMuzzle = thirdPersonWeaponModel.GetGameObjectInChildren ("Muzzle").transform;
 	}
 
 	protected override void ServerUpdate () {

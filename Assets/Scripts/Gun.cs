@@ -21,6 +21,10 @@ public class Gun : Weapon {
 	public float recoilCooldown = 0.25f;
 	public Recoil recoil;
 
+	public float range = 100;
+	public int penetrationPower = 1;
+	public int armorPenetration = 2;
+
 	public float reloadDuration = 2.5f;
 	public bool continuousReload = false;
 

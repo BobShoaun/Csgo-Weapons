@@ -7,7 +7,12 @@ using DUtil = Doxel.Utility.Utility;
 using Doxel.Utility.ExtensionMethods;
 
 public class Player : NetworkBehaviour {
-	
+
+	// Client
+	public Transform model;
+	public GameObject ragdollPrefab;
+	private GameObject ragdollInstance;
+
 	// Server
 	public int health = 100;
 	[SyncVar]
@@ -15,20 +20,12 @@ public class Player : NetworkBehaviour {
 	[SyncVar]
 	public int deaths = 0;
 	private bool isDead = false;
-
-
-	public Transform model;
-	public GameObject ragdollPrefab;
-	private GameObject ragdollInstance;
+	public Transform aim;
+	private Vector3 aimRotation;
 
 	public float testValue = 10;
 	public float time = 0;
-
 	public LayerMask shootableLayer;
-
-	// Server
-	public Transform aim;
-	private Vector3 aimRotation;
 
 	public override void OnStartLocalPlayer () {
 		
@@ -106,6 +103,8 @@ public class Player : NetworkBehaviour {
 
 	[Server]
 	public void TakeDamage (int damage, GameObject damager, Vector3 damagerPos, BodyPartType bodyPartType) {
+		if (damage <= 0)
+			return;
 		health -= damage;
 		if (health <= 0)
 			Die (damager, bodyPartType);

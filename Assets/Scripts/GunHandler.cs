@@ -7,18 +7,20 @@ using Doxel.Utility.ExtensionMethods;
 using DUtil = Doxel.Utility.Utility;
 using System;
 using System.Linq;
+using DMat = Doxel.Environment.Material;
 
 public class GunHandler : Handler {
 
-	// client
+	// Client
 	public View view;
 	private Transform thirdPersonMuzzle;
 	private Transform firstPersonMuzzle;
 	public GameObject bulletTracerPrefab;
 	public GameObject bulletHolePrefab;
+	public GameObject bloodSplatterPrefab;
 
-	// server
-	public Transform recoilTransform;
+	// Server
+	public Transform aim;
 	private float nextFireTime = 0;
 	private float nextContinuousReloadTime = 0;
 	private float nextRecoilCooldownTime = 0;
@@ -34,9 +36,8 @@ public class GunHandler : Handler {
 
 	private Gun gun;
 
-	protected override bool SetWeapon (Weapon weapon) {
-		gun = weapon as Gun;
-		return base.SetWeapon (gun);
+	protected override Type WeaponType {
+		get { return typeof (Gun); }
 	}
 
 	[ServerCallback]
@@ -44,7 +45,10 @@ public class GunHandler : Handler {
 		initialSense = GetComponent<PlayerController> ().sensitivity;
 	}
 
-	protected override void ServerDeploy () {
+	protected override void ServerDeploy (Weapon weapon) {
+		base.ServerDeploy (weapon);
+		gun = weapon as Gun;
+
 		nextFireTime = Time.time + gun.deployDuration; // factor in deploy time
 		nextContinuousReloadTime = 0;
 		nextRecoilCooldownTime = 0;
@@ -56,18 +60,19 @@ public class GunHandler : Handler {
 		previousScopeState = 0;
 		rescopePending = false;
 
-		base.ServerDeploy ();
 		RpcUpdateUI (gun.ammunitionInMagazine, gun.reservedAmmunition, gun.Name);
 	}
 
-	protected override void ClientDeploy (GameObject firstPerson, GameObject thirdPerson) {
+	protected override void ClientDeploy (Weapon weapon) {
+		base.ClientDeploy (weapon);
 		if (isLocalPlayer)
-			firstPersonMuzzle = firstPerson.GetGameObjectInChildren ("Muzzle").transform;
+			firstPersonMuzzle = firstPersonViewmodel.GetGameObjectInChildren ("Muzzle").transform;
 		else
-			thirdPersonMuzzle = thirdPerson.GetGameObjectInChildren ("Muzzle").transform;
+			thirdPersonMuzzle = thirdPersonWeaponModel.GetGameObjectInChildren ("Muzzle").transform;
 	}
 
 	protected override void ServerKeep () {
+		print ("GUN KEEP");
 		SetScopeState (0);
 	}
 
@@ -76,7 +81,7 @@ public class GunHandler : Handler {
 			ContinuousReload ();
 
 		recoilRotation = DUtil.ExponentialDecayTowards (recoilRotation, Vector3.zero, 1f, Time.deltaTime * 5f);
-		recoilTransform.localRotation = Quaternion.Euler (recoilRotation);
+		aim.localRotation = Quaternion.Euler (recoilRotation);
 		RpcRecoilCooldown (recoilRotation);
 
 		if (Time.time >= nextRecoilCooldownTime) { // RESET RECOIL AND ACCURACY
@@ -118,7 +123,7 @@ public class GunHandler : Handler {
 			CmdCycleScopeState ();
 
 		if (Input.GetKeyDown (KeyCode.F)) {
-			// Inspect
+			// TODO Inspect
 		}
 	}
 
@@ -147,31 +152,61 @@ public class GunHandler : Handler {
 			var recoilRotation = new Vector3 (-gun.recoil.Current.y,
 				gun.recoil.Current.x) * gun.recoilScale;
 			this.recoilRotation += recoilRotation;
-			recoilTransform.localEulerAngles = this.recoilRotation;
+			aim.localEulerAngles = this.recoilRotation;
 			//RaycastHit raycastHit;
 			//create ray with recoil and innacuracy applied
-			Ray ray = new Ray (recoilTransform.position, 
-				recoilTransform.forward + UnityRandom.insideUnitSphere * innacuracy); 
+			int damage = gun.damage; // dynamic damage, initialized with every shot with base damage, but will be changed by penetration
+			bool hitPlayer = false;
+			Ray ray = new Ray (aim.position, 
+				aim.forward + UnityRandom.insideUnitSphere * innacuracy); 
 
-			RaycastHit [] raycastHits = Physics.RaycastAll (ray, 100).OrderBy (raycastHit => raycastHit.distance).ToArray ();
+			RaycastHit [] raycastHits = Physics.RaycastAll (ray, gun.range).OrderBy (raycastHit => raycastHit.distance).ToArray ();
 			foreach (var raycastHit in raycastHits) {
+				DMat mat;
 				BodyPart bodyPart;
 				if (bodyPart = raycastHit.collider.GetComponent<BodyPart> ()) {
-					bodyPart.TakeDamage (gun.damage, gameObject, transform.position);
 					if (netId == bodyPart.NetId) {
 						// Hit itself
+						print ("PLAYER HIT HIMSELF, WHAT A SPOON!");
 						continue;
 					}
+					else {
+						print ("PLAYER SHOT SOMEONE ELSE LIKE A PRO ");
+						bodyPart.TakeDamage (damage, gameObject, transform.position);
+						hitPlayer = true;
+						// TODO blood splatter behind
+					}
+				}
+				else if (mat = raycastHit.collider.GetComponent<DMat> ()) {
+					Ray reverseRay = new Ray (ray.GetPoint (gun.range), -ray.direction);
+					RaycastHit reverseRaycastHit;
+					if (raycastHit.collider.Raycast (reverseRay, out reverseRaycastHit, gun.range - raycastHit.distance)) {
+						float thickness = Vector3.Distance (raycastHit.point, reverseRaycastHit.point);
+						damage -= (int) (thickness / gun.penetrationPower * mat.penetrationPrevention);
+						// TODO spawn specific bullet hole for different materials
+						SpawnBulletHole (reverseRaycastHit.point, reverseRaycastHit.normal, reverseRaycastHit.collider.gameObject);
+						print ("HIT WALL " + raycastHit.collider.name + " with thickness " + thickness + " Damage reduced from " + gun.damage + " to " + damage);
+					}
+					SpawnBulletHole (raycastHit.point, raycastHit.normal, raycastHit.collider.gameObject);
 				}
 				else if (!raycastHit.collider.CompareTag ("Weapon")) {
-					if (raycastHit.collider.GetComponent<NetworkIdentity> ())
-						RpcSpawnBulletHoleWithParent (raycastHit.point, raycastHit.normal, raycastHit.collider.gameObject);
-					else
-						RpcSpawnBulletHole (raycastHit.point, raycastHit.normal);
+					Ray reverseRay = new Ray (ray.GetPoint (gun.range), -ray.direction);
+					RaycastHit reverseRaycastHit;
+					if (raycastHit.collider.Raycast (reverseRay, out reverseRaycastHit, gun.range - raycastHit.distance)) {
+						float thickness = Vector3.Distance (raycastHit.point, reverseRaycastHit.point);
+						damage -= (int) (thickness / gun.penetrationPower * 5f);
+						SpawnBulletHole (reverseRaycastHit.point, reverseRaycastHit.normal, reverseRaycastHit.collider.gameObject);
+						print ("HIT WALL " + raycastHit.collider.name + " with thickness " + thickness + " Damage reduced from " + gun.damage + " to " + damage);
+					}
+					SpawnBulletHole (raycastHit.point, raycastHit.normal, raycastHit.collider.gameObject);
+					if (hitPlayer) {
+						hitPlayer = false;
+						RpcSpawnBloodSplatter (raycastHit.point, raycastHit.normal);
+					}
 				}
 				Rigidbody rigidbody = raycastHit.rigidbody;
 				if (rigidbody && rigidbody.GetComponent<NetworkIdentity> ())
-					rigidbody.AddForceAtPosition (recoilTransform.forward * 30, raycastHit.point, ForceMode.Impulse);
+					rigidbody.AddForceAtPosition (ray.direction * 30, raycastHit.point, ForceMode.Impulse);
 
 			}
 
@@ -204,6 +239,14 @@ public class GunHandler : Handler {
 		}
 		RpcFire (this.recoilRotation, gun.recoil.Direction);
 		RpcUpdateUI (gun.ammunitionInMagazine, gun.reservedAmmunition, gun.Name);
+	}
+
+	[Server]
+	private void SpawnBulletHole (Vector3 position, Vector3 direction, GameObject gameObject) {
+		if (gameObject.GetComponent<NetworkIdentity> ())
+			RpcSpawnBulletHoleWithParent (position, direction, gameObject);
+		else
+			RpcSpawnBulletHole (position, direction);
 	}
 
 	[Command]
@@ -278,15 +321,15 @@ public class GunHandler : Handler {
 		switch (value) {
 			case 0: // unscoped
 				RpcSetScopeState (60, initialSense, false);
-				RpcCrosshair (gun.showCrosshair);
+				RpcUpdateCrosshair (gun.showCrosshair);
 				break;
 			case 1: // scoped
 				RpcSetScopeState (40, initialSense / 2, true);
-				RpcCrosshair (false);
+				RpcUpdateCrosshair (false);
 				break;
 			case 2: // zoom
 				RpcSetScopeState (20, initialSense / 4, true);
-				RpcCrosshair (false);
+				RpcUpdateCrosshair (false);
 				break;
 		}
 		previousScopeState = scopeState;
@@ -330,10 +373,19 @@ public class GunHandler : Handler {
 
 	[ClientRpc]
 	private void RpcSpawnTracer (Vector3 direction) {
-		if (isLocalPlayer)
+
+		if (isLocalPlayer) {
+			if (firstPersonMuzzle == null)
+				print ("MUZZLE IS NULL");
 			Instantiate (bulletTracerPrefab, firstPersonMuzzle.position, Quaternion.LookRotation (direction));
+		}
 		else
 			Instantiate (bulletTracerPrefab, thirdPersonMuzzle.position, Quaternion.LookRotation (direction));
+	}
+
+	[ClientRpc]
+	private void RpcSpawnBloodSplatter (Vector3 position, Vector3 direction) {
+		Destroy (Instantiate (bloodSplatterPrefab, position, Quaternion.LookRotation (direction)), 20);
 	}
 
 }

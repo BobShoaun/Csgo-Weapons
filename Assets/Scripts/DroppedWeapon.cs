@@ -5,8 +5,6 @@ using UnityEngine.Serialization;
 
 public class DroppedWeapon : NetworkBehaviour {
 
-	// Client
-
 	// Server
 	public Weapon weapon;
 

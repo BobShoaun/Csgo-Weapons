@@ -16,13 +16,16 @@ public class LauncherHandler : Handler {
 	private Launcher launcher;
 	private float nextFireTime = 0;
 
-	protected override bool SetWeapon (Weapon weapon) {
-		launcher = weapon as Launcher;
-		return base.SetWeapon (launcher);
+	protected override Type WeaponType {
+		get {
+			return typeof (Launcher);
+		}
 	}
 
-	protected override void ServerDeploy () {
-		base.ServerDeploy ();
+	protected override void ServerDeploy (Weapon weapon) {
+		base.ServerDeploy (weapon);
+		launcher = weapon as Launcher;
+
 		nextFireTime = Time.time + launcher.deployDuration;
 	}
 
@@ -30,8 +33,10 @@ public class LauncherHandler : Handler {
 		
 	}
 
-	protected override void ClientDeploy (GameObject firstPerson, GameObject thirdPerson) {
-		muzzle = firstPerson.GetGameObjectInChildren ("Muzzle").transform;
+	protected override void ClientDeploy (Weapon weapon) {
+		base.ClientDeploy (weapon);
+		if (isLocalPlayer)
+			muzzle = firstPersonViewmodel.GetGameObjectInChildren ("Muzzle").transform;
 	}
 
 	protected override void ClientUpdate () {

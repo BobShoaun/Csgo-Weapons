@@ -36,10 +36,7 @@ namespace Doxel.Utility.ExtensionMethods {
 		}
 
 		public static GameObject GetGameObjectInChildren (this GameObject gameObject, string name, bool includeInactive = false) {
-			Transform gO = Array.Find (gameObject.GetComponentsInChildren<Transform> (includeInactive), transform => transform.name == name);
-			if (gO == null)
-				Debug.LogError (name + " couldnt be found");
-			return gO.gameObject;
+			return Array.Find (gameObject.GetComponentsInChildren<Transform> (includeInactive), transform => transform.name == name).gameObject;
 		}
 
 	}

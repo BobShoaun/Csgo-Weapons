@@ -8,6 +8,7 @@ public class BodyPart : MonoBehaviour {
 	public NetworkInstanceId NetId {
 		get { return player.netId; }
 	}
+
 	private Player player;
 	[SerializeField]
 	private BodyPartType bodyPartType;
