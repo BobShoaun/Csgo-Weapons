@@ -176,13 +176,22 @@ public class PlayerHUD : SingletonMonoBehaviour<PlayerHUD> {
 	public void AddPlayerToScoreboard (NetworkIdentity netId, string name, int kills, int deaths) {
 		ScoreUI score = Instantiate (scorePrefab, scoreList).GetComponent<ScoreUI> ();
 		scoreUIs.Add (netId.netId, score);
-		score.UpdateUI (name, kills, deaths, netId.isLocalPlayer);
+		score.SetName (name, netId.isLocalPlayer);
+		score.Kills = kills;
+		score.Deaths = deaths;
 	}
 
-	public void UpdatePlayerScoreUI (NetworkIdentity netId, string name, int kills, int deaths) {
+	public void UpdateKills (NetworkInstanceId netId, int kills) {
 		ScoreUI score;
-		if (scoreUIs.TryGetValue (netId.netId, out score)) {
-			score.UpdateUI (name, kills, deaths, netId.isLocalPlayer);
+		if (scoreUIs.TryGetValue (netId, out score)) {
+			score.Kills = kills;
+		}
+	}
+
+	public void UpdateDeaths (NetworkInstanceId netId, int deaths) {
+		ScoreUI score;
+		if (scoreUIs.TryGetValue (netId, out score)) {
+			score.Deaths = deaths;
 		}
 	}
 

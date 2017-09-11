@@ -49,12 +49,5 @@ public abstract class Weapon : ScriptableObject, IIdentifiable {
 		
 	public float deployDuration = 1.5f;
 	public bool showCrosshair = true;
-//
-//	public virtual object Clone () {
-//		return MemberwiseClone ();
-//	}
-//
-//	[NonSerialized]
-//	public int runtimeId;
-//
+
 }

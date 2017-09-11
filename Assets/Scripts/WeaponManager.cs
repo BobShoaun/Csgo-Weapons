@@ -75,11 +75,8 @@ public class WeaponManager : NetworkBehaviour {
 		if (weapons [index] != null)
 			DropWeapon (index);
 		weapons [index] = weapon;
-		if (!SwitchWeapon (index)) {
-			print ("CALLED");
+		if (!SwitchWeapon (index))
 			Array.ForEach (handlers, handler => handler.OnWeaponChanged (weapons [index]));
-			//RpcInstantiateViewmodel (weapon.Id);
-		}
 	}
 
 	[Server]
@@ -95,7 +92,6 @@ public class WeaponManager : NetworkBehaviour {
 		for (int i = 0; i < weapons.Length; i++)
 			if (SwitchWeapon (i))
 				return;
-		print ("CALLED");
 		Array.ForEach (handlers, handler => handler.OnWeaponChanged (weapons [index]));
 	}
 
@@ -128,12 +124,9 @@ public class WeaponManager : NetworkBehaviour {
 
 	[Server]
 	private bool SwitchWeapon (int index) {
-		if (index == currentIndex || weapons [index] == null) {
+		if (index == currentIndex || weapons [index] == null)
 			return false;
-		}
-		print ("CALLED");
 		Array.ForEach (handlers, handler => handler.OnWeaponChanged (weapons [index]));
-		//RpcInstantiateViewmodel (weapons [index].Id);
 		currentIndex = index;
 		return true;
 	}

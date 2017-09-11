@@ -16,6 +16,7 @@ public abstract class Handler : NetworkBehaviour {
 	protected GameObject firstPersonViewmodel;
 	protected GameObject thirdPersonWeaponModel;
 
+	// Both
 	[SyncVar (hook = "SetWeapon")]
 	private int WeaponId;
 
@@ -60,13 +61,15 @@ public abstract class Handler : NetworkBehaviour {
 
 	[Server]
 	protected virtual void ServerDeploy (Weapon weapon) {
-		RpcUpdateUI (0, 0, weapon.name);
+		RpcUpdateAmmo (0);
+		RpcUpdateReservedAmmo (0);
 	}
 
 	[Client]
 	protected virtual void ClientDeploy (Weapon weapon) {
 		InstantiateModels (weapon);
 		UpdateCrosshair (weapon.showCrosshair);
+		UpdateName (weapon.name);
 	}
 
 	[Server]
@@ -84,12 +87,24 @@ public abstract class Handler : NetworkBehaviour {
 	protected abstract void ClientUpdate ();
 
 	[ClientRpc]
-	protected void RpcUpdateUI (int ammo, int reserved, string name) {
+	protected void RpcUpdateAmmo (int ammunition) {
+		if (!isLocalPlayer)
+			return;
+		PlayerHUD.Instance.WeaponAmmo = ammunition;
+	}
+
+	[ClientRpc]
+	protected void RpcUpdateReservedAmmo (int reservedAmmunition) {
+		if (!isLocalPlayer)
+			return;
+		PlayerHUD.Instance.WeaponReserve = reservedAmmunition;
+	}
+
+	[Client]
+	private void UpdateName (string name) {
 		if (!isLocalPlayer)
 			return;
 		PlayerHUD.Instance.WeaponName = name;
-		PlayerHUD.Instance.WeaponAmmo = ammo;
-		PlayerHUD.Instance.WeaponReserve = reserved;
 	}
 
 	[ClientRpc]

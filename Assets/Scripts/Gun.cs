@@ -25,7 +25,8 @@ public class Gun : Weapon {
 	public int penetrationPower = 1;
 	public int armorPenetration = 2;
 
-	public float reloadDuration = 2.5f;
+	public float clipReadyReloadDuration = 1.5f;
+	public float fireReadyReloadDuration = 2.5f;
 	public bool continuousReload = false;
 
 	public int bulletsPerShot = 1;
@@ -38,7 +39,10 @@ public class Gun : Weapon {
 	public GameObject bulletHolePrefab;
 	public GameObject bulletTracerPrefab;
 
-	// runtime properties
+	public AudioClip shoot;
+	public AudioClip reload;
+
+	// runtime persistent properties
 	[NonSerialized]
 	public int ammunitionInMagazine = 0;
 	[NonSerialized]

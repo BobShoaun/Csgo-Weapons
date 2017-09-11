@@ -7,22 +7,20 @@ using System;
 
 public class KnifeHandler : Handler {
 
-	// clients
+	// Client
 	private Animator animator;
 
 	private Vector3 position;
 	private Quaternion rotation;
 	private Transform knifeTransform;
 
-	// server
+	// Server
 	public Transform look;
 	private Knife knife;
 	private float nextAttackTime;
 
 	protected override Type WeaponType {
-		get {
-			return typeof (Knife);
-		}
+		get { return typeof (Knife); }
 	}
 
 	protected override void ClientKeep () {

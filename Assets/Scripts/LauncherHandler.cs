@@ -17,9 +17,7 @@ public class LauncherHandler : Handler {
 	private float nextFireTime = 0;
 
 	protected override Type WeaponType {
-		get {
-			return typeof (Launcher);
-		}
+		get { return typeof (Launcher); }
 	}
 
 	protected override void ServerDeploy (Weapon weapon) {
@@ -61,11 +59,6 @@ public class LauncherHandler : Handler {
 			//Quaternion.LookRotation (muzzle.up, muzzle.forward) 
 		}
 
-	}
-
-	[ClientRpc]
-	protected void RpcEnable (bool enable) {
-		enabled = enable;
 	}
 
 }

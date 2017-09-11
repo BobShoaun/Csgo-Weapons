@@ -18,6 +18,10 @@ public class GunHandler : Handler {
 	public GameObject bulletTracerPrefab;
 	public GameObject bulletHolePrefab;
 	public GameObject bloodSplatterPrefab;
+	private AudioSource audioSource;
+
+	// Both
+	private Gun gun;
 
 	// Server
 	[SerializeField]
@@ -28,7 +32,8 @@ public class GunHandler : Handler {
 	private float nextContinuousReloadTime = 0;
 	private float nextRecoilCooldownTime = 0;
 	private float nextRescopeTime = 0;
-	private float endReloadTime = 0;
+	private float endFireReadyReloadTime = 0;
+	private float endClipReadyReloadTime = 0;
 	private bool reloading = false;
 	private float innacuracy = 0;
 	private Vector3 recoilRotation;
@@ -37,15 +42,15 @@ public class GunHandler : Handler {
 	private int previousScopeState;
 	private bool rescopePending = false;
 
-	private Gun gun;
-
 	protected override Type WeaponType {
 		get { return typeof (Gun); }
 	}
 
-	[ServerCallback]
 	private void Start () {
-		initialSense = GetComponent<PlayerController> ().sensitivity;
+		if (isServer)
+			initialSense = GetComponent<PlayerController> ().sensitivity;
+		if (isClient)
+			audioSource = GetComponent<AudioSource> ();
 	}
 
 	protected override void ServerDeploy (Weapon weapon) {
@@ -56,18 +61,20 @@ public class GunHandler : Handler {
 		nextContinuousReloadTime = 0;
 		nextRecoilCooldownTime = 0;
 		nextRescopeTime = 0;
-		endReloadTime = 0;
+		endFireReadyReloadTime = 0;
 		reloading = false;
 		innacuracy = gun.baseInnacuracy;
 		scopeState = 0;
 		previousScopeState = 0;
 		rescopePending = false;
 
-		RpcUpdateUI (gun.ammunitionInMagazine, gun.reservedAmmunition, gun.Name);
+		RpcUpdateAmmo (gun.ammunitionInMagazine);
+		RpcUpdateReservedAmmo (gun.reservedAmmunition);
 	}
 
 	protected override void ClientDeploy (Weapon weapon) {
 		base.ClientDeploy (weapon);
+		gun = weapon as Gun;
 		if (isLocalPlayer)
 			firstPersonMuzzle = firstPersonViewmodel.GetGameObjectInChildren ("Muzzle").transform;
 		else
@@ -92,17 +99,21 @@ public class GunHandler : Handler {
 			gun.recoil.Reset ();
 		}
 
-		if (reloading && Time.time >= endReloadTime) { // RELOAD
-			int ammoToReload = gun.magazineCapacity - gun.ammunitionInMagazine;
-			if (gun.reservedAmmunition < ammoToReload) {
-				ammoToReload = gun.reservedAmmunition;
-				gun.reservedAmmunition = 0;
+		if (reloading) {
+			if (Time.time >= endClipReadyReloadTime) { // RELOAD CLIP
+				int ammoToReload = gun.magazineCapacity - gun.ammunitionInMagazine;
+				if (gun.reservedAmmunition < ammoToReload) {
+					ammoToReload = gun.reservedAmmunition;
+					gun.reservedAmmunition = 0;
+				}
+				else
+					gun.reservedAmmunition -= ammoToReload;
+				gun.ammunitionInMagazine += ammoToReload;
+				RpcUpdateAmmo (gun.ammunitionInMagazine);
+				RpcUpdateReservedAmmo (gun.reservedAmmunition);
 			}
-			else
-				gun.reservedAmmunition -= ammoToReload;
-			gun.ammunitionInMagazine += ammoToReload;
-			reloading = false;
-			RpcUpdateUI (gun.ammunitionInMagazine, gun.reservedAmmunition, gun.Name);
+			if (Time.time >= endFireReadyReloadTime) // END reload and can fire
+				reloading = false;
 		}
 
 		if (gun.smartScope && rescopePending && Time.time >= nextRescopeTime) { // RESCOPING
@@ -143,7 +154,7 @@ public class GunHandler : Handler {
 		nextFireTime = Time.time + 1 / gun.fireRate;
 		gun.ammunitionInMagazine--;
 		// The first reload after a shot takes the longest
-		nextContinuousReloadTime = Time.time + gun.reloadDuration * 3; 
+		nextContinuousReloadTime = Time.time + gun.fireReadyReloadDuration * 3; 
 		if (!gun.recoil.MoveNext ())
 			gun.recoil.Reset ();
 
@@ -214,24 +225,6 @@ public class GunHandler : Handler {
 					rigidbody.AddForceAtPosition (ray.direction * 30, raycastHit.point, ForceMode.Impulse);
 
 			}
-
-//
-//			if (Physics.Raycast (ray, out raycastHit, Mathf.Infinity)) {
-//				var part = raycastHit.collider.GetComponent<BodyPart> ();
-//				if (part)
-//					part.player.CmdTakeDamage (Gun.damage, part.bodyPartType, 
-//						gameObject, transform.position);
-//				else if (!raycastHit.collider.CompareTag ("Weapon")) {
-//					if (raycastHit.collider.GetComponent<NetworkIdentity> ())
-//						RpcSpawnBulletHoleWithParent (raycastHit.point, raycastHit.normal, raycastHit.collider.gameObject);
-//					else
-//						RpcSpawnBulletHole (raycastHit.point, raycastHit.normal);
-//				}
-//				Rigidbody rb = raycastHit.rigidbody;
-//				if (rb && rb.GetComponent<NetworkIdentity> () && !rb.isKinematic)
-//					rb.AddForceAtPosition (recoilTransform.forward * 30, raycastHit.point, ForceMode.Impulse);
-//			}
-
 			if (gun.ammunitionInMagazine % gun.tracerBulletInterval == 0) {
 				RpcSpawnTracer (ray.direction);
 			}
@@ -243,7 +236,7 @@ public class GunHandler : Handler {
 			rescopePending = true;
 		}
 		RpcFire (this.recoilRotation, gun.recoil.Direction);
-		RpcUpdateUI (gun.ammunitionInMagazine, gun.reservedAmmunition, gun.Name);
+		RpcUpdateAmmo (gun.ammunitionInMagazine);
 	}
 
 	[Server]
@@ -277,11 +270,12 @@ public class GunHandler : Handler {
 			return;
 		SetScopeState (0); // Unscope when reloading
 		if (gun.smartScope) { // If scope is smart then prepare for rescope
-			nextRescopeTime = Time.time + gun.reloadDuration;
+			nextRescopeTime = Time.time + gun.fireReadyReloadDuration;
 			rescopePending = true;
 		}
 		reloading = true;
-		endReloadTime = Time.time + gun.reloadDuration;
+		endClipReadyReloadTime = Time.time + gun.clipReadyReloadDuration;
+		endFireReadyReloadTime = Time.time + gun.fireReadyReloadDuration;
 		RpcReload ();
 	}
 
@@ -295,10 +289,11 @@ public class GunHandler : Handler {
 			return;
 		if (Time.time < nextContinuousReloadTime)
 			return;
-		nextContinuousReloadTime = Time.time + gun.reloadDuration;
+		nextContinuousReloadTime = Time.time + gun.fireReadyReloadDuration;
 		gun.reservedAmmunition--;
 		gun.ammunitionInMagazine++;
-		RpcUpdateUI (gun.ammunitionInMagazine, gun.reservedAmmunition, gun.Name);
+		RpcUpdateAmmo (gun.ammunitionInMagazine);
+		RpcUpdateReservedAmmo (gun.reservedAmmunition);
 	}
 
 
@@ -348,7 +343,8 @@ public class GunHandler : Handler {
 		view.FieldOfView = newFOV;
 		GetComponent<PlayerController> ().sensitivity = newSense;
 		PlayerHUD.Instance.scopeOverlay.SetActive (scoped);
-		firstPersonViewmodel.SetActive (!scoped);
+		if (firstPersonViewmodel)
+			firstPersonViewmodel.SetActive (!scoped);
 	}
 
 	[ClientRpc]
@@ -359,12 +355,18 @@ public class GunHandler : Handler {
 	[ClientRpc]
 	private void RpcReload () {
 		// TODO reload animation
+		if (audioSource) {
+			audioSource.clip = gun.reload;
+			audioSource.Play ();
+		}
 	}
 
 	[ClientRpc]
 	private void RpcFire (Vector3 recoilRotation, Vector3 recoilDirection) {
 		view.recoilTrackingRotation = recoilRotation;
 		view.PunchDirection = recoilDirection;
+		if (audioSource)
+			audioSource.PlayOneShot (gun.shoot);
 	}
 
 	[ClientRpc]
