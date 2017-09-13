@@ -3049,7 +3049,7 @@ GameObject:
   - component: {fileID: 1231853443}
   - component: {fileID: 1231853442}
   m_Layer: 0
-  m_Name: Player Better
+  m_Name: Player New 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5503,7 +5503,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2063235118}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: 'Player New '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
