@@ -9,15 +9,16 @@ public class View : MonoBehaviour {
 	[NonSerialized]
 	public float recoilTrackingScale = 0.45f;
 	[NonSerialized]
-	public float punchAmount = 1;
+	public float punchAmount = 0;
 	public float punchDecay = 1;
 
 	private new Camera camera;
-	public Vector2 recoilTrackingRotation;
+	public Vector3 recoilTrackingRotation;
 	private Vector3 punchRotation;
 	public Vector3 PunchDirection {
 		set { 
-			punchRotation += new Vector3 (-value.y, value.x) * punchAmount;
+			// TODO Consider adding to the punch Direction instead of setting it, might become smoother
+			punchRotation = new Vector3 (-value.y, value.x) * punchAmount;
 		}
 	}
 
@@ -38,8 +39,8 @@ public class View : MonoBehaviour {
 //		float angleY = recoilTransform.localEulerAngles.y;
 //		angleY = angleY > 180 ? angleY - 360 : angleY;
 		//Debug.Log (new Vector3 (angleX, angleY));
-		recoilTrackingRotation = Utility.ExponentialDecayTowards (recoilTrackingRotation, Vector3.zero, 1f, Time.deltaTime * 5f);
-		transform.localRotation = Quaternion.Euler (punchRotation + (Vector3) recoilTrackingRotation * recoilTrackingScale);
+		recoilTrackingRotation = Utility.ExponentialDecayTowards (recoilTrackingRotation, Vector3.zero, Mathf.Exp (-1), Time.deltaTime);
+		transform.localRotation = Quaternion.Euler (punchRotation + recoilTrackingRotation * recoilTrackingScale);
 		// TODO make this decay exponential
 		punchRotation = Vector3.MoveTowards (punchRotation, Vector3.zero, Time.deltaTime * punchDecay);
 	}

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using UnityRandom = UnityEngine.Random;
 
 [CreateAssetMenu]
 public class Gun : Weapon {
@@ -17,7 +18,6 @@ public class Gun : Weapon {
 	public float baseInnacuracy = 0;
 	public float accuracyDecay = 0.001f;
 
-	public float recoilScale = 50;
 	public float recoilCooldown = 0.25f;
 	public Recoil recoil;
 
@@ -58,26 +58,35 @@ public class Gun : Weapon {
 
 
 [Serializable]
-public class Recoil : IEnumerator<Vector2> {
+public class Recoil {
 	// TODO: make this class responsible for the innacuracy,
 	// and decay of it ?
+
+	// TODO condiser recoil without storing data but generating pseudo random directions with a seed
 
 	[SerializeField]
 	private AnimationCurve patternX;
 	[SerializeField]
 	private AnimationCurve patternY;
 	[SerializeField]
+	private int seed = 0;
+	[SerializeField]
+	private float scale = 50;
+	[SerializeField]
 	private bool random = false;
 
+	private System.Random randomGenerator;
 	private Vector2 [] pattern;
 	private int index;
 	private int [] randomIndices;
 
-	public bool MoveNext () {
-		return ++index < pattern.Length;
+	public void MoveNext () {
+		if (++index >= pattern.Length)
+			Reset ();
 	}
 
 	public void Reset () {
+		randomGenerator = new System.Random (seed);
 		index = -1;
 		if (random) {
 			randomIndices = new int [pattern.Length];
@@ -88,25 +97,28 @@ public class Recoil : IEnumerator<Vector2> {
 			}
 		}
 	}
-
-	object IEnumerator.Current {
-		get { return Current; }
-	}
-
-	public void Dispose () {
-
-	}
-
-	public Vector2 Next {
+		
+	private Vector2 Next {
 		get { 
 			int nextIndex = index + (index < pattern.Length - 1 ? 1 : 0);
 			return pattern [random ? randomIndices [nextIndex] : nextIndex];
 		}
 	}
 
-	public Vector2 Current {
+	private Vector2 Current {
 		get {
-			return pattern [random ? randomIndices [index] : index];
+			Vector2 direction = new Vector2 ((float) randomGenerator.NextDouble () * 2 - 1, 
+				1f).normalized;
+			return direction;
+		}
+		//get { return pattern [random ? randomIndices [index] : index]; }
+	}
+
+	public Vector3 Rotation {
+		get { 
+			Vector2 current = Current;
+			Debug.Log (current);
+			return new Vector3 (-current.y, current.x) * scale; 
 		}
 	}
 
@@ -119,6 +131,8 @@ public class Recoil : IEnumerator<Vector2> {
 	}
 
 	public void Initialize (int magAmmo) {
+		randomGenerator = new System.Random (seed);
+		//UnityRandom.InitState (seed);
 		pattern = new Vector2 [magAmmo];
 		float timeValue;
 		int i;

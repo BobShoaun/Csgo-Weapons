@@ -28,7 +28,6 @@ MonoBehaviour:
   reservedCapacity: 32
   baseInnacuracy: 0.05
   accuracyDecay: 0
-  recoilScale: 0
   recoilCooldown: 1
   recoil:
     patternX:
@@ -55,8 +54,14 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 0
+    seed: 0
+    scale: 10
     random: 0
-  reloadDuration: 0.5
+  range: 100
+  penetrationPower: 1
+  armorPenetration: 2
+  clipReadyReloadDuration: 0
+  fireReadyReloadDuration: 1
   continuousReload: 1
   bulletsPerShot: 8
   tracerBulletInterval: 1
@@ -67,3 +72,5 @@ MonoBehaviour:
     type: 2}
   bulletTracerPrefab: {fileID: 1788621936390712, guid: 8d0cdece92161c24d90549748d7cc20f,
     type: 2}
+  shoot: {fileID: 0}
+  reload: {fileID: 0}

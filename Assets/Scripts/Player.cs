@@ -18,9 +18,6 @@ public class Player : NetworkBehaviour {
 	public int kills = 0;
 	public int deaths = 0;
 	private bool isDead = false;
-	[SerializeField]
-	private Transform aim;
-	private Vector3 aimRotation;
 
 	public float testValue = 10;
 	public float time = 0;
@@ -68,10 +65,6 @@ public class Player : NetworkBehaviour {
 		testValue = DUtil.Decay (testValue, 0, 1, Time.deltaTime);
 		//testValue /= 2 * time;
 		//if (testValue > 0)
-
-		aimRotation = DUtil.ExponentialDecayTowards (aimRotation, Vector3.zero, 1f, Time.deltaTime * 5f);
-		aim.localRotation = Quaternion.Euler (aimRotation);
-
 	}
 
 	[Command]

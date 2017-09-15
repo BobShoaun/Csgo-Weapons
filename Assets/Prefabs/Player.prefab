@@ -408,6 +408,7 @@ GameObject:
   - component: {fileID: 114966763973976172}
   - component: {fileID: 114131981858514698}
   - component: {fileID: 114383539216060534}
+  - component: {fileID: 114964203038065422}
   - component: {fileID: 114846387171594086}
   - component: {fileID: 114918566923426996}
   - component: {fileID: 114545878552089196}
@@ -1709,7 +1710,6 @@ MonoBehaviour:
   health: 100
   kills: 0
   deaths: 0
-  aim: {fileID: 4998159600237738}
   testValue: 10
   time: 0
   shootableLayer:
@@ -1885,7 +1885,6 @@ MonoBehaviour:
   shootableLayer:
     serializedVersion: 2
     m_Bits: 4294964441
-  aim: {fileID: 4998159600237738}
 --- !u!114 &114962258396299914
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1898,6 +1897,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bodyPartType: 1
+--- !u!114 &114964203038065422
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1961750146996600}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9bd66496aaebc742b978bbd91bfb55f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  aim: {fileID: 4998159600237738}
 --- !u!114 &114965757139657734
 MonoBehaviour:
   m_ObjectHideFlags: 1

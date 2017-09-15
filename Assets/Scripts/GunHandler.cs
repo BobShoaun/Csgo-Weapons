@@ -26,8 +26,7 @@ public class GunHandler : Handler {
 	// Server
 	[SerializeField]
 	private LayerMask shootableLayer;
-	[SerializeField]
-	private Transform aim;
+	private Aim aim;
 	private float nextFireTime = 0;
 	private float nextContinuousReloadTime = 0;
 	private float nextRecoilCooldownTime = 0;
@@ -47,8 +46,10 @@ public class GunHandler : Handler {
 	}
 
 	private void Start () {
-		if (isServer)
+		if (isServer) {
+			aim = GetComponent<Aim> ();
 			initialSense = GetComponent<PlayerController> ().sensitivity;
+		}
 		if (isClient)
 			audioSource = GetComponent<AudioSource> ();
 	}
@@ -90,9 +91,9 @@ public class GunHandler : Handler {
 		if (gun.continuousReload)
 			ContinuousReload ();
 
-		recoilRotation = DUtil.ExponentialDecayTowards (recoilRotation, Vector3.zero, 1f, Time.deltaTime * 5f);
-		aim.localRotation = Quaternion.Euler (recoilRotation);
-		RpcRecoilCooldown (recoilRotation);
+		//recoilRotation = DUtil.ExponentialDecayTowards (recoilRotation, Vector3.zero, 1f, Time.deltaTime * 5f);
+		//aim.localRotation = Quaternion.Euler (recoilRotation);
+		//RpcRecoilCooldown (recoilRotation);
 
 		if (Time.time >= nextRecoilCooldownTime) { // RESET RECOIL AND ACCURACY
 			innacuracy = Mathf.MoveTowards (innacuracy, gun.baseInnacuracy, Time.deltaTime * 2);
@@ -154,26 +155,26 @@ public class GunHandler : Handler {
 		nextFireTime = Time.time + 1 / gun.fireRate;
 		gun.ammunitionInMagazine--;
 		// The first reload after a shot takes the longest
-		nextContinuousReloadTime = Time.time + gun.fireReadyReloadDuration * 3; 
-		if (!gun.recoil.MoveNext ())
-			gun.recoil.Reset ();
+		if (gun.continuousReload)
+			nextContinuousReloadTime = Time.time + gun.fireReadyReloadDuration * 3; 
+		gun.recoil.MoveNext ();
 
 		for (int i = 0; i < gun.bulletsPerShot; i++) {
 			// TODO get a better formula that factors in movement innacuracy, 
 			// for now it is just adding it linearly
 			innacuracy += gun.accuracyDecay;
 			nextRecoilCooldownTime = Time.time + gun.recoilCooldown;
-			var recoilRotation = new Vector3 (-gun.recoil.Current.y,
-				gun.recoil.Current.x) * gun.recoilScale;
-			this.recoilRotation += recoilRotation;
-			aim.localEulerAngles = this.recoilRotation;
+			//aim.localEulerAngles += recoilRotation;
+			aim.AddRotation (gun.recoil.Rotation);
+			//aim.localEulerAngles = this.recoilRotation;
 			//RaycastHit raycastHit;
 			//create ray with recoil and innacuracy applied
 			int damage = gun.damage; // dynamic damage, initialized with every shot with base damage, but will be changed by penetration
 			bool hitPlayer = false;
 			List<NetworkInstanceId> shotPlayers = new List<NetworkInstanceId> ();
-			Ray ray = new Ray (aim.position, 
-				aim.forward + UnityRandom.insideUnitSphere * innacuracy); 
+			Ray ray = new Ray (aim.Origin, 
+				//aim.Direction + UnityRandom.insideUnitSphere * innacuracy); 
+			aim.Direction); 
 
 			RaycastHit [] raycastHits = Physics.RaycastAll (ray, gun.range, shootableLayer).OrderBy (raycastHit => raycastHit.distance).ToArray ();
 			foreach (var raycastHit in raycastHits) {
@@ -235,7 +236,7 @@ public class GunHandler : Handler {
 			nextRescopeTime = nextFireTime;
 			rescopePending = true;
 		}
-		RpcFire (this.recoilRotation, gun.recoil.Direction);
+		//RpcFire (gun.recoil.Direction);
 		RpcUpdateAmmo (gun.ammunitionInMagazine);
 	}
 
@@ -362,11 +363,12 @@ public class GunHandler : Handler {
 	}
 
 	[ClientRpc]
-	private void RpcFire (Vector3 recoilRotation, Vector3 recoilDirection) {
-		view.recoilTrackingRotation = recoilRotation;
-		view.PunchDirection = recoilDirection;
+	private void RpcFire (Vector3 recoilDirection) {
 		if (audioSource)
 			audioSource.PlayOneShot (gun.shoot);
+		if (!isLocalPlayer)
+			return;
+		view.PunchDirection = recoilDirection;
 	}
 
 	[ClientRpc]

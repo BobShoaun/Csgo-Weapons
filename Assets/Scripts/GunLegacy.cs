@@ -475,20 +475,20 @@ public class GunLegacy : HeldWeapon {
 
 		nextContinuousReloadTime = Time.time + reloadDuration * 3;
 
-		if (!recoil.MoveNext ())
-			recoil.Reset ();
+//		if (!recoil.MoveNext ())
+//			recoil.Reset ();
 
 		for (int i = 0; i < bulletsPerShot; i++) {
 			
 			innacuracy += accuracyDecay;
 			nextRecoilCooldownTime = Time.time + recoilCooldown;
 
-			var recoilRotation = new Vector3 (-recoil.Current.y, recoil.Current.x) * recoilScale;
+			//var recoilRotation = new Vector3 (-recoil.Current.y, recoil.Current.x) * recoilScale;
 			//var recoilDirection = (recoil.Next - recoil.Current).normalized;
 			// TODO get a better formula that factors in movement innacuracy, 
 			// for now it is just adding it linearly
 			// = finalRecoil;
-			finalRecoil += recoilRotation;
+			//finalRecoil += recoilRotation;
 			//transition = false;
 			recoilTransform.localEulerAngles = finalRecoil;
 			//recoilTransform.localEulerAngles = (Vector3) recoilRotation;
