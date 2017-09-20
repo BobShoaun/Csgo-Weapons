@@ -171,8 +171,8 @@ public class GunHandler : Handler {
 			//create ray with recoil and innacuracy applied
 			int damage = gun.damage; // dynamic damage, initialized with every shot with base damage, but will be changed by penetration
 			bool hitPlayer = false;
-			List<NetworkInstanceId> shotPlayers = new List<NetworkInstanceId> ();
-			Ray ray = new Ray (aim.Origin, 
+			var shotPlayers = new List<NetworkInstanceId> ();
+			var ray = new Ray (aim.Origin, 
 				//aim.Direction + UnityRandom.insideUnitSphere * innacuracy); 
 			aim.Direction); 
 

@@ -107,6 +107,7 @@ public class Recoil {
 
 	private Vector2 Current {
 		get {
+			// TODO make first recoil at zero zero
 			Vector2 direction = new Vector2 ((float) randomGenerator.NextDouble () * 2 - 1, 
 				1f).normalized;
 			return direction;
