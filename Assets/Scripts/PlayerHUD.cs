@@ -34,8 +34,6 @@ public class PlayerHUD : SingletonMonoBehaviour<PlayerHUD> {
 	public GameObject crossHair;
 	public GameObject damageIndicator;
 
-	public Player player;
-
 	public string WeaponName {
 		set {
 			weaponName.text = value;
@@ -94,10 +92,11 @@ public class PlayerHUD : SingletonMonoBehaviour<PlayerHUD> {
 
 	public void SendChat (string msg) {
 		CloseChat ();
-		player.CmdSendChat (player.name + ": " + msg);
+		GameManager.Instance.SendChat (msg);
+		//player.CmdSendChat (player.name + ": " + msg);
 	}
 
-	public void ClientReceiveChat (string msg) {
+	public void ReceiveChat (string msg) {
 		GameObject chatObj = Instantiate (chatMessagePrefab, chatMessageList);
 		chatObj.GetComponent<Text> ().text = msg;
 		Destroy (chatObj, 20);
@@ -119,7 +118,8 @@ public class PlayerHUD : SingletonMonoBehaviour<PlayerHUD> {
 		healthPanel.SetActive (true);
 
 		//(GameManager.singleton as GameManager).CmdRespawn (player.gameObject);
-		player.CmdRespawn ();
+		//player.CmdRespawn ();
+		GameManager.Instance.CmdRespawn ();
 	}
 
 	public void UpdateHealth (int health) {
@@ -197,6 +197,14 @@ public class PlayerHUD : SingletonMonoBehaviour<PlayerHUD> {
 
 	public void SetRadarCam (Camera radarCam) {
 		radarCam.targetTexture = radar;
+	}
+
+	public void DisplayDamageIndicator (Vector3 forward, Vector3 direction) {
+		damageIndicator.SetActive (true);
+		StartCoroutine (DUtil.DelayedInvoke (() => damageIndicator.SetActive (false), 2));
+		damageIndicator.transform.rotation = 
+			Quaternion.Euler (Vector3.forward *
+				-Vector3.SignedAngle (transform.forward, direction, Vector3.up));
 	}
 		
 }

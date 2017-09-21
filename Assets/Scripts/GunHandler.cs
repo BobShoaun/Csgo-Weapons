@@ -157,7 +157,7 @@ public class GunHandler : Handler {
 		// The first reload after a shot takes the longest
 		if (gun.continuousReload)
 			nextContinuousReloadTime = Time.time + gun.fireReadyReloadDuration * 3; 
-		gun.recoil.MoveNext ();
+		//gun.recoil.MoveNext ();
 
 		for (int i = 0; i < gun.bulletsPerShot; i++) {
 			// TODO get a better formula that factors in movement innacuracy, 
@@ -297,7 +297,6 @@ public class GunHandler : Handler {
 		RpcUpdateReservedAmmo (gun.reservedAmmunition);
 	}
 
-
 	[Command]
 	private void CmdCycleScopeState () {
 		if (gun.scope == Gun.Scope.None)
@@ -383,7 +382,6 @@ public class GunHandler : Handler {
 
 	[ClientRpc]
 	private void RpcSpawnTracer (Vector3 direction) {
-
 		if (isLocalPlayer) {
 			if (firstPersonMuzzle == null)
 				print ("MUZZLE IS NULL");

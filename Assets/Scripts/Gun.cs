@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using UnityRandom = UnityEngine.Random;
+using Doxel.Utility.ExtensionMethods;
 
 [CreateAssetMenu]
 public class Gun : Weapon {
@@ -81,8 +82,8 @@ public class Recoil {
 	private int [] randomIndices;
 
 	public void MoveNext () {
-		if (++index >= pattern.Length)
-			Reset ();
+//		if (++index >= pattern.Length)
+//			Reset ();
 	}
 
 	public void Reset () {
@@ -97,19 +98,21 @@ public class Recoil {
 			}
 		}
 	}
-		
-	private Vector2 Next {
-		get { 
-			int nextIndex = index + (index < pattern.Length - 1 ? 1 : 0);
-			return pattern [random ? randomIndices [nextIndex] : nextIndex];
-		}
-	}
+//		
+//	private Vector2 Next {
+//		get { 
+//			int nextIndex = index + (index < pattern.Length - 1 ? 1 : 0);
+//			return pattern [random ? randomIndices [nextIndex] : nextIndex];
+//		}
+//	}
+
+	Vector2 direction;
 
 	private Vector2 Current {
 		get {
 			// TODO make first recoil at zero zero
-			Vector2 direction = new Vector2 ((float) randomGenerator.NextDouble () * 2 - 1, 
-				1f).normalized;
+			direction = new Vector2 (randomGenerator.NextSingle (-2, 2), 
+				2f).normalized;
 			return direction;
 		}
 		//get { return pattern [random ? randomIndices [index] : index]; }
@@ -119,17 +122,19 @@ public class Recoil {
 		get { 
 			Vector2 current = Current;
 			Debug.Log (current);
-			return new Vector3 (-current.y, current.x) * scale; 
+			return new Vector3 (-current.y, current.x) 
+				//* ((float)randomGenerator.NextDouble () * 2) 
+				* scale; 
 		}
 	}
 
-	public Vector2 Direction {
-		get { 
-			if (random)
-				return Next.normalized;
-			return (Next - Current).normalized;
-		}
-	}
+//	public Vector2 Direction {
+//		get { 
+//			if (random)
+//				return Next.normalized;
+//			return (Next - Current).normalized;
+//		}
+//	}
 
 	public void Initialize (int magAmmo) {
 		randomGenerator = new System.Random (seed);

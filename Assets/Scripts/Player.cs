@@ -27,7 +27,7 @@ public class Player : NetworkBehaviour {
 		base.OnStartLocalPlayer ();
 	
 		GetComponent<PlayerController> ().enabled = true;
-		PlayerHUD.Instance.player = this;
+		//PlayerHUD.Instance.player = this;
 		GameObject radarCam = gameObject.GetGameObjectInChildren ("Radar Camera", true);
 		radarCam.SetActive (true);
 		PlayerHUD.Instance.SetRadarCam (radarCam.GetComponent<Camera> ());
@@ -105,15 +105,7 @@ public class Player : NetworkBehaviour {
 		//print (Vector3.SignedAngle (transform.forward, damagerPos - transform.position, Vector3.up));
 		if (isLocalPlayer) {
 			PlayerHUD.Instance.UpdateHealth (health);
-
-			Vector3 dir = (damagerPos - transform.position).normalized;
-			//dir = transform.TransformDirection (dir);
-			float angle = 90 - (Mathf.Atan2 (dir.z, dir.x) * Mathf.Rad2Deg);
-			//print (angle);
-
-			PlayerHUD.Instance.damageIndicator.transform.rotation = 
-			Quaternion.Euler (Vector3.forward *
-				-Vector3.SignedAngle (transform.forward, damagerPos - transform.position, Vector3.up));// Quaternion.Euler (Vector3.forward * angle);
+			PlayerHUD.Instance.DisplayDamageIndicator (transform.forward, damagerPos - transform.position);
 		}
 	}
 
@@ -124,7 +116,8 @@ public class Player : NetworkBehaviour {
 
 	[ClientRpc]
 	private void RpcSendChat (string msg) {
-		PlayerHUD.Instance.ClientReceiveChat (msg);
+		if (isLocalPlayer)
+			PlayerHUD.Instance.ReceiveChat (msg);
 	}
 
 	[Server]
