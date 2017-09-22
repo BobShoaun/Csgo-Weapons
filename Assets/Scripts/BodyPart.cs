@@ -32,8 +32,8 @@ public class BodyPart : MonoBehaviour {
 		}
 	}
 
-	public void TakeDamage (int damage, GameObject damager, Vector3 damageSourcePosition) {
-		player.TakeDamage (CalculateDamage (damage), damager, damageSourcePosition, bodyPartType);
+	public void TakeDamage (int damage, GameObject damager, Vector3 damageSourcePosition, bool wallBang = false) {
+		player.TakeDamage (CalculateDamage (damage), damager, damageSourcePosition, bodyPartType == BodyPartType.Head, wallBang);
 	}
 
 }

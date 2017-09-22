@@ -171,6 +171,7 @@ public class GunHandler : Handler {
 			//create ray with recoil and innacuracy applied
 			int damage = gun.damage; // dynamic damage, initialized with every shot with base damage, but will be changed by penetration
 			bool hitPlayer = false;
+			bool wallBang = false;
 			var shotPlayers = new List<NetworkInstanceId> ();
 			var ray = new Ray (aim.Origin, 
 				//aim.Direction + UnityRandom.insideUnitSphere * innacuracy); 
@@ -189,7 +190,7 @@ public class GunHandler : Handler {
 						if (shotPlayers.Contains (bodyPart.NetId)) // shot the same player mroe than once, hit hand, then torso, then hand again
 							continue;
 						shotPlayers.Add (bodyPart.NetId);
-						bodyPart.TakeDamage (damage, gameObject, transform.position);
+						bodyPart.TakeDamage (damage, gameObject, transform.position, wallBang);
 						hitPlayer = true;
 						// DONE blood splatter behind
 					}
@@ -203,6 +204,7 @@ public class GunHandler : Handler {
 						// TODO spawn specific bullet hole for different materials
 						SpawnBulletHole (reverseRaycastHit.point, reverseRaycastHit.normal, reverseRaycastHit.collider.gameObject);
 						print ("HIT WALL " + raycastHit.collider.name + " with thickness " + thickness + " Damage reduced from " + gun.damage + " to " + damage);
+						wallBang = true;
 					}
 					SpawnBulletHole (raycastHit.point, raycastHit.normal, raycastHit.collider.gameObject);
 				}
@@ -214,6 +216,7 @@ public class GunHandler : Handler {
 						damage -= (int) (thickness / gun.penetrationPower * 5f);
 						SpawnBulletHole (reverseRaycastHit.point, reverseRaycastHit.normal, reverseRaycastHit.collider.gameObject);
 						print ("HIT WALL " + raycastHit.collider.name + " with thickness " + thickness + " Damage reduced from " + gun.damage + " to " + damage);
+						wallBang = true;
 					}
 					SpawnBulletHole (raycastHit.point, raycastHit.normal, raycastHit.collider.gameObject);
 					if (hitPlayer) {

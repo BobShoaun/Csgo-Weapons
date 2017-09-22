@@ -25,7 +25,7 @@ public class Player : NetworkBehaviour {
 
 	public override void OnStartLocalPlayer () {
 		base.OnStartLocalPlayer ();
-	
+
 		GetComponent<PlayerController> ().enabled = true;
 		//PlayerHUD.Instance.player = this;
 		GameObject radarCam = gameObject.GetGameObjectInChildren ("Radar Camera", true);
@@ -40,9 +40,7 @@ public class Player : NetworkBehaviour {
 
 	[ServerCallback]
 	private void Start () {
-		name = "Player " + netId;
-		RpcInitialize (name, health, kills, deaths);
-		RpcSendChat ("[Server]: " + name + " has joined the game");
+		RpcUpdateHealth (health);
 	}
 
 	private void Update () {
@@ -50,13 +48,14 @@ public class Player : NetworkBehaviour {
 		ServerUpdate ();
 	}
 
+
 	[ClientCallback]
 	private void ClientUpdate () {
 		if (!isLocalPlayer)
 			return;
 		if (Input.GetKeyDown (KeyCode.Z))
 			TakeDamage (20, gameObject, 
-				transform.position + Vector3.left * 10 + Vector3.forward * 10, BodyPartType.UpperTorso);
+				transform.position + Vector3.left * 10 + Vector3.forward * 10, false, false);
 	}
 
 	[ServerCallback]
@@ -84,12 +83,12 @@ public class Player : NetworkBehaviour {
 	}
 
 	[Server]
-	public void TakeDamage (int damage, GameObject damager, Vector3 damagerPos, BodyPartType bodyPartType) {
+	public void TakeDamage (int damage, GameObject damager, Vector3 damagerPos, bool headShot, bool wallBang) {
 		if (damage <= 0)
 			return;
 		health -= damage;
 		if (health <= 0)
-			Die (damager, bodyPartType);
+			Die (damager, headShot, wallBang);
 		RpcTakeDamage (health, damagerPos);
 	}
 
@@ -109,17 +108,6 @@ public class Player : NetworkBehaviour {
 		}
 	}
 
-	[Command]
-	public void CmdSendChat (string msg) {
-		RpcSendChat (msg);
-	}
-
-	[ClientRpc]
-	private void RpcSendChat (string msg) {
-		if (isLocalPlayer)
-			PlayerHUD.Instance.ReceiveChat (msg);
-	}
-
 	[Server]
 	private void OnKill () {
 		kills++;
@@ -128,13 +116,11 @@ public class Player : NetworkBehaviour {
 
 	[ClientRpc]
 	private void RpcOnKill (int kills) {
-		if (!isLocalPlayer)
-			return;
-		PlayerHUD.Instance.UpdateKills (netId, kills);
+		RpcUpdateKills (kills);
 	}
 
 	[Server]
-	private void Die (GameObject murderer, BodyPartType bdt) {
+	private void Die (GameObject murderer, bool headShot, bool wallBang) {
 		if (isDead)
 			return;
 		isDead = true;
@@ -143,17 +129,18 @@ public class Player : NetworkBehaviour {
 		deaths++;
 		GetComponent<WeaponManager> ().DropAllWeapons ();
 		gameObject.SetActive (false);
-		RpcDie (murderer, bdt, deaths);
+
+		GameManager.Instance.SendKillFeed (connectionToClient.connectionId, 
+			murderer.GetComponent<NetworkIdentity> ().connectionToClient.connectionId, 
+			headShot, wallBang);
+
+		RpcDie (murderer, deaths);
 	}
 
 	[ClientRpc]
-	private void RpcDie (GameObject murderer, BodyPartType bdt, int deaths) {
-		PlayerHUD.Instance.UpdateKillFeedList (bdt == BodyPartType.Head ?
-			murderer.name + " Head Shotted " + gameObject.name :
-			murderer.name + " Killed " + gameObject.name);
-
+	private void RpcDie (GameObject murderer, int deaths) {
+		RpcUpdateDeaths (deaths);
 		if (isLocalPlayer) {
-			PlayerHUD.Instance.UpdateDeaths (netId, deaths);
 			PlayerHUD.Instance.DisplayDeathUI (murderer);
 		}
 
@@ -203,7 +190,6 @@ public class Player : NetworkBehaviour {
 	[ClientRpc]
 	private void RpcSpawn (GameObject gameObject, GameObject parent) {
 		gameObject.transform.SetParent (parent.transform);
-
 	}
 
 	[Command]
@@ -227,16 +213,6 @@ public class Player : NetworkBehaviour {
 	}
 
 	[ClientRpc]
-	private void RpcInitialize (string name, int health, int kills, int deaths) {
-		// UI feeback when a player joins
-		this.name = name;
-		PlayerHUD.Instance.AddPlayerToScoreboard (GetComponent<NetworkIdentity> (), name, kills, deaths);
-		if (!isLocalPlayer)
-			return;
-		PlayerHUD.Instance.UpdateHealth (health);
-	}
-
-	[ClientRpc]
 	private void RpcUpdateHealth (int health) {
 		if (!isLocalPlayer)
 			return;
@@ -247,14 +223,14 @@ public class Player : NetworkBehaviour {
 	private void RpcUpdateKills (int kills) {
 		if (!isLocalPlayer)
 			return;
-		PlayerHUD.Instance.UpdateKills (netId, kills);
+		PlayerHUD.Instance.UpdateKills (connectionToClient.connectionId, kills);
 	}
 
 	[ClientRpc]
 	private void RpcUpdateDeaths (int deaths) {
 		if (!isLocalPlayer)
 			return;
-		PlayerHUD.Instance.UpdateDeaths (netId, deaths);
+		PlayerHUD.Instance.UpdateDeaths (connectionToClient.connectionId, deaths);
 	}
 
 }

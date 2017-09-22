@@ -93,7 +93,6 @@ public class PlayerHUD : SingletonMonoBehaviour<PlayerHUD> {
 	public void SendChat (string msg) {
 		CloseChat ();
 		GameManager.Instance.SendChat (msg);
-		//player.CmdSendChat (player.name + ": " + msg);
 	}
 
 	public void ReceiveChat (string msg) {
@@ -133,7 +132,7 @@ public class PlayerHUD : SingletonMonoBehaviour<PlayerHUD> {
 	private IEnumerator FlashSequence (bool direct) {
 
 		yield return new WaitForEndOfFrame ();
-		burntImage.texture = Capture ();
+		burntImage.texture = ScreenShot ();
 		burntImage.enabled = true;
 		flashOverlay.enabled = true;
 		if (direct) {
@@ -154,7 +153,7 @@ public class PlayerHUD : SingletonMonoBehaviour<PlayerHUD> {
 		burntImage.enabled = false;
 	}
 
-	private Texture Capture () {
+	private Texture ScreenShot () {
 		var result = new Texture2D (Screen.width, Screen.height, TextureFormat.RGB24, false);
 		result.ReadPixels (new Rect (0, 0, Screen.width, Screen.height), 0, 0);
 		result.Apply ();
@@ -171,26 +170,26 @@ public class PlayerHUD : SingletonMonoBehaviour<PlayerHUD> {
 		hoverPickup.text = string.Empty;
 	}
 
-	private Dictionary<NetworkInstanceId, ScoreUI> scoreUIs = new Dictionary<NetworkInstanceId, ScoreUI> ();
+	private Dictionary<int, ScoreUI> scoreUIs = new Dictionary<int, ScoreUI> ();
 
-	public void AddPlayerToScoreboard (NetworkIdentity netId, string name, int kills, int deaths) {
+	public void AddPlayerToScoreboard (int connectionId, string name, bool isLocalPlayer) {
 		ScoreUI score = Instantiate (scorePrefab, scoreList).GetComponent<ScoreUI> ();
-		scoreUIs.Add (netId.netId, score);
-		score.SetName (name, netId.isLocalPlayer);
-		score.Kills = kills;
-		score.Deaths = deaths;
+		scoreUIs.Add (connectionId, score);
+		score.SetName (name, isLocalPlayer);
+		score.Kills = 0;
+		score.Deaths = 0;
 	}
 
-	public void UpdateKills (NetworkInstanceId netId, int kills) {
+	public void UpdateKills (int connectionId, int kills) {
 		ScoreUI score;
-		if (scoreUIs.TryGetValue (netId, out score)) {
+		if (scoreUIs.TryGetValue (connectionId, out score)) {
 			score.Kills = kills;
 		}
 	}
 
-	public void UpdateDeaths (NetworkInstanceId netId, int deaths) {
+	public void UpdateDeaths (int connectionId, int deaths) {
 		ScoreUI score;
-		if (scoreUIs.TryGetValue (netId, out score)) {
+		if (scoreUIs.TryGetValue (connectionId, out score)) {
 			score.Deaths = deaths;
 		}
 	}
