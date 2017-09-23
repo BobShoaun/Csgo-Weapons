@@ -11,10 +11,13 @@ using DMat = Doxel.Environment.Material;
 
 public class GunHandler : Handler {
 
-	// Client
+
+	// Local
 	public View view;
-	private Transform thirdPersonMuzzle;
 	private Transform firstPersonMuzzle;
+	// Remote
+	private Transform thirdPersonMuzzle;
+	// Client
 	public GameObject bulletTracerPrefab;
 	public GameObject bulletHolePrefab;
 	public GameObject bloodSplatterPrefab;
@@ -170,8 +173,8 @@ public class GunHandler : Handler {
 			//RaycastHit raycastHit;
 			//create ray with recoil and innacuracy applied
 			int damage = gun.damage; // dynamic damage, initialized with every shot with base damage, but will be changed by penetration
-			bool hitPlayer = false;
 			bool wallBang = false;
+			bool bloodSplatterPending = false;
 			var shotPlayers = new List<NetworkInstanceId> ();
 			var ray = new Ray (aim.Origin, 
 				//aim.Direction + UnityRandom.insideUnitSphere * innacuracy); 
@@ -182,17 +185,14 @@ public class GunHandler : Handler {
 				DMat mat;
 				BodyPart bodyPart;
 				if (bodyPart = raycastHit.collider.GetComponent<BodyPart> ()) {
-					if (netId == bodyPart.NetId) {
-						// Hit itself
+					if (netId == bodyPart.NetId) // Hit itself
 						continue;
-					}
 					else {
 						if (shotPlayers.Contains (bodyPart.NetId)) // shot the same player mroe than once, hit hand, then torso, then hand again
 							continue;
 						shotPlayers.Add (bodyPart.NetId);
-						bodyPart.TakeDamage (damage, gameObject, transform.position, wallBang);
-						hitPlayer = true;
-						// DONE blood splatter behind
+						bodyPart.TakeDamage (damage, gameObject, transform.position, gun.Id, wallBang);
+						bloodSplatterPending = true;
 					}
 				}
 				else if (mat = raycastHit.collider.GetComponent<DMat> ()) {
@@ -219,10 +219,9 @@ public class GunHandler : Handler {
 						wallBang = true;
 					}
 					SpawnBulletHole (raycastHit.point, raycastHit.normal, raycastHit.collider.gameObject);
-					if (hitPlayer) {
-						hitPlayer = false;
+					if (bloodSplatterPending && raycastHit.distance < 5) // DONE blood splatter behind
 						RpcSpawnBloodSplatter (raycastHit.point, raycastHit.normal);
-					}
+					bloodSplatterPending = false;
 				}
 				Rigidbody rigidbody = raycastHit.rigidbody;
 				if (rigidbody && rigidbody.GetComponent<NetworkIdentity> ())
@@ -351,11 +350,6 @@ public class GunHandler : Handler {
 	}
 
 	[ClientRpc]
-	private void RpcRecoilCooldown (Vector3 recoilRotation) {
-		view.recoilTrackingRotation = recoilRotation;
-	}
-
-	[ClientRpc]
 	private void RpcReload () {
 		// TODO reload animation
 		if (audioSource) {
@@ -368,9 +362,8 @@ public class GunHandler : Handler {
 	private void RpcFire (Vector3 recoilDirection) {
 		if (audioSource)
 			audioSource.PlayOneShot (gun.shoot);
-		if (!isLocalPlayer)
-			return;
-		view.PunchDirection = recoilDirection;
+		if (isLocalPlayer)
+			view.PunchDirection = recoilDirection;
 	}
 
 	[ClientRpc]
@@ -390,8 +383,11 @@ public class GunHandler : Handler {
 				print ("MUZZLE IS NULL");
 			Instantiate (bulletTracerPrefab, firstPersonMuzzle.position, Quaternion.LookRotation (direction));
 		}
-		else
+		else {
+			if (thirdPersonMuzzle == null)
+				print ("THRED MUZZLE NULL!!");
 			Instantiate (bulletTracerPrefab, thirdPersonMuzzle.position, Quaternion.LookRotation (direction));
+		}
 	}
 
 	[ClientRpc]

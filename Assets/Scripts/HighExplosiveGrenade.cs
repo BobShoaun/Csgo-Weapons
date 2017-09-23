@@ -64,7 +64,7 @@ public class HighExplosiveGrenade : DroppedWeapon, IGrenade {
 				col.attachedRigidbody.AddExplosionForce (1000, transform.position, 5, 5);
 			BodyPart bodyPart;
 			if (bodyPart = col.GetComponent<BodyPart> ())
-				bodyPart.TakeDamage (50, playerPrimer.gameObject, transform.position);
+				bodyPart.TakeDamage (50, playerPrimer.gameObject, transform.position, 0);
 		}
 		Destroy (gameObject);
 	}

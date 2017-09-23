@@ -5,13 +5,14 @@ using UnityEngine.UI;
 using UnityEngine.Networking;
 using Doxel.Utility;
 using DUtil = Doxel.Utility.Utility;
+using System.Text;
 
 public class PlayerHUD : SingletonMonoBehaviour<PlayerHUD> {
 	
 	public GameObject gameOverPanel;
 	public GameObject healthPanel;
 	public Transform killFeedList;
-	public GameObject killFeedPrefab;
+	public Text killFeedPrefab;
 	public GameObject chatMessageInput;
 	public GameObject chatMessagePrefab;
 	public GameObject scorePrefab;
@@ -33,6 +34,7 @@ public class PlayerHUD : SingletonMonoBehaviour<PlayerHUD> {
 	public GameObject scopeOverlay;
 	public GameObject crossHair;
 	public GameObject damageIndicator;
+	public WeaponDatabase weaponDatabase;
 
 	public string WeaponName {
 		set {
@@ -106,10 +108,19 @@ public class PlayerHUD : SingletonMonoBehaviour<PlayerHUD> {
 		healthPanel.SetActive (false);
 	}
 
-	public void UpdateKillFeedList (string note) {
-		GameObject killFeed = Instantiate (killFeedPrefab, killFeedList);
-		killFeed.GetComponent<Text> ().text = note;
-		Destroy (killFeed, 10);
+	public void UpdateKillFeedList (string killed, string killer, string assist, int weaponId, bool headShot, bool wallBang) {
+		var killFeed = Instantiate (killFeedPrefab, killFeedList);
+		var killFeedText = new StringBuilder (killer);
+		if (assist != string.Empty)
+			killFeedText.Append (" + ").Append (assist);
+		killFeedText.Append (' ').Append (weaponDatabase [weaponId].Name);
+		if (wallBang)
+			killFeedText.Append (' ').Append ("WallBang");
+		if (headShot)
+			killFeedText.Append (' ').Append ("HeadShot");
+		killFeedText.Append (' ').Append (killed);
+		killFeed.text = killFeedText.ToString ();
+		Destroy (killFeed.gameObject, 10);
 	}
 		
 	public void PlayerRespawn () {
@@ -118,7 +129,7 @@ public class PlayerHUD : SingletonMonoBehaviour<PlayerHUD> {
 
 		//(GameManager.singleton as GameManager).CmdRespawn (player.gameObject);
 		//player.CmdRespawn ();
-		GameManager.Instance.CmdRespawn ();
+		GameManager.Instance.RespawnPlayer ();
 	}
 
 	public void UpdateHealth (int health) {
@@ -172,26 +183,37 @@ public class PlayerHUD : SingletonMonoBehaviour<PlayerHUD> {
 
 	private Dictionary<int, ScoreUI> scoreUIs = new Dictionary<int, ScoreUI> ();
 
-	public void AddPlayerToScoreboard (int connectionId, string name, bool isLocalPlayer) {
+	public void AddPlayerToScoreboard (int connectionId, string name, int kills, int assists, int deaths) {
 		ScoreUI score = Instantiate (scorePrefab, scoreList).GetComponent<ScoreUI> ();
 		scoreUIs.Add (connectionId, score);
-		score.SetName (name, isLocalPlayer);
-		score.Kills = 0;
-		score.Deaths = 0;
+		score.Name = name;
+		score.Kills = kills;
+		score.Assists = assists;
+		score.Deaths = deaths;
+	}
+
+	public void SetLocalPlayer (int connectionId) {
+		ScoreUI score;
+		if (scoreUIs.TryGetValue (connectionId, out score))
+			score.IsLocalPlayer = true;
 	}
 
 	public void UpdateKills (int connectionId, int kills) {
 		ScoreUI score;
-		if (scoreUIs.TryGetValue (connectionId, out score)) {
+		if (scoreUIs.TryGetValue (connectionId, out score))
 			score.Kills = kills;
-		}
 	}
 
 	public void UpdateDeaths (int connectionId, int deaths) {
 		ScoreUI score;
-		if (scoreUIs.TryGetValue (connectionId, out score)) {
+		if (scoreUIs.TryGetValue (connectionId, out score))
 			score.Deaths = deaths;
-		}
+	}
+
+	public void UpdateAssists (int connectionId, int assists) {
+		ScoreUI score;
+		if (scoreUIs.TryGetValue (connectionId, out score))
+			score.Assists = assists;
 	}
 
 	public void SetRadarCam (Camera radarCam) {

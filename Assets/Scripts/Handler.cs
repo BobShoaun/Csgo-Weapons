@@ -6,19 +6,21 @@ using UnityEngine.Networking;
 
 public abstract class Handler : NetworkBehaviour {
 
+	// Local
+	[SerializeField]
+	private Transform firstPersonMount;
+	protected GameObject firstPersonViewmodel;
+	// Remote
+	[SerializeField]
+	private Transform thirdPersonMount;
+	protected GameObject thirdPersonWeaponModel;
 	// Client
 	[SerializeField]
 	private WeaponDatabase weaponDatabase;
-	[SerializeField]
-	private Transform firstPersonMount;
-	[SerializeField]
-	private Transform thirdPersonMount;
-	protected GameObject firstPersonViewmodel;
-	protected GameObject thirdPersonWeaponModel;
 
 	// Both
 	[SyncVar (hook = "SetWeapon")]
-	private int WeaponId;
+	private int WeaponId = -1;
 
 	// Server
 	private Weapon weapon;

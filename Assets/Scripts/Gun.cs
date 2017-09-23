@@ -121,7 +121,6 @@ public class Recoil {
 	public Vector3 Rotation {
 		get { 
 			Vector2 current = Current;
-			Debug.Log (current);
 			return new Vector3 (-current.y, current.x) 
 				//* ((float)randomGenerator.NextDouble () * 2) 
 				* scale; 

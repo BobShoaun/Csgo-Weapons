@@ -102,7 +102,7 @@ public class LaserBeamerHandler : Handler {
 		if (Physics.Raycast (position, direction, out raycastHit, range, shootableLayer)) {
 			BodyPart bodyPart;
 			if (bodyPart = raycastHit.collider.GetComponent<BodyPart> ()) {
-				bodyPart.TakeDamage (laserBeamer.baseDamage, gameObject, transform.position);
+				bodyPart.TakeDamage (laserBeamer.baseDamage, gameObject, transform.position, laserBeamer.Id);
 				nextDamageIncreaseTime = Time.time + laserBeamer.damageIncreaseInterval;
 				if (nextDamageIncreaseTime >= Time.time) {
 					

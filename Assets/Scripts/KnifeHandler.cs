@@ -73,7 +73,7 @@ public class KnifeHandler : Handler {
 		if (Physics.Raycast (look.position, look.forward, out hit, 2)) {
 			var part = hit.collider.GetComponent<BodyPart> ();
 			if (part)
-				part.TakeDamage (knife.swingDamage, gameObject, transform.position);
+				part.TakeDamage (knife.swingDamage, gameObject, transform.position, knife.Id);
 		}
 		RpcSwing ();
 	}
@@ -87,7 +87,7 @@ public class KnifeHandler : Handler {
 		if (Physics.Raycast (look.position, look.forward, out hit, 2)) {
 			BodyPart bodyPart;
 			if (bodyPart = hit.collider.GetComponent<BodyPart> ())
-				bodyPart.TakeDamage (knife.stabDamage, gameObject, transform.position);
+				bodyPart.TakeDamage (knife.stabDamage, gameObject, transform.position, knife.Id);
 		}
 		RpcStab ();
 	}

@@ -6,7 +6,7 @@ using DUtil = Doxel.Utility.Utility;
 
 public class Aim : NetworkBehaviour {
 	 
-	// Client
+	// Local Player Client
 	private View view;
 
 	// Server
@@ -22,8 +22,8 @@ public class Aim : NetworkBehaviour {
 		get { return aim.forward; }
 	}
 
-	[ClientCallback]
-	private void Start () {
+	public override void OnStartLocalPlayer () {
+		base.OnStartLocalPlayer ();
 		view = GetComponentInChildren<View> ();
 	}
 
@@ -41,7 +41,8 @@ public class Aim : NetworkBehaviour {
 
 	[ClientRpc]
 	private void RpcSetViewRotation (Vector3 rotation) {
-		view.recoilTrackingRotation = rotation;
+		if (isLocalPlayer)
+			view.recoilTrackingRotation = rotation;
 	}
 
 }
