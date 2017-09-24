@@ -47,6 +47,8 @@ public abstract class Weapon : ScriptableObject, IIdentifiable {
 		get { return droppedPrefab; }
 	}
 		
+	public int price = 1000;
+	public int killReward = 300;
 	public float deployDuration = 1.5f;
 	public bool showCrosshair = true;
 

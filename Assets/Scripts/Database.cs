@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
+// Make this inherit frm IEnumerator or IEnumerable
 public abstract class Database<TElement> : ScriptableObject
 	where TElement : IIdentifiable {
 
+	// make this property virtual
 	[SerializeField]
 	protected TElement[] elements;
 
