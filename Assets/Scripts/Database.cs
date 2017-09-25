@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-// Make this inherit frm IEnumerator or IEnumerable
 public abstract class Database<TElement> : ScriptableObject, IEnumerable<TElement>
 	where TElement : IIdentifiable {
 

@@ -19,6 +19,7 @@ public class Player : NetworkBehaviour {
 	public int kills = 0;
 	public int deaths = 0;
 	public int assists = 0;
+	public int money = 10000;
 	private bool isDead = false;
 
 	public float testValue = 10;

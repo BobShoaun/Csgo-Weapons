@@ -10,9 +10,10 @@ public class GameManager : NetworkManager {
 	private Dictionary<int, Player> players = new Dictionary<int, Player> ();
 
 	// Both
-	private const short chatMessageType = 131;
-	private const short killFeedMessageType = 132;
-	private const short scoreboardMessageType = 133;
+	private const short chatMessageType = 100;
+	private const short killFeedMessageType = 101;
+	private const short scoreboardMessageType = 102;
+	private const short weaponPurchaseMessageType = 103;
 
 	public static GameManager Instance {
 		get { return singleton as GameManager; }
@@ -70,6 +71,7 @@ public class GameManager : NetworkManager {
 		client.RegisterHandler (chatMessageType, ReceiveChat);
 		client.RegisterHandler (killFeedMessageType, ReceiveKillFeed);
 		client.RegisterHandler (scoreboardMessageType, ReceiveScoreboardUpdate);
+		client.RegisterHandler (weaponPurchaseMessageType, ServerPurchaseWeapon);
 	}
 
 	public override void OnStopClient () {
@@ -77,16 +79,29 @@ public class GameManager : NetworkManager {
 		client.UnregisterHandler (chatMessageType);
 		client.UnregisterHandler (killFeedMessageType);
 		client.UnregisterHandler (scoreboardMessageType);
+		client.UnregisterHandler (weaponPurchaseMessageType);
 	}
 
+	/// <summary>
+	/// Send Chat Command to Server
+	/// </summary>
+	/// <param name="message">Message.</param>
 	public void SendChat (string message) {
 		client.Send (chatMessageType, new StringMessage (message));
 	}
 
+	/// <summary>
+	/// Client receives chat message from server
+	/// </summary>
+	/// <param name="networkMessage">Network message.</param>
 	private void ReceiveChat (NetworkMessage networkMessage) {
 		PlayerHUD.Instance.ReceiveChat (networkMessage.ReadMessage<StringMessage> ().value);
 	}
 
+	/// <summary>
+	/// Server transmit chat message to clients
+	/// </summary>
+	/// <param name="networkMessage">Network message.</param>
 	private void ServerRelayChat (NetworkMessage networkMessage) {
 		Player player;
 		if (players.TryGetValue (networkMessage.conn.connectionId, out player)) {
@@ -97,11 +112,8 @@ public class GameManager : NetworkManager {
 	}
 
 	public void Respawn (GameObject player) {
-
 		GameObject newPlayer = Instantiate (playerPrefab);
-
 		NetworkIdentity n = player.GetComponent<NetworkIdentity> ();
-
 		NetworkServer.ReplacePlayerForConnection (
 			n.connectionToClient, 
 			newPlayer,
@@ -150,6 +162,23 @@ public class GameManager : NetworkManager {
 		var msg = networkMessage.ReadMessage<ScoreboardMessage> ();
 		PlayerHUD.Instance.AddPlayerToScoreboard (msg.connectionId, msg.name, 
 			msg.kills, msg.assists, msg.deaths);
+	}
+
+	/// <summary>
+	/// Purchase Weapon Command from Client
+	/// </summary>
+	/// <param name="weapon">Weapon.</param>
+	public void PurchaseWeapon (Weapon weapon) {
+		client.Send (weaponPurchaseMessageType, new IntegerMessage (weapon.Id));
+	}
+
+	/// <summary>
+	/// Purchase Weapon on the Server
+	/// </summary>
+	/// <param name="networkMessage">Network message.</param>
+	private void ServerPurchaseWeapon (NetworkMessage networkMessage) {
+		int weaponId = networkMessage.ReadMessage<IntegerMessage> ().value;
+
 	}
 
 	private class KillFeedMessage : MessageBase {
