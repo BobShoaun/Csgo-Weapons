@@ -29,7 +29,4 @@ public class WeaponDatabase : Database<Weapon> {
 //		};
 //	}
 
-	private void Awake () {
-		//Resources.LoadAll<Weapon> ("
-	}
 }

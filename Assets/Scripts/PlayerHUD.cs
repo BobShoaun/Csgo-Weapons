@@ -8,7 +8,8 @@ using DUtil = Doxel.Utility.Utility;
 using System.Text;
 
 public class PlayerHUD : SingletonMonoBehaviour<PlayerHUD> {
-	
+
+	public GameObject shopMenu;
 	public GameObject gameOverPanel;
 	public GameObject healthPanel;
 	public Transform killFeedList;
@@ -81,7 +82,11 @@ public class PlayerHUD : SingletonMonoBehaviour<PlayerHUD> {
 		}
 		if (chatOpen && Input.GetKeyDown (KeyCode.Return)) {
 			SendChat (chatMessageInputField.text);
-		}
+		} 
+		if (Input.GetKeyDown (KeyCode.B) && !shopMenu.activeSelf)
+			shopMenu.SetActive (true);
+		else if (Input.GetKeyDown (KeyCode.B) || Input.GetKeyDown (KeyCode.Escape) && shopMenu.activeSelf)
+			shopMenu.SetActive (false);
 		scoreboard.SetActive (Input.GetKey (KeyCode.Tab));
 	}
 

@@ -1,14 +1,18 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 // Make this inherit frm IEnumerator or IEnumerable
-public abstract class Database<TElement> : ScriptableObject
+public abstract class Database<TElement> : ScriptableObject, IEnumerable<TElement>
 	where TElement : IIdentifiable {
 
-	// make this property virtual
 	[SerializeField]
-	protected TElement[] elements;
+	private TElement[] elements;
+
+	protected virtual IEnumerable<TElement> Elements { 
+		get { return elements; } 
+	}
 
 	public TElement this [int id] {
 		get {
@@ -40,6 +44,14 @@ public abstract class Database<TElement> : ScriptableObject
 		bool querySuccessful = ((element = Array.Find (elements, _element => _element.Name == name)) != null);
 		element = element != null ? element : default (TElement);
 		return querySuccessful;
+	}
+
+	public IEnumerator<TElement> GetEnumerator () {
+		return Elements.GetEnumerator ();
+	}
+
+	IEnumerator IEnumerable.GetEnumerator () {
+		return this.GetEnumerator ();
 	}
 
 }

@@ -18,7 +18,10 @@ public class Shop : MonoBehaviour {
 	private WeaponDatabase weaponDatabase;
 
 	private void Start () {
-		//weaponDatabase.
+		foreach (var weapon in weaponDatabase) {
+			Instantiate (weaponShopItemPrefab, weaponShopList).GetComponentInChildren<Text> ().text = 
+				weapon.name + '\n' + weapon.price;
+		}
 	}
 
 }

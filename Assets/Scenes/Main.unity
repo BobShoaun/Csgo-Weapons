@@ -3181,6 +3181,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09aeadb3a43c1ef4a820dc4c4db0e54c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  shopMenu: {fileID: 1364766830}
   gameOverPanel: {fileID: 1343415518}
   healthPanel: {fileID: 632536407}
   killFeedList: {fileID: 245887345}
@@ -3753,11 +3754,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be3a38b5ff3955149b0b311c9312000d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponInformation: {fileID: 0}
-  weaponImage: {fileID: 0}
-  weaponShopItemPrefab: {fileID: 0}
-  weaponShopList: {fileID: 0}
-  weaponDatabase: {fileID: 0}
+  weaponInformation: {fileID: 1937525522}
+  weaponImage: {fileID: 1483682312}
+  weaponShopItemPrefab: {fileID: 1009176110839460, guid: 0e9dd64fd08e3b645b62275140af63d2,
+    type: 2}
+  weaponShopList: {fileID: 958912292}
+  weaponDatabase: {fileID: 11400000, guid: 01ee59e264703fb4a8df04367d72a68a, type: 2}
 --- !u!114 &1364766833
 MonoBehaviour:
   m_ObjectHideFlags: 0
