@@ -19,6 +19,9 @@ public class GameManager : NetworkManager {
 		get { return singleton as GameManager; }
 	}
 
+	public enum GameMode { FreeForAllDeathMatch, BombScenarioMission, TeamDeathMatch, CaptureTheFlag }
+	public GameMode currentGameMode;
+
 	// Client
 	private Player localPlayer;
 	public Player LocalPlayer {
